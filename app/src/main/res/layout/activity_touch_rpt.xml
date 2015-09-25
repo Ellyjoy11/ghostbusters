@@ -1,0 +1,44 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:keepScreenOn="true"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp"
+    android:paddingTop="0dp"
+    android:paddingBottom="0dp"
+    android:background="#FFFFFF"
+    tools:context="com.motorola.ghostbusters.TouchRpt">
+
+    <com.motorola.ghostbusters.TouchReport
+        android:id="@+id/touchReport"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Quit"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:id="@+id/quit"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:onClick="onQuitClick"
+        android:alpha="0.5"
+        android:visibility="gone"/>
+<!--
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Gear"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        android:id="@+id/gear"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:onClick="onGearClick"
+        android:alpha="0.5"
+        android:visibility="gone"/>
+        -->
+
+</RelativeLayout>

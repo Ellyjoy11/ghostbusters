@@ -1,0 +1,195 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp"
+    android:paddingTop="0dp"
+    android:paddingBottom="0dp"
+    tools:context=".MainActivity">
+
+    <ImageButton
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginTop="4dp"
+        android:id="@+id/gearsButton"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:background="@android:color/transparent"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"
+        android:src="@drawable/gears"
+        android:onClick="onGearClick"
+        android:text="Gears"
+         />
+
+    <ImageButton
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="4dp"
+        android:id="@+id/addButton"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:background="@android:color/transparent"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"
+        android:text ="Add image"
+        android:onClick="onAddFile"
+
+         />
+
+    <ImageButton
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginRight="3dp"
+        android:layout_marginTop="4dp"
+        android:id="@+id/setButton"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/colors_icon"
+        android:background="@android:color/transparent"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"
+        android:text ="Select images"
+        android:onClick="onImSetClick"
+        />
+
+    <ImageView
+        android:id="@+id/logoView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:src="@drawable/ghostbusters_logo"/>
+
+<!--
+    <LinearLayout
+        android:id="@+id/line1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="6dp"
+        android:paddingRight="5.0dip" >
+
+        <TextView
+            android:id="@+id/stat1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="right"
+            android:text="@string/stat1"/>
+
+        <TextView
+            android:id="@+id/val1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingLeft="2dp"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/line2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/line1"
+        android:orientation="horizontal"
+        android:paddingRight="5.0dip" >
+
+        <TextView
+            android:id="@+id/stat2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="right"
+            android:text="@string/stat2"/>
+
+        <TextView
+            android:id="@+id/val2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingLeft="2dp"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/line3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/line2"
+        android:orientation="horizontal"
+        android:paddingRight="5.0dip" >
+
+        <TextView
+            android:id="@+id/stat3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="right"
+            android:text="@string/stat3"/>
+
+        <TextView
+            android:id="@+id/val3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingLeft="2dp"/>
+
+    </LinearLayout>
+    -->
+
+    <TextView
+        android:id="@+id/testInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/productInfo"
+        android:layout_centerHorizontal="true"
+        android:textStyle="bold"
+        />
+
+    <TextView
+        android:id="@+id/productInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/buttons"
+        android:layout_centerHorizontal="true"
+        android:textStyle="bold"
+        />
+
+    <LinearLayout
+        android:id="@+id/buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Touch Report"
+            android:id="@+id/buttonReport"
+            android:layout_weight="1"
+            android:onClick="onRptClick"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Display Test"
+            android:id="@+id/buttonDisplay"
+            android:layout_weight="1"
+            android:onClick="onDisplayTest" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Noise Profile"
+            android:id="@+id/buttonTest"
+            android:layout_weight="1"
+            android:onClick="onStartClick"
+            />
+
+    </LinearLayout>
+
+</RelativeLayout>

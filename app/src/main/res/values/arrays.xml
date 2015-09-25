@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="empty">
+
+    </string-array>
+
+<string-array name="drawablesArray720">
+    <item>0 - blackscreen_720</item>
+    <item>1 - whitescreen_720</item>
+    <item>2 - band1kw_720</item>
+    <item>3 - band2kw_720</item>
+    <item>4 - band3kw_720</item>
+    <item>5 - band4kw_720</item>
+    <item>6 - imb0_720</item>
+    <item>7 - imb1_720</item>
+    <item>8 - imb2_720</item>
+    <item>9 - imb3_720</item>
+    <item>10 - imb4_720</item>
+    <item>11 - imb5_720</item>
+    <item>12 - imb6_720</item>
+    <item>13 - bimb1w_720</item>
+    <item>14 - bimb2w_720</item>
+    <item>15 - bimb3w_720</item>
+    <item>16 - bimb4w_720</item>
+</string-array>
+
+<string-array name="drawablesValues720">
+    <item>blackscreen_720</item>
+    <item>whitescreen_720</item>
+    <item>band1kw_720</item>
+    <item>band2kw_720</item>
+    <item>band3kw_720</item>
+    <item>band4kw_720</item>
+    <item>imb0_720</item>
+    <item>imb1_720</item>
+    <item>imb2_720</item>
+    <item>imb3_720</item>
+    <item>imb4_720</item>
+    <item>imb5_720</item>
+    <item>imb6_720</item>
+    <item>bimb1w_720</item>
+    <item>bimb2w_720</item>
+    <item>bimb3w_720</item>
+    <item>bimb4w_720</item>
+</string-array>
+
+    <string-array name="drawablesDefaults720">
+        <item>blackscreen_720</item>
+        <item>whitescreen_720</item>
+        <item>band1kw_720</item>
+        <item>band2kw_720</item>
+        <item>band3kw_720</item>
+        <item>band4kw_720</item>
+        <item>imb0_720</item>
+        <item>imb1_720</item>
+        <item>imb2_720</item>
+        <item>imb3_720</item>
+        <item>imb4_720</item>
+        <item>imb5_720</item>
+        <item>imb6_720</item>
+        <item>bimb1w_720</item>
+        <item>bimb2w_720</item>
+        <item>bimb3w_720</item>
+        <item>bimb4w_720</item>
+    </string-array>
+
+    <string-array name="drawablesArray1080">
+        <item>0 - blackscreen_1080</item>
+        <item>1 - whitescreen_1080</item>
+        <item>2 - band1kw_1080</item>
+        <item>3 - band2kw_1080</item>
+        <item>4 - band3kw_1080</item>
+        <item>5 - band4kw_1080</item>
+        <item>6 - imb0_1080</item>
+        <item>7 - imb1_1080</item>
+        <item>8 - imb2_1080</item>
+        <item>9 - imb3_1080</item>
+        <item>10 - imb4_1080</item>
+        <item>11 - imb5_1080</item>
+        <item>12 - imb6_1080</item>
+        <item>13 - bimb1w_1080</item>
+        <item>14 - bimb2w_1080</item>
+        <item>15 - bimb3w_1080</item>
+        <item>16 - bimb4w_1080</item>
+        <item>17 - black1white1_1080</item>
+        <item>18 - black4white4_1080</item>
+    </string-array>
+
+    <string-array name="drawablesValues1080">
+        <item>blackscreen_1080</item>
+        <item>whitescreen_1080</item>
+        <item>band1kw_1080</item>
+        <item>band2kw_1080</item>
+        <item>band3kw_1080</item>
+        <item>band4kw_1080</item>
+        <item>imb0_1080</item>
+        <item>imb1_1080</item>
+        <item>imb2_1080</item>
+        <item>imb3_1080</item>
+        <item>imb4_1080</item>
+        <item>imb5_1080</item>
+        <item>imb6_1080</item>
+        <item>bimb1w_1080</item>
+        <item>bimb2w_1080</item>
+        <item>bimb3w_1080</item>
+        <item>bimb4w_1080</item>
+        <item>black1white1_1080</item>
+        <item>black4white4_1080</item>
+    </string-array>
+
+    <string-array name="drawablesDefaults1080">
+        <item>blackscreen_1080</item>
+        <item>whitescreen_1080</item>
+        <item>band1kw_1080</item>
+        <item>band2kw_1080</item>
+        <item>band3kw_1080</item>
+        <item>band4kw_1080</item>
+        <item>imb0_1080</item>
+        <item>imb1_1080</item>
+        <item>imb2_1080</item>
+        <item>imb3_1080</item>
+        <item>imb4_1080</item>
+        <item>imb5_1080</item>
+        <item>imb6_1080</item>
+        <item>bimb1w_1080</item>
+        <item>bimb2w_1080</item>
+        <item>bimb3w_1080</item>
+        <item>bimb4w_1080</item>
+        <item>black1white1_1080</item>
+        <item>black4white4_1080</item>
+    </string-array>
+
+    <string-array name="drawablesArray1440">
+        <item>0 - blackscreen_1440</item>
+        <item>1 - whitescreen_1440</item>
+        <item>2 - band1kw_1440</item>
+        <item>3 - band2kw_1440</item>
+        <item>4 - band4kw_1440</item>
+        <item>5 - blue2_1440</item>
+        <item>6 - imb0_1440</item>
+        <item>7 - imb1_1440</item>
+        <item>8 - imb2_1440</item>
+        <item>9 - imb3_1440</item>
+        <item>10 - imb4_1440</item>
+        <item>11 - imb5_1440</item>
+        <item>12 - imb6_1440</item>
+        <item>13 - bandimb1w_1440</item>
+        <item>14 - bandimb2w_1440</item>
+        <item>15 - bandimb4w_1440</item>
+    </string-array>
+
+    <string-array name="drawablesValues1440">
+        <item>blackscreen_1440</item>
+        <item>whitescreen_1440</item>
+        <item>band1kw_1440</item>
+        <item>band2kw_1440</item>
+        <item>band4kw_1440</item>
+        <item>blue2_1440</item>
+        <item>imb0_1440</item>
+        <item>imb1_1440</item>
+        <item>imb2_1440</item>
+        <item>imb3_1440</item>
+        <item>imb4_1440</item>
+        <item>imb5_1440</item>
+        <item>imb6_1440</item>
+        <item>bandimb1w_1440</item>
+        <item>bandimb2w_1440</item>
+        <item>bandimb4w_1440</item>
+    </string-array>
+
+    <string-array name="drawablesDefaults1440">
+        <item>blackscreen_1440</item>
+        <item>whitescreen_1440</item>
+        <item>band1kw_1440</item>
+        <item>band2kw_1440</item>
+        <item>band4kw_1440</item>
+        <item>blue2_1440</item>
+        <item>imb0_1440</item>
+        <item>imb1_1440</item>
+        <item>imb2_1440</item>
+        <item>imb3_1440</item>
+        <item>imb4_1440</item>
+        <item>imb5_1440</item>
+        <item>imb6_1440</item>
+        <item>bandimb1w_1440</item>
+        <item>bandimb2w_1440</item>
+        <item>bandimb4w_1440</item>
+    </string-array>
+
+</resources>
