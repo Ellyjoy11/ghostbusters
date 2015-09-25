@@ -12,6 +12,22 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
+    <ImageView
+        android:id="@+id/oopsView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        />
+
+    <TextView
+        android:id="@+id/oopsText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textSize="20dp"
+        android:textStyle="italic"
+        />
+
 <!--
     <TextView
         android:layout_width="wrap_content"
@@ -24,7 +40,7 @@
         android:id="@+id/statColumns"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/infoText"
         android:orientation="horizontal">
 
         <TextView

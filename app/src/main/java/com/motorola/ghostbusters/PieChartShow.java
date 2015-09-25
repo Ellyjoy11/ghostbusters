@@ -5,12 +5,15 @@ import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class PieChartShow extends Activity {
     TextView stView4, stView5;
     MyPie pieView;
     TextView touchInfo;
+    TextView oopsText;
+    ImageView oopsView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +25,8 @@ public class PieChartShow extends Activity {
     @Override
     public void onResume() {
         super.onResume();
+
+        //pieView.arrangeArrays(MainActivity.mDevice.diagGearCount);
 
         String stats[] = MainActivity.mDevice.diagStats();
         String value1 = "";
@@ -37,12 +42,21 @@ public class PieChartShow extends Activity {
         }
 
         /////////////End of read stats////////
-        TextView stView4 = (TextView) findViewById(R.id.stat1);
-        stView4.setMovementMethod(new ScrollingMovementMethod());
-        stView4.setText(value1);
-        TextView stView5 = (TextView) findViewById(R.id.stat2);
-        stView5.setMovementMethod(new ScrollingMovementMethod());
-        stView5.setText(value2);
+        if (!value1.isEmpty()) {
+            TextView stView4 = (TextView) findViewById(R.id.stat1);
+            stView4.setMovementMethod(new ScrollingMovementMethod());
+            stView4.setText(value1);
+            TextView stView5 = (TextView) findViewById(R.id.stat2);
+            stView5.setMovementMethod(new ScrollingMovementMethod());
+            stView5.setText(value2);
+        } else {
+            TextView oopsText = (TextView) findViewById(R.id.oopsText);
+            ImageView oopsView = (ImageView) findViewById(R.id.oopsView);
+
+            //TODO set image and text randomly
+            oopsText.setText("Oops, there are no statistics data for touch in this build...");
+            oopsView.setImageResource(R.drawable.no_stats_1);
+        }
 
         touchInfo = (TextView) findViewById(R.id.infoText);
         String textToShowAtBottom = "Product: " + MainActivity.productInfo + "  Config: " + MainActivity.getTouchCfg();
