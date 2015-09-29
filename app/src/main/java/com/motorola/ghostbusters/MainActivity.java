@@ -575,6 +575,10 @@ public class MainActivity extends Activity {
     public static String getPanelType() {
         //TODO
         String panel = readFile("/sys/class/graphics/fb0/panel_supplier");
+        String tmpVersion = readFile("/sys/class/graphics/fb0/panel_ver");
+        if (!panel.isEmpty() && !tmpVersion.isEmpty()) {
+            panel += "-v" + tmpVersion.substring(tmpVersion.length() - 3, tmpVersion.length() - 2); // begin index inclusive, end index exclusive!!!
+        }
         return panel;
     }
 
@@ -903,36 +907,7 @@ public class MainActivity extends Activity {
     }
 
     public void onDisplayTest(View view) {
-        /*
-            AlertDialog.Builder builder = new AlertDialog.Builder((new ContextThemeWrapper(this, R.style.Theme_CustDialog)));
-            builder.setMessage(
-                    "The only way to stop display test - \n"
-                            + "is to reboot your phone. \n" +
-            "Start anyway?")
-                    .setTitle("Be careful!");
 
-            builder.setPositiveButton("OK, run the test!",
-                    new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent intent = new Intent(getApplicationContext(),
-                                    com.motorola.ghostbusters.DisplayTest.class);
-                            startActivity(intent);
-                        }
-                    });
-            builder.setNegativeButton("Back",
-                    new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
-        */
         Intent intent = new Intent(getApplicationContext(),
                 com.motorola.ghostbusters.DisplayTest.class);
         startActivity(intent);
