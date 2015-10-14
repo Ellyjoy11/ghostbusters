@@ -33,7 +33,8 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends Activity {
-    public static final String ABOUT_TITLE = "\u00a9 2015 TBD";
+    public static final String ABOUT_TITLE = "\u00a9 Motorola Hackathon 2015\n" +
+            "Igor Kovalenko\nElena Last\nAlex Filonenko\nKonstantin Makariev";
     public static String ABOUT_VERSION;
     private final static String TAG = "Ghostbusters";
     private int ROWS;// = 1000;
@@ -400,7 +401,7 @@ public class MainActivity extends Activity {
             return true;
         }
         if (item.getItemId() == R.id.about) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.Theme_CustDialog));
 
             builder.setMessage(ABOUT_TITLE).setTitle(
                     ABOUT_VERSION);
