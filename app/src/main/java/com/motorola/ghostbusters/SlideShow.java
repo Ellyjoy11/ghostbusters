@@ -107,12 +107,13 @@ public class SlideShow extends Activity {
         public void handleMessage (Message msg) {
                 //super.handleMessage(msg);
                 //TODO
+                //Log.d(TAG, "Handler's got message to process");
                 if (msg.what < CYCLES) {
                     //try {
                     //imReadySemaphore.acquire();
 
                     imCounter = msg.what;
-                    Log.d(TAG, "image counter = " + imCounter);
+                    //Log.d(TAG, "image counter = " + imCounter);
                     if (mCheck != imCounter || imCounter == 0) {
                         mFlipper.removeAllViews();
 
@@ -137,10 +138,10 @@ public class SlideShow extends Activity {
                         if (imCounter < standardImgMap.length) {// && standardImgMap[imCounter][1].equals("1")) {
                             setFlipperImages(imCounter, false);
 
-                            Log.d(TAG, "set image in map " + imCounter + ": " + standardImgMap[imCounter][0]);
+                            //Log.d(TAG, "set image in map " + imCounter + ": " + standardImgMap[imCounter][0]);
                         }
 
-                        Log.d(TAG, "image ready, setting it on display");
+                        //Log.d(TAG, "image ready, setting it on display");
                         mFlipper.setDisplayedChild(0);
 
                         //lineToDraw = msg.what+1;
@@ -152,7 +153,7 @@ public class SlideShow extends Activity {
                         mCheck = imCounter;
                         imReadySemaphore.release();
                         tmpCount++;
-                        Log.d(TAG, "semaphore is released after image " + imCounter);
+                        //Log.d(TAG, "semaphore is released after image " + imCounter);
                     }
                 }
 
@@ -164,7 +165,7 @@ public class SlideShow extends Activity {
                     //myView.setCycles(CYCLES);
                     myView.invalidate();
                     imReadySemaphore.release();
-                    Log.d(TAG, "semaphore is released after progress update " + lineToDraw + " / " + ACTUAL_NUM * (MainActivity.gearsCount+1));
+                    //Log.d(TAG, "semaphore is released after progress update " + lineToDraw + " / " + ACTUAL_NUM * (MainActivity.gearsCount+1));
                 }
 
                  else if (msg.what == FINISH) {
@@ -232,7 +233,7 @@ public class SlideShow extends Activity {
 
             CYCLES = MainActivity.standardEntries;
 
-        Log.d(TAG, "cycles = " + CYCLES + "; act/num " + ACTUAL_NUM);
+        //Log.d(TAG, "cycles = " + CYCLES + "; act/num " + ACTUAL_NUM);
         if (addCustom) {
             customPath = userPref.getString("custom_path", "");
             addCustomImages(customPath);
@@ -248,12 +249,12 @@ public class SlideShow extends Activity {
             ACTUAL_NUM += 1;
         }
 
-        Log.d(TAG, "isDone and isStopped: " + isDone + " / " + isStopped);
+        //Log.d(TAG, "isDone and isStopped: " + isDone + " / " + isStopped);
 
         if (standardImgMap == null || mMaxIm == null || CYCLES > mMaxIm.length
                 || (imgUri != null && !imgUriDone.equals(imgUri)) || isStopped
                 || samplesDone != samples || gearsSetDone != gearsSet) {
-            Log.d(TAG, "we are here, cycles = " + CYCLES);
+            //Log.d(TAG, "we are here, cycles = " + CYCLES);
             isStopped = false;
             SharedPreferences.Editor editor = userPref.edit();
             editor.putBoolean("isStop", isStopped);
@@ -298,7 +299,7 @@ public class SlideShow extends Activity {
 
         //mFlipper.setDisplayedChild(0);
 
-        Log.d(TAG, "init cycles " + CYCLES);
+        //Log.d(TAG, "init cycles " + CYCLES);
         lineToDraw = c;
         myView.setProgress(lineToDraw);
         myView.setCycles(ACTUAL_NUM * (MainActivity.gearsCount+1));
@@ -340,7 +341,7 @@ public class SlideShow extends Activity {
         ArrayList<String> imgs = new ArrayList<String>();
         imgs.clear();
         for (int i=0; i<MainActivity.standardEntries; i++) {
-            Log.d(TAG, "..." + MainActivity.standardImgMap[i][1]);
+            //Log.d(TAG, "..." + MainActivity.standardImgMap[i][1]);
             if (MainActivity.standardImgMap[i][1].equals("1")) {
                 imgCount++;
                 imgs.add(MainActivity.standardImgMap[i][0]);
@@ -383,10 +384,10 @@ public class SlideShow extends Activity {
             }
         }
         String imgMask = new StringBuilder(maskAsBinaryString).reverse().toString();
-        Log.d(TAG, "string mask for images: " + maskAsBinaryString + "; length is " + maskAsBinaryString.length());
+        //Log.d(TAG, "string mask for images: " + maskAsBinaryString + "; length is " + maskAsBinaryString.length());
         int decimal = Integer.parseInt(imgMask,2);
         imgMaskAsString = "0x" + Integer.toString(decimal, 16);
-        Log.d(TAG, "try to save mask as hex: " + imgMask + " -> " + imgMaskAsString);
+        //Log.d(TAG, "try to save mask as hex: " + imgMask + " -> " + imgMaskAsString);
         return imgMaskAsString;
     }
 
@@ -418,7 +419,7 @@ public class SlideShow extends Activity {
             Log.d(TAG, "bitmap is processed, alloc size is " + mBitmap.getAllocationByteCount());
             //Log.d(TAG, "bitmap is processed, size in bytes is " + mBitmap.getByteCount());
             mImage.setImageBitmap(mBitmap);
-
+            //mImage.setScaleType(ImageView.ScaleType.MATRIX);
         }
         mFlipper.addView(mImage);
         //Log.d(TAG, "images in flipper: " + mFlipper.getChildCount());
@@ -605,11 +606,12 @@ public class SlideShow extends Activity {
 
                         msg = mHandler.obtainMessage(i);
                         mHandler.sendMessage(msg);
-                        Log.d(TAG, "sent request to change image");
+                        //Log.d(TAG, "sent request to change image");
                         imReadySemaphore.acquire();
 
                         if (needSleep){
                             try {
+                                Log.d(TAG, "Pause 10 s before running the test");
                                 Thread.sleep(10000);
 
                             } catch (InterruptedException e) {
@@ -622,11 +624,11 @@ public class SlideShow extends Activity {
 
                             msg = mHandler.obtainMessage(gear+1000);
                             mHandler.sendMessage(msg);
-                            Log.d(TAG, "sent request to change progress");
+                            //Log.d(TAG, "sent request to change progress");
                             imReadySemaphore.acquire();
 
                             if (gear == 0) {
-                                Log.d(TAG, "sleeping to get image on screen...");
+                                //Log.d(TAG, "sleeping 2 s to get image on screen...");
                                 try {
                                     Thread.sleep(2000);
 
@@ -635,11 +637,25 @@ public class SlideShow extends Activity {
                                 }
                             }
 
-                            Log.d(TAG, "start test for gear " + gear);
+                            //Log.d(TAG, "start test for gear " + gear);
                             if (gear < MainActivity.gearsCount && String.valueOf(MainActivity.gearsEnabled[gear]).equals("0")) {
                                 continue;
                             } else {
                                 if (gear == MainActivity.gearsCount) {
+                                    int tmpMinValue = mMaxIm[i][0];
+                                    int bestGear = 0;
+                                    for (int ll=1; ll < gear; ll++) {
+                                        if (String.valueOf(MainActivity.gearsEnabled[ll]).equals("1") &&
+                                                (mMaxIm[i][ll] < tmpMinValue ||
+                                                String.valueOf(MainActivity.gearsEnabled[bestGear]).equals("0"))) {
+                                            tmpMinValue = mMaxIm[i][ll];
+                                            bestGear = ll;
+                                        } else {
+                                            continue;
+                                        }
+                                    }
+                                    TouchDevice.diagGearSelect(bestGear);
+                                    Log.d(TAG, "Switch to best gear before auto test: Gear " + bestGear);
                                     TouchDevice.diagGearAuto(0);
                                 } else {
                                     TouchDevice.diagGearAuto(1);
@@ -683,7 +699,9 @@ public class SlideShow extends Activity {
 
                             }
                             */
+                            //Log.d(TAG, "getting data using diagDeltaPeaks for " + samples + " samples");
                             maxmin = MainActivity.mDevice.diagDeltaPeaks(samples);
+                            //Log.d(TAG, "getting max and min from data");
                             mMaxIm[i][gear] = maxmin / 65536;
                             mMinIm[i][gear] = maxmin % 65536;
 
@@ -692,12 +710,12 @@ public class SlideShow extends Activity {
                         }
                         if (i < standardImgMap.length) {
                             standardImgMap[i][2] = "1";
-                            Log.d(TAG, "Setting tested value to true for image " + i);
+                            //Log.d(TAG, "Setting tested value to true for image " + i);
                         }
                     } else if (i < standardImgMap.length && (standardImgMap[i][1].equals("0")
                             && standardImgMap[i][2].equals("0"))) {
                         standardImgMap[i][2] = "0";
-                        Log.d(TAG, "Setting tested value to false for image " + i);
+                        //Log.d(TAG, "Setting tested value to false for image " + i);
                     }
                 } catch (InterruptedException e) {
                     //Log.d(TAG, "interrupt");
