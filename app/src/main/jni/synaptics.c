@@ -36,6 +36,12 @@ int fd_powerIMl = -1;
 int fd_powerIMm = -1;
 int fd_coherentIMl = -1;
 int fd_coherentIMm = -1;
+int fd_reset = -1;
+int fd_status = -1;
+int fd_report_type = -1;
+int fd_get_report = -1;
+int fd_report_size = -1;
+int fd_report_data = -1;
 
 int SatCap = 0;
 int Threshold = 0;
@@ -43,10 +49,12 @@ int frameTx = 0;
 int frameRx = 0;
 int gearCount = 0;
 jshort *fill = NULL;
-char *dpath;
+const char *dpath;
 
-int sloc_interleaved = 0;
+int sloc_panel = 0;
 int receivers_on_x = 0;
+int dimX = 0;
+int dimY = 0;
 
 // opens all required files internally and inticates success/error
 JNIEXPORT int JNICALL
@@ -65,11 +73,138 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 	}
 
 	LOGE("TOUCH DEVICE path = %s\n", dpath);
-	sprintf(path, "%s/f54/c95_disable", dpath);
+	sprintf(path, "%s/f54/num_of_mapped_tx", dpath);
+	fd = open(path, O_RDONLY);
+	if (fd < 0) {
+		printf("failed to open num_of_mapped_tx\n");
+		return -1;
+	}
+	read(fd, val, 6);
+	frameTx = atoi(val);
+
+	sprintf(path, "%s/f54/num_of_mapped_rx", dpath);
+	fd = open(path, O_RDONLY);
+	if (fd < 0) {
+		printf("failed to open num_of_mapped_rx\n");
+		return -1;
+	}
+	read(fd, val, 6);
+	frameRx = atoi(val);
+
+	fill = malloc(frameTx*frameRx*sizeof(short));
+	if (fill == NULL) return -1;
+	printf("%s: allocated %dx%d array of shorts @ %p\n", __FUNCTION__, frameTx, frameRx, fill);
+
+	sprintf(path, "%s/f54/f55_q2_has_single_layer_multitouch", dpath);
+	fd = open(path, O_RDONLY);
+	if (fd < 0) {
+		printf("failed to open f55_q2_has_single_layer_multitouch\n");
+		return -1;
+	}
+	read(fd, val, 6);
+	close(fd);
+	sloc_panel = atoi(val);
+	printf("sloc panel = %d\n", sloc_panel);
+
+	sprintf(path, "%s/f54/f55_c0_receivers_on_x", dpath);
+	fd = open(path, O_RDONLY);
+	if (fd < 0) {
+		printf("failed to open f55_c0_receivers_on_x\n");
+		return -1;
+	}
+	read(fd, val, 6);
+	close(fd);
+	receivers_on_x = atoi(val);
+	printf("receivers on x = %d\n", receivers_on_x);
+
+	if (sloc_panel) {
+	    dimX = frameTx * 2;
+	    dimY = frameRx / 2;
+	 }
+	 else if (receivers_on_x) {
+	    dimX = frameTx;
+	    dimY = frameRx;
+	 }
+	 else {
+	    dimX = frameRx;
+	    dimY = frameTx;
+	 }
+
+	sprintf(path, "%s/f54/reset", dpath);
+	fd_reset = open(path, O_RDWR);
+	if (fd_reset < 0) {
+		printf("failed to open reset\n");
+		return -1;
+	}
+
+	sprintf(path, "%s/f54/status", dpath);
+    fd_status = open(path, O_RDONLY);
+    if (fd_status < 0) {
+    	printf("failed to open status\n");
+    	return -1;
+    }
+
+    sprintf(path, "%s/f54/report_type", dpath);
+    fd_report_type = open(path, O_RDWR);
+    if (fd_report_type < 0) {
+      	printf("failed to open report_type\n");
+      	return -1;
+    }
+
+	sprintf(path, "%s/f54/get_report", dpath);
+    fd_get_report = open(path, O_RDWR);
+    if (fd_get_report < 0) {
+    	printf("failed to open get_report\n");
+        return -1;
+    }
+
+    sprintf(path, "%s/f54/report_size", dpath);
+    fd_report_size = open(path, O_RDONLY);
+    if (fd_report_size < 0) {
+    	printf("failed to open report_size\n");
+    	return -1;
+    }
+
+    sprintf(path, "%s/f54/report_data", dpath);
+    fd_report_data = open(path, O_RDONLY);
+    if (fd_report_data < 0) {
+    	printf("failed to open report_data\n");
+    	return -1;
+    }
+
+	sprintf(path, "%s/f54/saturation_cap", dpath);
+	fd_satCap = open(path, O_RDWR);
+	if (fd_satCap < 0) {
+		printf("failed to open saturation_cap\n");
+		return -1;
+	}
+
+	sprintf(path, "%s/f54/force_update", dpath);
+	fd_forceUpdate = open(path, O_RDWR);
+	if (fd_forceUpdate < 0) {
+		printf("failed to open force_update\n");
+		return -1;
+	}
+
+	sprintf(path, "%s/query", dpath);
+	fd_query = open(path, O_RDWR);
+	if (fd_query < 0) {
+		printf("failed to open query\n");
+		return -1;
+	}
+
+	sprintf(path, "%s/reporting", dpath);
+	fd_reporting = open(path, O_RDWR);
+	if (fd_reporting < 0) {
+		printf("failed to open reporting\n");
+		return -1;
+	}
+
+sprintf(path, "%s/f54/c95_disable", dpath);
 	fd_gearsEnabled = open(path, O_RDWR);
 	printf("%s: fd_gearsEnabled = %d\n", __FUNCTION__, fd_gearsEnabled);
 	if (fd_gearsEnabled < 0) {
-		printf("failed to open c95_disable\n");
+		printf("failed to open c95_disable (%d: %s)\n", errno, strerror(errno));
 		return -1;
 	}
 
@@ -80,18 +215,10 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 		return -1;
 	}
 
-
 	sprintf(path, "%s/f54/d17_inhibit_freq_shift", dpath);
 	fd_gearAuto = open(path, O_RDWR);
 	if (fd_gearAuto < 0) {
 		printf("failed to open d17_inhibit_freq_shift\n");
-		return -1;
-	}
-
-	sprintf(path, "%s/f54/saturation_cap", dpath);
-	fd_satCap = open(path, O_RDWR);
-	if (fd_satCap < 0) {
-		printf("failed to open saturation_cap\n");
 		return -1;
 	}
 
@@ -113,38 +240,6 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 		return -1;
 	}
 
-	sprintf(path, "%s/f54/force_update", dpath);
-	fd_forceUpdate = open(path, O_RDWR);
-	if (fd_forceUpdate < 0) {
-		printf("failed to open force_update\n");
-		return -1;
-	}
-
-	sprintf(path, "%s/reporting", dpath);
-	fd_reporting = open(path, O_RDWR);
-	if (fd_reporting < 0) {
-		printf("failed to open reporting\n");
-		return -1;
-	}
-
-	sprintf(path, "%s/f54/num_of_mapped_tx", dpath);
-	fd = open(path, O_RDONLY);
-	if (fd < 0) {
-		printf("failed to open num_of_mapped_tx\n");
-		return -1;
-	}
-	read(fd, val, 6);
-	frameTx = atoi(val);
-
-	sprintf(path, "%s/f54/num_of_mapped_rx", dpath);
-	fd = open(path, O_RDONLY);
-	if (fd < 0) {
-		printf("failed to open num_of_mapped_rx\n");
-		return -1;
-	}
-	read(fd, val, 6);
-	frameRx = atoi(val);
-
 	sprintf(path, "%s/f54/q17_num_of_sense_freqs", dpath);
 	fd = open(path, O_RDONLY);
 	if (fd < 0) {
@@ -155,37 +250,6 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 	read(fd, val, 6);
 	gearCount = atoi(val);
 	printf("gearCount=%d\n", gearCount);
-
-	fill = malloc(frameTx*frameRx*sizeof(short));
-	if (fill == NULL) return -1;
-	printf("%s: allocated %dx%d array of shorts @ %p\n", __FUNCTION__, frameTx, frameRx, fill);
-
-	sprintf(path, "%s/query", dpath);
-	fd_query = open(path, O_RDWR);
-	if (fd_query < 0) {
-		printf("failed to open query\n");
-		return -1;
-	}
-
-	sprintf(path, "%s/f54/f55_q2_has_single_layer_multitouch", dpath);
-	fd = open(path, O_RDONLY);
-	if (fd < 0) {
-		printf("failed to open f55_q2_has_single_layer_multitouch\n");
-		return -1;
-	}
-	read(fd, val, 6);
-	close(fd);
-	sloc_interleaved = atoi(val);
-
-	sprintf(path, "%s/f54/f55_c0_receivers_on_x", dpath);
-	fd = open(path, O_RDONLY);
-	if (fd < 0) {
-		printf("failed to open f55_c0_receivers_on_x\n");
-		return -1;
-	}
-	read(fd, val, 6);
-	close(fd);
-	receivers_on_x = atoi(val);
 
 	printf("exiting %s\n", __FUNCTION__);
 
@@ -255,12 +319,12 @@ Java_com_motorola_ghostbusters_TouchDevice_diagGearCurrent(JNIEnv* env, jobject 
 JNIEXPORT void JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagGearAuto(JNIEnv* env, jobject obj, int disable)
 {
-        char val[6];
+    char val[6];
 
-        sprintf(val, "%d", disable);
+    sprintf(val, "%d", disable);
 
 	lseek(fd_gearAuto, 0, SEEK_SET);
-        write(fd_gearAuto, val, 1);
+	write(fd_gearAuto, val, 1);
 	return;
 }
 
@@ -346,30 +410,22 @@ int synaptics_report2(int16_t* data)
 {
 	int ret = 0;
 	int status;
-	int fd = -1;
-	int fd_status = -1;
 	int i, size;
 	char buf[10];
 	char path[256];
 
-	sprintf(path, "%s/f54/status", dpath);
-	fd_status = open(path, O_RDONLY);
+	lseek(fd_status, 0, SEEK_SET);
 	read(fd_status, buf, 10);
-	status = atoi(buf);
 	if (status != 0) {
-		LOGE("Touch is busy. Aborting.\n");
-		return -1;
-	}
+    	LOGE("Touch is busy. Aborting.\n");
+    	return -1;
+    }
 
-	sprintf(path, "%s/f54/report_type", dpath);
-	fd = open(path, O_RDWR);
-	write(fd, "2", 1);
-	close(fd);
+	lseek(fd_report_type, 0, SEEK_SET);
+	write(fd_report_type, "2", 1);
 
-	sprintf(path, "%s/f54/get_report", dpath);
-	fd = open(path, O_RDWR);
-	write(fd, "1", 1);
-	close(fd);
+	lseek(fd_get_report, 0, SEEK_SET);
+	write(fd_get_report, "1", 1);
 
 	for(i=0; i<40; i++) {
 		lseek(fd_status, 0, SEEK_SET);
@@ -383,17 +439,14 @@ int synaptics_report2(int16_t* data)
 		LOGE("timed out waiting for report completion.\n");
 		return -1;
 	}
-	close(fd_status);
 
-    sprintf(path, "%s/f54/report_size", dpath);
-    fd = open(path, O_RDONLY);
-    read(fd, buf, 10);
+	lseek(fd_report_size, 0, SEEK_SET);
+    read(fd_report_size, buf, 10);
     size = atoi(buf);
-    close(fd);
 
 	if (size != frameTx * frameRx * sizeof(uint16_t))
 	{
-		LOGE("report size mismatch %d != %d*%d*%d\n",
+		LOGE("report size mismatch %d != %d*%d*%ld\n",
 			size,
 			frameRx,
 			frameTx,
@@ -401,16 +454,12 @@ int synaptics_report2(int16_t* data)
 		return -1;
 	}
 
-    sprintf(path, "%s/f54/report_data", dpath);
-	fd = open(path, O_RDONLY);
-	ret = read(fd, data, size);
+	lseek(fd_report_data, 0, SEEK_SET);
+	ret = read(fd_report_data, data, size);
 	if (ret != size){
 		LOGE("can't read report data ret=%d size=%d\n", ret, size);
 		return -1;
 	}
-	close(fd);
-
-	printf("%s: returning %d bytes\n", __FUNCTION__, size);
 
 	return 0;
 }
@@ -452,36 +501,57 @@ Java_com_motorola_ghostbusters_TouchDevice_diagDeltaPeaks(JNIEnv* env, jobject o
 
 // returns number of Tx lines
 JNIEXPORT int JNICALL
-Java_com_motorola_ghostbusters_TouchDevice_diagFrameTx(JNIEnv* env, jobject obj)
+Java_com_motorola_ghostbusters_TouchDevice_diagFrameY(JNIEnv* env, jobject obj)
 {
-        return frameTx;
+        return dimY;
 }
 
 // returns number of Rx lines
 JNIEXPORT int JNICALL
-Java_com_motorola_ghostbusters_TouchDevice_diagFrameRx(JNIEnv* env, jobject obj)
+Java_com_motorola_ghostbusters_TouchDevice_diagFrameX(JNIEnv* env, jobject obj)
 {
-        return frameRx;
+        return dimX;
 }
 
 static void compose_sloc_frame(int frameTx, int frameRx, short *array) {
-	int tx, tx_dest;
-	uint16_t *dest = malloc(frameTx * frameRx * sizeof(short));
-	for(tx = 0, tx_dest = 0; tx < frameTx; tx += 2, ++tx_dest)
-		memcpy(dest + tx_dest * frameRx, array + tx * frameRx, frameRx * sizeof(short));
+	int tx, rx;
+	int x, y;
+	static uint16_t *dest = NULL;
 
-	for(tx = 1; tx < frameTx; tx += 2, ++tx_dest)
-		memcpy(dest + tx_dest * frameRx, array + tx * frameRx, frameRx * sizeof(short));
+	if (!dest)
+		dest = malloc(dimX * dimY * sizeof(short));
+
+	x = 0;
+	y = 0;
+	for(tx = 0; tx < frameTx; ++tx) {
+		for(rx = 0; rx < frameRx; ++rx) {
+			dest[y * dimX + x] = array[tx * frameRx + rx];
+			if (y == (dimY - 1)) {
+            	y = 0;
+            	++x;
+            }
+            else
+				++y;
+		}
+	}
 
 	memcpy(array, dest, frameTx * frameRx * sizeof(short));
-	free(dest);
 }
 
-// flip XY to match geometry of the touch IC
-JNIEXPORT int JNICALL
-Java_com_motorola_ghostbusters_TouchDevice_diagDeltaFrameFlipXY(JNIEnv* env, jobject obj)
+static void invert_frame(int frameTx, int frameRx, short *array)
 {
-	return receivers_on_x;
+	int tx, rx;
+	static uint16_t *dest = NULL;
+
+	if (!dest)
+		dest = malloc(frameTx * frameRx * sizeof(short));
+
+	for (tx = 0; tx < frameTx; ++tx)
+		for (rx = 0; rx < frameRx; ++rx) {
+			dest[frameTx * rx + tx] = array[frameRx * tx + rx];
+		}
+
+	memcpy(array, dest, frameTx * frameRx * sizeof(short));
 }
 
 JNIEXPORT jshortArray JNICALL
@@ -497,9 +567,14 @@ Java_com_motorola_ghostbusters_TouchDevice_diagDeltaFrame(JNIEnv *env, jobject o
  	//synaptics_report2(array);
  	synaptics_report2(fill);
 
-	if (sloc_interleaved)
+	if (sloc_panel)
+	{
 		compose_sloc_frame(frameTx, frameRx, fill);
-
+	}
+	else if (receivers_on_x)
+	{
+		invert_frame(frameTx, frameRx, fill);
+	}
 
 	// move from the temp structure to the java structure
 	// (*env)->SetShortArrayRegion(env, result, 0, frameTx*frameRx, array);
@@ -646,6 +721,16 @@ out:
 
         free(stats);
         return(ret);
+}
+
+// restores reporting of touch events to framework
+JNIEXPORT void JNICALL
+Java_com_motorola_ghostbusters_TouchDevice_diagResetTouch(JNIEnv* env, jobject obj)
+{
+    char val[6] = "1";
+	lseek(fd_reset, 0, SEEK_SET);
+    write(fd_reset, val, 1);
+    return;
 }
 
 // closes all opened files
