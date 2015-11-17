@@ -63,7 +63,6 @@ public class MainActivity extends Activity {
     public static int threshold;
     public static int satLevel;
     public static int hysteresis;
-    public static boolean isSLOC;
 
     public boolean selectedGear[];
     public boolean selectedImg[];
@@ -148,7 +147,6 @@ public class MainActivity extends Activity {
         mDevice = new TouchDevice();
         mDevice.diagInit(touchFWPath);
         gearsCount = mDevice.diagGearCount();
-        isSLOC = mDevice.diagDeltaFrameFlipXY();
 
         //imgNames = null;
         gearsNames = new String[gearsCount + 1];

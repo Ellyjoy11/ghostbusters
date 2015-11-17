@@ -94,14 +94,14 @@ public class TouchRpt extends Activity {
     public static void getArray() {
         //TODO get Array and its dimensions
 
-        int yD = MainActivity.mDevice.diagFrameTx();
-        int xD = MainActivity.mDevice.diagFrameRx();
+        int yD = MainActivity.mDevice.diagFrameY();
+        int xD = MainActivity.mDevice.diagFrameX();
         //mValues = new short[xD][yD];
 
         short[] report = MainActivity.mDevice.diagDeltaFrame();
 
         //TODO set real dimensions and values
-        TouchReport.setDimensions(xD, yD, MainActivity.isSLOC);
+        TouchReport.setDimensions(xD, yD);
 
         //TouchReport.setValues(mValues);
         TouchReport.setValues(report);

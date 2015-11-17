@@ -16,8 +16,8 @@ public class TouchDevice {
     public native static int diagPowerIM();
     public native static int diagCoherentIM();
     public native static int diagDeltaPeaks(int loops);
-    public native static int diagFrameTx();
-    public native static int diagFrameRx();
+    public native static int diagFrameY();
+    public native static int diagFrameX();
     public native static short[] diagDeltaFrame();
     public native static void diagDisableTouch();
     public native static void diagEnableTouch();
@@ -27,8 +27,8 @@ public class TouchDevice {
     public native static void diagEnableGears(int gears);
     public native static void diagForceUpdate();
     public native static String[] diagStats();
+    public native static void diagResetTouch();
     public native static void diagClose();
-    public native static boolean diagDeltaFrameFlipXY();
 
     public static int gearCount;
     private final String TAG = "Ghostbusters";
@@ -51,8 +51,8 @@ public class TouchDevice {
         Log.d(TAG, "PowerIM " + diagPowerIM());
         Log.d(TAG, "Coherent IM " + diagCoherentIM());
         Log.d(TAG, "Delta Peaks " + diagDeltaPeaks(0));
-        Log.d(TAG, "Frame Tx " +  diagFrameTx());
-        Log.d(TAG, "Frame Rx " + diagFrameRx());
+        Log.d(TAG, "Frame Y " +  diagFrameY());
+        Log.d(TAG, "Frame X " + diagFrameX());
         //ArrayList<Integer> tmp = new ArrayList<Integer>();
         //tmp = diagDeltaFrame();
         //for (int i=0; i < diagFrameTx() * diagFrameRx(); i++) {
