@@ -16,6 +16,26 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
+    <com.motorola.ghostbusters.MyAbsChart
+        android:id="@+id/myAbsChart"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="invisible"/>
+
+    <Button
+        android:id="@+id/switchType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/infoText"
+        android:textSize="10dp"
+        android:textStyle="bold"
+        android:minHeight="0dp"
+        android:minWidth="0dp"
+        android:alpha="0.5"
+        android:text="switch report"
+        android:onClick="switchChart"/>
+
     <TextView
         android:id="@+id/infoText"
         android:layout_width="wrap_content"

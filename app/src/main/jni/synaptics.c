@@ -42,19 +42,37 @@ int fd_report_type = -1;
 int fd_get_report = -1;
 int fd_report_size = -1;
 int fd_report_data = -1;
+int fd_rxObjThresh = -1;
+int fd_txObjThresh = -1;
 
 int SatCap = 0;
 int Threshold = 0;
 int frameTx = 0;
 int frameRx = 0;
 int gearCount = 0;
+int hasCtrl113 = 0;
+int enHybridOnRx = 0;
+int enHybridOnTx = 0;
+int rxObjThresh;
+int txObjThresh;
+
 jshort *fill = NULL;
+jint *fill_rxtx = NULL;
 const char *dpath;
 
 int sloc_panel = 0;
 int receivers_on_x = 0;
 int dimX = 0;
 int dimY = 0;
+
+static void reset_touch()
+{
+    char val[6] = "1";
+    LOGE("resetting touch\n");
+	lseek(fd_reset, 0, SEEK_SET);
+    write(fd_reset, val, 1);
+    return;
+}
 
 // opens all required files internally and inticates success/error
 JNIEXPORT int JNICALL
@@ -73,6 +91,16 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 	}
 
 	LOGE("TOUCH DEVICE path = %s\n", dpath);
+
+	sprintf(path, "%s/f54/reset", dpath);
+    	fd_reset = open(path, O_RDWR);
+    	if (fd_reset < 0) {
+    		printf("failed to open reset\n");
+    		return -1;
+    	}
+
+    reset_touch();
+
 	sprintf(path, "%s/f54/num_of_mapped_tx", dpath);
 	fd = open(path, O_RDONLY);
 	if (fd < 0) {
@@ -94,6 +122,11 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 	fill = malloc(frameTx*frameRx*sizeof(short));
 	if (fill == NULL) return -1;
 	printf("%s: allocated %dx%d array of shorts @ %p\n", __FUNCTION__, frameTx, frameRx, fill);
+
+	fill_rxtx = malloc((frameTx + frameRx) * sizeof(jint));
+    	if (fill_rxtx == NULL) return -1;
+    printf("%s: allocated %d + %d array of jint @ %p\n", __FUNCTION__, frameTx, frameRx, fill_rxtx);
+
 
 	sprintf(path, "%s/f54/f55_q2_has_single_layer_multitouch", dpath);
 	fd = open(path, O_RDONLY);
@@ -130,12 +163,7 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 	    dimY = frameTx;
 	 }
 
-	sprintf(path, "%s/f54/reset", dpath);
-	fd_reset = open(path, O_RDWR);
-	if (fd_reset < 0) {
-		printf("failed to open reset\n");
-		return -1;
-	}
+
 
 	sprintf(path, "%s/f54/status", dpath);
     fd_status = open(path, O_RDONLY);
@@ -179,6 +207,63 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 		return -1;
 	}
 
+	hasCtrl113 = 0;
+	sprintf(path, "%s/f54/has_ctrl113", dpath);
+	fd = open(path, O_RDONLY);
+	if (fd < 0) {
+		printf("failed to open has_ctrl113\n");
+	}
+	else {
+		read(fd, val, 6);
+		close(fd);
+		hasCtrl113 = atoi(val);
+		printf("control 113 is %s\n", hasCtrl113 ? "present" : "not present");
+    }
+
+	if (hasCtrl113) {
+		sprintf(path, "%s/f54/c113_en_hybrid_on_tx", dpath);
+    	fd = open(path, O_RDONLY);
+    	if (fd < 0) {
+    		printf("failed to open c113_en_hybrid_on_tx\n");
+    		return -1;
+    	}
+    	read(fd, val, 6);
+        close(fd);
+        enHybridOnTx = atoi(val);
+        printf("hybrid on tx is %s\n", enHybridOnTx ? "enabled" : "not enabled");
+
+		sprintf(path, "%s/f54/c113_en_hybrid_on_rx", dpath);
+    	fd = open(path, O_RDONLY);
+    	if (fd < 0) {
+    		printf("failed to open c113_en_hybrid_on_rx\n");
+    		return -1;
+    	}
+    	read(fd, val, 6);
+        close(fd);
+        enHybridOnRx = atoi(val);
+        printf("hybrid on rx is %s\n", enHybridOnRx ? "enabled" : "not enabled");
+
+		sprintf(path, "%s/f54/c113_rx_obj_thresh", dpath);
+		fd_rxObjThresh = open(path, O_RDWR);
+		if (fd_rxObjThresh < 0) {
+			printf("failed to open c113_rx_obj_thresh\n");
+			return -1;
+		}
+
+		read(fd_rxObjThresh, val, 6);
+        rxObjThresh = atoi(val);
+
+		sprintf(path, "%s/f54/c113_tx_obj_thresh", dpath);
+        fd_txObjThresh = open(path, O_RDWR);
+        if (fd_txObjThresh < 0) {
+        	printf("failed to open c113_tx_obj_thresh\n");
+        	return -1;
+        }
+
+		read(fd_txObjThresh, val, 6);
+		txObjThresh = atoi(val);
+	}
+
 	sprintf(path, "%s/f54/force_update", dpath);
 	fd_forceUpdate = open(path, O_RDWR);
 	if (fd_forceUpdate < 0) {
@@ -200,7 +285,7 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 		return -1;
 	}
 
-sprintf(path, "%s/f54/c95_disable", dpath);
+	sprintf(path, "%s/f54/c95_disable", dpath);
 	fd_gearsEnabled = open(path, O_RDWR);
 	printf("%s: fd_gearsEnabled = %d\n", __FUNCTION__, fd_gearsEnabled);
 	if (fd_gearsEnabled < 0) {
@@ -256,12 +341,96 @@ sprintf(path, "%s/f54/c95_disable", dpath);
 	return 0;
 }
 
+// returns flag indication presence of hybrid baseline control
+JNIEXPORT int JNICALL
+Java_com_motorola_ghostbusters_TouchDevice_diagHasHybridBaselineControl(JNIEnv* env, jobject obj)
+{
+	if (hasCtrl113)
+		return 1;
+	else
+		return 0;
+}
+
+
+// returns Tx Object Threshold
+JNIEXPORT int JNICALL
+Java_com_motorola_ghostbusters_TouchDevice_diagTxObjThresh(JNIEnv* env, jobject obj)
+{
+	if (hasCtrl113)
+		return txObjThresh;
+	else
+		return -1;
+}
+
+// returns Rx Object Threshold
+JNIEXPORT int JNICALL
+Java_com_motorola_ghostbusters_TouchDevice_diagRxObjThresh(JNIEnv* env, jobject obj)
+{
+	if (hasCtrl113)
+		return rxObjThresh;
+	else
+		return -1;
+}
+
+// sets Tx Object Threshold
+JNIEXPORT int JNICALL
+Java_com_motorola_ghostbusters_TouchDevice_diagSetTxObjThresh(JNIEnv* env, jobject obj, int thresh)
+{
+	LOGE("function called %s\n", __FUNCTION__);
+	if (hasCtrl113) {
+    	char val[12];
+		LOGE("setting TX threshold to %d\n", thresh);
+		sprintf(val, "%d", thresh);
+		lseek(fd_txObjThresh, 0, SEEK_SET);
+        write(fd_txObjThresh, val, strlen(val));
+        txObjThresh = thresh;
+		return 0;
+	} else
+		return -1;
+}
+
+// sets Rx Object Threshold
+JNIEXPORT int JNICALL
+Java_com_motorola_ghostbusters_TouchDevice_diagSetRxObjThresh(JNIEnv* env, jobject obj, int thresh)
+{
+	LOGE("function called %s\n", __FUNCTION__);
+	if (hasCtrl113) {
+    	char val[12];
+		LOGE("setting RX threshold to %d\n", thresh);
+		sprintf(val, "%d", thresh);
+		lseek(fd_rxObjThresh, 0, SEEK_SET);
+        write(fd_rxObjThresh, val, strlen(val));
+        rxObjThresh = thresh;
+		return 0;
+	} else
+		return -1;
+}
+
+// returns true if hybrid is using rx
+JNIEXPORT int JNICALL
+Java_com_motorola_ghostbusters_TouchDevice_diagEnHybridOnRx(JNIEnv* env, jobject obj)
+{
+	if (hasCtrl113)
+		return enHybridOnRx;
+	else
+		return 0;
+}
+
+// returns true if hybrid is using tx
+JNIEXPORT int JNICALL
+Java_com_motorola_ghostbusters_TouchDevice_diagEnHybridOnTx(JNIEnv* env, jobject obj)
+{
+	if (hasCtrl113)
+		return enHybridOnTx;
+	else
+		return 0;
+}
 
 // returns number of gears available
 JNIEXPORT int JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagGearCount(JNIEnv* env, jobject obj)
 {
-        return gearCount;
+	return gearCount;
 }
 
 // returns bitmask of gears enabled
@@ -272,8 +441,10 @@ Java_com_motorola_ghostbusters_TouchDevice_diagGearsEnabled(JNIEnv* env, jobject
 	unsigned gearList = 0;
 	char val[64];
 
+	LOGE("function called %s\n", __FUNCTION__);
+
 	lseek(fd_gearsEnabled, 0, SEEK_SET);
-    	read(fd_gearsEnabled, val, 64);
+    read(fd_gearsEnabled, val, 64);
 	for(n=0, i=0; i<gearCount; i++, n+=2) {
 		if (val[n] == '0')
 			gearList |= (1 << i);
@@ -287,6 +458,8 @@ Java_com_motorola_ghostbusters_TouchDevice_diagEnableGears(JNIEnv* env, jobject 
 {
         int i, n;
         char val[64];
+
+	LOGE("function called %s %d\n", __FUNCTION__, gears);
 
         for(n=0, i=0; i<gearCount; i++, n+=2) {
 		if (gears & (1<<i))
@@ -308,6 +481,8 @@ Java_com_motorola_ghostbusters_TouchDevice_diagGearCurrent(JNIEnv* env, jobject 
         char val[6];
         int  gearcurrent = 0;
 
+	LOGE("function called %s\n", __FUNCTION__);
+
 	lseek(fd_gearCurrent, 0, SEEK_SET);
         read(fd_gearCurrent, val, 6);
         gearcurrent = atoi(val);
@@ -321,6 +496,8 @@ Java_com_motorola_ghostbusters_TouchDevice_diagGearAuto(JNIEnv* env, jobject obj
 {
     char val[6];
 
+	LOGE("function called %s %d\n", __FUNCTION__, disable);
+
     sprintf(val, "%d", disable);
 
 	lseek(fd_gearAuto, 0, SEEK_SET);
@@ -333,6 +510,8 @@ JNIEXPORT void JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagGearSelect(JNIEnv* env, jobject obj, int gear)
 {
         char val[6] = "1";
+
+	LOGE("function called %s %d\n", __FUNCTION__, gear);
 
 	lseek(fd_gearAuto, 0, SEEK_SET);
         write(fd_gearAuto, val, 1);
@@ -352,6 +531,8 @@ Java_com_motorola_ghostbusters_TouchDevice_diagPowerIM(JNIEnv* env, jobject obj)
         int  powerIM = 0;
 	int res = -1;
 	int i;
+
+	LOGE("function called %s\n", __FUNCTION__);
 
 	lseek(fd_powerIMl, 0, SEEK_SET);
 	lseek(fd_powerIMm, 0, SEEK_SET);
@@ -384,6 +565,8 @@ Java_com_motorola_ghostbusters_TouchDevice_diagCoherentIM(JNIEnv* env, jobject o
         int res = -1;
         int i;
 
+	LOGE("function called %s\n", __FUNCTION__);
+
         lseek(fd_coherentIMl, 0, SEEK_SET);
         lseek(fd_coherentIMm, 0, SEEK_SET);
         res = read(fd_coherentIMm, msb, 4);
@@ -413,12 +596,28 @@ int synaptics_report2(int16_t* data)
 	int i, size;
 	char buf[10];
 	char path[256];
+	static int count = 0;
+
+	LOGE("function called %s\n", __FUNCTION__);
 
 	lseek(fd_status, 0, SEEK_SET);
-	read(fd_status, buf, 10);
+    read(fd_status, buf, 10);
+    status = atoi(buf);
 	if (status != 0) {
-    	LOGE("Touch is busy. Aborting.\n");
-    	return -1;
+		LOGE("%d successful reports processed\n", count);
+		count = 0;
+		/* if touch report is in progress wait until it completes or times out */
+		for (i=0; status == 1 & i < 25; i++) {
+    		LOGE("Touch is busy. Waiting...\n");
+    		usleep(50000);
+    		lseek(fd_status, 0, SEEK_SET);
+            read(fd_status, buf, 10);
+    	}
+    	/* if not idle or timedout touch has to be reset */
+    	if (!(status == 0 || status == -110)) {
+    		LOGE("Touch is still busy. Aborting.\n");
+    		return -1;
+    	}
     }
 
 	lseek(fd_report_type, 0, SEEK_SET);
@@ -435,10 +634,17 @@ int synaptics_report2(int16_t* data)
 			break;
 		usleep(50000);
 	}
-	if (status != 0) {
-		LOGE("timed out waiting for report completion.\n");
+
+	if (status == -110) {
+		LOGE("Timed out waiting for report completion.\n");
 		return -1;
-	}
+	} else if (status == 1) {
+		LOGE("Touch is still busy.\n");
+		return -1;
+	} else if (status != 0) {
+      		LOGE("Unknown error (%d).\n", status);
+      		return -1;
+    }
 
 	lseek(fd_report_size, 0, SEEK_SET);
     read(fd_report_size, buf, 10);
@@ -461,9 +667,101 @@ int synaptics_report2(int16_t* data)
 		return -1;
 	}
 
+	++count;
+	if (!(count % 100)) {
+		LOGE("Success counter = %d\n", count);
+	}
+
 	return 0;
 }
 
+int synaptics_rx_tx_report(char report_type, int32_t* data)
+{
+	int ret = 0;
+	int status;
+	int i, size;
+	char buf[10];
+	char path[256];
+	static int count = 0;
+	char report_type_str[4] = {0};
+
+	LOGE("function called %s\n", __FUNCTION__);
+
+	lseek(fd_status, 0, SEEK_SET);
+    read(fd_status, buf, 10);
+    status = atoi(buf);
+	if (status != 0) {
+		LOGE("%d successful reports processed\n", count);
+		count = 0;
+		/* if touch report is in progress wait until it completes or times out */
+		for (i=0; status == 1 & i < 25; i++) {
+    		LOGE("Touch is busy. Waiting...\n");
+    		usleep(50000);
+    		lseek(fd_status, 0, SEEK_SET);
+            read(fd_status, buf, 10);
+    	}
+    	/* if not idle or timedout touch has to be reset */
+    	if (!(status == 0 || status == -110)) {
+    		LOGE("Touch is still busy. Aborting.\n");
+    		return -1;
+    	}
+    }
+
+	sprintf(report_type_str, "%u", (uint16_t)report_type);
+	lseek(fd_report_type, 0, SEEK_SET);
+	write(fd_report_type, report_type_str, strlen(report_type_str));
+
+	lseek(fd_get_report, 0, SEEK_SET);
+	write(fd_get_report, "1", 1);
+
+	for(i=0; i<40; i++) {
+		lseek(fd_status, 0, SEEK_SET);
+		read(fd_status, buf, 10);
+		status = atoi(buf);
+		if (status == 0)
+			break;
+		usleep(50000);
+	}
+
+	if (status == -110) {
+		LOGE("Timed out waiting for report completion.\n");
+		return -1;
+	} else if (status == 1) {
+		LOGE("Touch is still busy.\n");
+		return -1;
+	} else if (status != 0) {
+      		LOGE("Unknown error (%d).\n", status);
+      		return -1;
+    }
+
+	lseek(fd_report_size, 0, SEEK_SET);
+    read(fd_report_size, buf, 10);
+    size = atoi(buf);
+
+	if (size != (frameTx + frameRx) * sizeof(int32_t))
+	{
+		LOGE("report size mismatch %d != (%d+%d)*%lu\n",
+			size,
+			frameRx,
+			frameTx,
+			sizeof(jint));
+		return -1;
+	}
+
+	lseek(fd_report_data, 0, SEEK_SET);
+	ret = read(fd_report_data, data, size);
+	if (ret != size){
+		LOGE("can't read report data ret=%d size=%d\n", ret, size);
+		return -1;
+	}
+
+	++count;
+	if (!(count % 100)) {
+		LOGE("Success counter = %d\n", count);
+	}
+
+	return 0;
+}
 
 // returns logical OR of min and max peaks in a delta frame (2 MSBs are negative peak, 2 LSBs are positive)
 JNIEXPORT int JNICALL
@@ -473,12 +771,18 @@ Java_com_motorola_ghostbusters_TouchDevice_diagDeltaPeaks(JNIEnv* env, jobject o
 	int rx, tx, delta, d_min, d_max;
 	int g_min = 0, g_max = 0, l;
 
+	LOGE("function called %s\n", __FUNCTION__);
+
 //	array = malloc(frameRx*frameTx*sizeof(short));
 //	synaptics_report2(array);
 //int indexS;
 //	for (indexS=0;;indexS++) if (indexS<100000) break;
 	for (l=0; l<loops; l++) {
-		synaptics_report2(fill);
+		int status = synaptics_report2(fill);
+
+		if (status != 0)
+			return 0;
+
 		d_min = d_max = 0;
 		for(tx=0; tx<frameTx; tx++)
 			for(rx=0; rx<frameRx; rx++) {
@@ -498,6 +802,117 @@ Java_com_motorola_ghostbusters_TouchDevice_diagDeltaPeaks(JNIEnv* env, jobject o
 //	free(array);
 	return (g_max << 16) | abs(g_min);
 }
+
+// returns logical OR of min and max peaks in a Hybrid Abs RX Delta (2 MSBs are negative peak, 2 LSBs are positive)
+// this is for report type 59
+JNIEXPORT int JNICALL
+Java_com_motorola_ghostbusters_TouchDevice_diagRxDeltaPeaks(JNIEnv* env, jobject obj, int loops)
+{
+//	short *array;
+	int rx, tx, delta, d_min, d_max;
+	int g_min = 0, g_max = 0, l;
+
+	LOGE("function called %s\n", __FUNCTION__);
+
+	if (!hasCtrl113) {
+		LOGE("%s called while F54.c113 is not present\n", __FUNCTION__);
+		return -1;
+	}
+
+//	array = malloc(frameRx*frameTx*sizeof(short));
+//	synaptics_report2(array);
+//int indexS;
+//	for (indexS=0;;indexS++) if (indexS<100000) break;
+	for (l=0; l<loops; l++) {
+		int status = synaptics_rx_tx_report(59, fill_rxtx);
+
+		if (status != 0)
+			return 0;
+
+		d_min = d_max = 0;
+		for(rx=0; rx<frameRx; rx++) {
+							//delta = *(array+tx*frameRx+rx);
+				delta = *(fill_rxtx + rx);
+				//printf("%3d ", delta);
+				if (delta > d_max)
+					d_max = delta;
+				if (delta < d_min)
+					d_min = delta;
+		}
+		if (d_min < g_min)
+			g_min = d_min;
+		if (d_max > g_max)
+			g_max = d_max;
+	}
+//	free(array);
+	return (g_max << 16) | abs(g_min);
+}
+
+// returns array of min/max peaks for Hybrid Abs TX RX Delta reports 59 or 63
+// [0] = Tx min
+// [1] = Tx max
+// [2] = Rx min
+// [3] = Rx max
+JNIEXPORT jintArray JNICALL
+Java_com_motorola_ghostbusters_TouchDevice_diagRxTxDeltaPeaks(JNIEnv* env, jobject obj, int loops, int report_type)
+{
+	int rx, tx, delta, d_min, d_max, l;
+	int peaks[4] = {0};
+	int *g_minTx = &peaks[0];
+	int *g_maxTx = &peaks[1];
+	int *g_minRx = &peaks[2];
+	int *g_maxRx = &peaks[3];
+	jintArray result;
+
+	LOGE("function called %s\n", __FUNCTION__);
+
+	if (!hasCtrl113) {
+		LOGE("%s called while F54.c113 is not present\n", __FUNCTION__);
+		return NULL;
+	}
+
+	result = (*env)->NewIntArray(env, 4);
+	if (result == NULL) {
+     		return NULL; /* out of memory error thrown */
+ 	}
+
+	for (l=0; l<loops; l++) {
+		int status = synaptics_rx_tx_report(report_type, fill_rxtx);
+
+		if (status != 0)
+			return NULL;
+
+		d_min = d_max = 0;
+		for(rx=0; rx<frameRx; rx++) {
+			delta = *(fill_rxtx + rx);
+			if (delta > d_max)
+				d_max = delta;
+			if (delta < d_min)
+				d_min = delta;
+		}
+		if (d_min < *g_minRx)
+			*g_minRx = abs(d_min);
+		if (d_max > *g_maxRx)
+			*g_maxRx = d_max;
+
+		d_min = d_max = 0;
+		for(tx = 0; tx < frameTx; tx++) {
+			delta = *(fill_rxtx + frameRx + tx);
+			if (delta > d_max)
+				d_max = delta;
+			if (delta < d_min)
+				d_min = delta;
+		}
+		if (d_min < *g_minTx)
+			*g_minTx = abs(d_min);
+		if (d_max > *g_maxTx)
+			*g_maxTx = d_max;
+	}
+	
+	(*env)->SetIntArrayRegion(env, result, 0, 4, peaks);
+	return result;
+}
+
 
 // returns number of Tx lines
 JNIEXPORT int JNICALL
@@ -582,11 +997,34 @@ Java_com_motorola_ghostbusters_TouchDevice_diagDeltaFrame(JNIEnv *env, jobject o
 	return result;
 }
 
+JNIEXPORT jintArray JNICALL
+Java_com_motorola_ghostbusters_TouchDevice_diagRxTxDelta(JNIEnv *env, jobject obj)
+{
+	jshortArray result;
+
+	result = (*env)->NewIntArray(env, frameTx + frameRx);
+	if (result == NULL) {
+     		return NULL; /* out of memory error thrown */
+ 	}
+
+ 	//synaptics_report2(array);
+ 	synaptics_rx_tx_report(59, fill_rxtx);
+
+	// move from the temp structure to the java structure
+	// (*env)->SetShortArrayRegion(env, result, 0, frameTx*frameRx, array);
+	(*env)->SetIntArrayRegion(env, result, 0, frameTx + frameRx, fill_rxtx);
+	return result;
+}
+
+
+
 // blocks reporting of touch events to framework
 JNIEXPORT void JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagDisableTouch(JNIEnv* env, jobject obj)
 {
         char val[6] = "0";
+
+	LOGE("function called %s\n", __FUNCTION__);
 
 	lseek(fd_reporting, 0, SEEK_SET);
         write(fd_reporting, val, 1);
@@ -599,6 +1037,8 @@ Java_com_motorola_ghostbusters_TouchDevice_diagEnableTouch(JNIEnv* env, jobject 
 {
         char val[6] = "1";
 
+	LOGE("function called %s\n", __FUNCTION__);
+
 	lseek(fd_reporting, 0, SEEK_SET);
         write(fd_reporting, val, 1);
         return;
@@ -609,6 +1049,8 @@ JNIEXPORT void JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagForceUpdate(JNIEnv* env, jobject obj)
 {
         char val[6] = "1";
+
+	LOGE("function called %s\n", __FUNCTION__);
 
 	lseek(fd_forceUpdate, 0, SEEK_SET);
         write(fd_forceUpdate, val, 1);
@@ -624,6 +1066,8 @@ Java_com_motorola_ghostbusters_TouchDevice_diagFingerThreshold(JNIEnv* env, jobj
 	char data[64];
 	char *val;
 	char *query = "F12@15:0=";
+
+	LOGE("function called %s\n", __FUNCTION__);
 
 	lseek(fd_query, 0, SEEK_SET);
 	write(fd_query, query, strlen(query));
@@ -655,6 +1099,8 @@ Java_com_motorola_ghostbusters_TouchDevice_diagSaturationLevel(JNIEnv* env, jobj
 	char val[6];
 	//int SatCap = 0;
 
+	LOGE("function called %s\n", __FUNCTION__);
+
 	lseek(fd_satCap, 0, SEEK_SET);
 	read(fd_satCap, val, 6);
 	SatCap = atoi(val);
@@ -678,6 +1124,7 @@ Java_com_motorola_ghostbusters_TouchDevice_diagStats(JNIEnv* env, jobject obj)
 		char **stats = malloc(maxcount*sizeof(char*));
 		char path[MAX_ATTR_PATH];
 
+	LOGE("function called %s\n", __FUNCTION__);
 
         sprintf(path, "%s/stats", dpath);
 
@@ -723,20 +1170,43 @@ out:
         return(ret);
 }
 
+
+
+
 // restores reporting of touch events to framework
 JNIEXPORT void JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagResetTouch(JNIEnv* env, jobject obj)
 {
     char val[6] = "1";
+    LOGE("function called %s\n", __FUNCTION__);
+
 	lseek(fd_reset, 0, SEEK_SET);
     write(fd_reset, val, 1);
     return;
+}
+
+// returns touch report status
+JNIEXPORT int JNICALL
+Java_com_motorola_ghostbusters_TouchDevice_diagStatus(JNIEnv* env, jobject obj)
+{
+	char buf[6];
+	int status = 0;
+
+	LOGE("function called %s\n", __FUNCTION__);
+
+	lseek(fd_status, 0, SEEK_SET);
+    read(fd_status, buf, 10);
+    status = atoi(buf);
+
+	return status;
 }
 
 // closes all opened files
 JNIEXPORT void JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagClose(JNIEnv* env, jobject obj /*, ???*/)
 {
+	LOGE("function called %s\n", __FUNCTION__);
+
 	close(fd_gearsEnabled);
 	close(fd_gearCurrent);
 	close(fd_gearAuto);
@@ -750,6 +1220,7 @@ Java_com_motorola_ghostbusters_TouchDevice_diagClose(JNIEnv* env, jobject obj /*
 	close(fd_query);
 
 	free(fill);
+	free(fill_rxtx);
 
 	return;
 }

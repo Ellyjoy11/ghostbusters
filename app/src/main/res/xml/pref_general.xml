@@ -89,6 +89,13 @@
         android:entryValues="@array/drawablesValues720"
         android:defaultValue="@array/empty"
         -->
+    <ListPreference
+        android:defaultValue="Report 2"
+        android:key="test_type"
+        android:entries="@array/test_types"
+        android:entryValues="@array/test_typesValues"
+        android:title="Select test to run"
+    />
 
     <EditTextPreference
         android:defaultValue="100"
@@ -99,6 +106,29 @@
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="Samples per image" />
+
+    <!--
+    <EditTextPreference
+        android:defaultValue="100"
+        android:inputType="number"
+        android:key="rx"
+        android:maxLines="1"
+        android:persistent="true"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Rx Threshold" />
+
+
+    <EditTextPreference
+        android:defaultValue="40"
+        android:inputType="number"
+        android:key="tx"
+        android:maxLines="1"
+        android:persistent="true"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Tx Threshold" />
+        -->
 
     <CheckBoxPreference
         android:defaultValue="false"

@@ -4,6 +4,16 @@
 
     </string-array>
 
+    <string-array name="test_types">
+        <item>Report 2</item>
+        <item>Report 59</item>
+    </string-array>
+
+    <string-array name="test_typesValues">
+        <item>Report 2</item>
+        <item>Report 59</item>
+    </string-array>
+
 <string-array name="drawablesArray720">
     <item>0 - blackscreen_720</item>
     <item>1 - whitescreen_720</item>

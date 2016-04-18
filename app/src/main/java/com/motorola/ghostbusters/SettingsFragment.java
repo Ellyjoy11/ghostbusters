@@ -15,9 +15,7 @@ import java.util.Set;
 public class SettingsFragment extends PreferenceFragment implements
         SharedPreferences.OnSharedPreferenceChangeListener {
 
-    //private final String[] keys = { "freq_shift", "fs_density", "noise", "medium_noise",
-    //"freq_scan", "cid_im", "quiet_im", "fnm_exit", "samples", "custom_path"};
-    private final String[] keys = { "samples", "custom_path"};
+    private final String[] keys = { "test_type", "samples", "custom_path"};
     private static String[] entrySet;
     private static String[] valSet;
     private static String[] defSet;
@@ -30,10 +28,7 @@ public class SettingsFragment extends PreferenceFragment implements
         addPreferencesFromResource(R.xml.pref_general);
         userPref = PreferenceManager
                 .getDefaultSharedPreferences(getActivity());
-        //myMultiList = (MultiSelectListPreference) findPreference("advanced");
-        //setMulti();
         setSummary();
-        //myMultiList.setDefaultValue(defVals);
     }
 
     public void onPause() {
@@ -59,16 +54,12 @@ public class SettingsFragment extends PreferenceFragment implements
 
     private void setSummary() {
 
-        //SharedPreferences userPref = PreferenceManager
-        //        .getDefaultSharedPreferences(getActivity());
         for (int i = 0; i < keys.length; i++) {
             String key_string = keys[i];
             Preference pref = (Preference) findPreference(key_string);
             String value = userPref.getString(key_string, "5");
             pref.setSummary(value);
         }
-        //Set<String> selectedVals = myMultiList.getValues();
-       // myMultiList.setSummary(getMask());
 
     }
 
@@ -111,9 +102,7 @@ public class SettingsFragment extends PreferenceFragment implements
     }
 
     public void setMulti() {
-        //myMultiList = (MultiSelectListPreference) findPreference("advanced");
         setMultiList(MainActivity.screenWidth);
-        //setMultiList(2160); //FOR TEST ONLY!!!!
         myMultiList.setEntries(entrySet);
         myMultiList.setPersistent(true);
         myMultiList.setEntryValues(valSet);

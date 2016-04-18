@@ -29,57 +29,59 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class MainActivity extends Activity {
-    public static final String ABOUT_TITLE = "\u00a9 Motorola Hackathon 2015\n" +
+    public static final String ABOUT_TITLE = "\u00a9 Moto Hackathon 2015\n" +
             "Igor Kovalenko\nElena Last\nAlex Filonenko\nKonstantin Makariev";
     public static String ABOUT_VERSION;
     private final static String TAG = "Ghostbusters";
-    private int ROWS;// = 1000;
-    private int RND_ROWS;// =1000;
+
     public static String touchFWPath;
     public static String product;
     public static String barcode;
     public static String touchCfg;
     public static String productInfo;
-    public String freqShift, fsDensity, mNoise, medNoise, freqScan, cidIm, quietIm, fnmExit;
+
     SharedPreferences userPref;
     public static boolean addCustom = false;
     public static String customPath = "";
     public static int screenWidth;
     public static int screenHeight;
-    //Context mContext;
+
     public static String[] entrySet;
     public static String[] valSet;
     public static String[] defSet;
     public static int standardEntries;
+
     public static int gearsCount;
     private static final int READ_REQUEST_CODE = 42;
     public static Uri currentUri = null;
+
     public static TouchDevice mDevice;
     public static char[] gearsEnabled;
+
     public static int threshold;
     public static int satLevel;
     public static int hysteresis;
+    public static int TxThreshold;
+    public static int RxThreshold;
 
     public boolean selectedGear[];
     public boolean selectedImg[];
     public static char[] imgSelected;
+
     public String[] gearsNames;
     static ImageButton btnGear;
     public static boolean isModeAuto;
 
-    //public static String imgMaskAsHex = "";
     public static String maskAsBinaryString;
     public static String imgMaskAsString;
     public static String[][] standardImgMap;
     public static String mask;
     public static String panel = "";
 
-    //public static boolean isGearsChanged;
-    public static ArrayList<String> imgNames;
     ImageButton addButton;
     TextView testInfo;
     TextView prodInfo;
@@ -88,20 +90,18 @@ public class MainActivity extends Activity {
     private static File[] list1;
     private static File[] list2;
 
+    public static String testType;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //mDevice.testTouch();
-
-        //System.loadLibrary("synaptics");
         setContentView(R.layout.activity_main);
+
         logoView = (ImageView) findViewById(R.id.logoView);
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         userPref = PreferenceManager
                 .getDefaultSharedPreferences(this);
 
-        //mContext = getBaseContext();
         String appVersion = "";
         try {
             appVersion = this.getPackageManager().getPackageInfo(
@@ -128,8 +128,6 @@ public class MainActivity extends Activity {
             standardImgMap = new String[standardEntries][3];
 
             for (int i = 0; i < standardEntries; i++) {
-                //standardImgMap[i][0] = valSet[i];
-                //standardImgMap[i][1] = "1";
                 standardImgMap[i][2] = "0";
             }
         }
@@ -148,7 +146,6 @@ public class MainActivity extends Activity {
         mDevice.diagInit(touchFWPath);
         gearsCount = mDevice.diagGearCount();
 
-        //imgNames = null;
         gearsNames = new String[gearsCount + 1];
         selectedGear = new boolean[gearsCount + 1];
         gearsNames[0] = "Automatic";
@@ -159,11 +156,6 @@ public class MainActivity extends Activity {
     @Override
     public void onResume() {
         super.onResume();
-        //Properties props = System.getProperties();
-        //props.list(System.out);
-
-        //
-        // Log.d(TAG, "SELinux status: " + checkSELinuxStatus());
 
         if (!checkSELinuxStatus() || !checkPermissions(touchFWPath)) {
             AlertDialog.Builder builder = new AlertDialog.Builder((new ContextThemeWrapper(this, R.style.Theme_CustDialog)));
@@ -193,25 +185,11 @@ public class MainActivity extends Activity {
             dialog.show();
         }
 
-        //currentUri = null;
-
         ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         int memoryClass = am.getMemoryClass();
         int largeMemoryClass = am.getLargeMemoryClass();
         //Log.d(TAG, "memoryClass:" + Integer.toString(memoryClass));
         //Log.d(TAG, "largeMemoryClass:" + Integer.toString(largeMemoryClass));
-
-        //TextView stView1 = (TextView) findViewById(R.id.val1);
-        //TextView stView2 = (TextView) findViewById(R.id.val2);
-        //TextView stView3 = (TextView) findViewById(R.id.val3);
-
-
-
-
-        //Random rnd = new Random();
-        //stView1.setText(Integer.toString(rnd.nextInt(1000)));
-        //stView2.setText(Integer.toString(rnd.nextInt(1000)));
-        //stView3.setText(Integer.toString(rnd.nextInt(1000)));
 
         product = Build.DEVICE;
         barcode = Build.SERIAL;
@@ -232,25 +210,37 @@ public class MainActivity extends Activity {
         //Log.d(TAG, "product " + product + "; config ID: " + touchCfg);
 
         int gears = mDevice.diagGearsEnabled();
-        // gears = ((gears & 0x00ff) << 8) | ((gears & 0xff00) >> 8);
-        //gears = gears << 16;
+
         String tmp = String.format("%16s", Integer.toBinaryString(gears)).replace(' ', '0');
         Log.d(TAG, "gears " + gearsCount + "; gearsEnabled: " + tmp);
         char[] gearsEnabledTmp = tmp.toCharArray();
         gearsEnabled = new char[gearsCount];
-        int diffL = gearsEnabledTmp.length - gearsCount;
+        //int diffL = gearsEnabledTmp.length - gearsCount;
 
         for (int i=0; i < gearsCount; i++) {
-            //Log.d(TAG, "difference in lenghts: " + (gearsEnabledTmp.length - gearsCount));
-            //gearsEnabled[i] = gearsEnabledTmp[i+diffL];
             gearsEnabled[i] = gearsEnabledTmp[gearsEnabledTmp.length - i - 1];
             Log.d(TAG, "gear "+i+" enabled: " + gearsEnabled[i]);
         }
 
+        SharedPreferences.Editor editor = userPref.edit();
+        StringBuilder str = new StringBuilder("");
+        str.append(MainActivity.gearsEnabled);
+        String toSave = str.reverse().toString();
+        if (!toSave.isEmpty()) {
+            Log.d(TAG, "gears mask: " + toSave);
+            TouchDevice.diagEnableGears(Integer.parseInt(toSave, 2));
+            TouchDevice.diagForceUpdate();
+            Log.d(TAG, "try to save gears mask as int: " + Integer.parseInt(toSave, 2));
+            editor.putInt("gearsMask", Integer.parseInt(toSave, 2));
+            editor.commit();
+        }
+
         selectedImg = new boolean[standardEntries];
         imgSelected = new char[standardEntries];
-        mask = userPref.getString("imgMask", null);
-        SharedPreferences.Editor editor = userPref.edit();
+        char[] zeroMask = new char[standardEntries];
+        Arrays.fill(zeroMask, '1');
+        mask = userPref.getString("imgMask", new String(zeroMask));
+        editor = userPref.edit();
         if (mask != null) {
             for (int k = 0; k < standardEntries; k++) {
                 if (mask.charAt(k) == '1') {
@@ -276,10 +266,10 @@ public class MainActivity extends Activity {
             editor.putBoolean("isListSet", true);
         }
 
-        StringBuilder str = new StringBuilder("");
-        str.append(imgSelected);
-        mask = str.toString();
-        String imgMask = str.reverse().toString();
+        StringBuilder str1 = new StringBuilder("");
+        str1.append(imgSelected);
+        mask = str1.toString();
+        String imgMask = str1.reverse().toString();
         int decimal = Integer.parseInt(imgMask, 2);
         imgMaskAsString = "0x" + Integer.toString(decimal, 16);
         Log.d(TAG, "img mask: " + imgMaskAsString);
@@ -288,7 +278,6 @@ public class MainActivity extends Activity {
         editor.putString("hexMask", imgMaskAsString);
         editor.commit();
 
-        //String isEnabled = "";
         for (int i=0; i < gearsCount; i++) {
 
             if (String.valueOf(gearsEnabled[i]).equals("1")) {
@@ -296,9 +285,7 @@ public class MainActivity extends Activity {
             } else {
                 selectedGear[i+1]=false;
             }
-
             gearsNames[i+1] = "Gear " + (i);
-            //selectedGear[i+1]=false;
         }
 
         btnGear = (ImageButton) findViewById(R.id.gearsButton);
@@ -309,32 +296,42 @@ public class MainActivity extends Activity {
         hysteresis = mDevice.diagFingerHysteresis();
         //Log.d(TAG, "getValues: " + threshold + "; " + satLevel + "; " + hysteresis);
 
-
+//DO NOT remove second reading of values!!!
         threshold = mDevice.diagFingerThreshold();
         satLevel = mDevice.diagSaturationLevel();
         hysteresis = mDevice.diagFingerHysteresis();
         //Log.d(TAG, "getValues #2: " + threshold + "; " + satLevel + "; " + hysteresis);
 
+        //TxThreshold = Integer.parseInt(userPref.getString("tx", "40"));
+        //RxThreshold = Integer.parseInt(userPref.getString("rx", "100"));
 
-        //Log.d(TAG, "gearsEnabled " + Integer.toBinaryString(mDevice.diagGearsEnabled()));
+        TxThreshold = mDevice.diagTxObjThresh();
+        RxThreshold = mDevice.diagRxObjThresh();
+        Log.d(TAG, "Report 59 thresholds: Tx=" + TxThreshold + "; Rx=" + RxThreshold);
 
-        //Log.d(TAG, "quiet threshold " + SlideShow.readFile(touchFWPath + "/f54" + "/quiet_threshold"));
-//////////remove from settings!!!!!!!!!!
-        /*
-        freqShift = readFile(touchFWPath + "/f54" + "/quiet_threshold");
-        fsDensity = readFile(touchFWPath + "/f54" + "/noise_density");
-        medNoise = readFile(touchFWPath + "/f54" + "/medium_noise_threshold");
-        fnmExit = readFile(touchFWPath + "/f54" + "/frame_count");
-        mNoise = Integer.toString(readPairValue(touchFWPath + "/f54" + "/c93_freq_shift_noise_threshold"));
-        freqScan = Integer.toString(readPairValue(touchFWPath + "/f54" + "/c89_freq_scan_threshold"));
-        cidIm = Integer.toString(readPairValue(touchFWPath + "/f54" + "/c89_cid_im_noise_threshold"));
-        quietIm = Integer.toString(readPairValue(touchFWPath + "/f54" + "/c89_quiet_im_threshold"));
-
-        setDefaultPrefs();
-        updateValuesByPrefs();
-*/
-        ///////////end of remove from settings/////////
         //check if custom path to addl images entered and correct
+        testType = userPref.getString("test_type", "Report 2");
+        if (testType.contains("59") && mDevice.diagHasHybridBaselineControl() != 1) {
+            AlertDialog.Builder builder = new AlertDialog.Builder((new ContextThemeWrapper(this, R.style.Theme_CustDialog)));
+            builder.setMessage(
+                    "Report 59 is not supported in device SW")
+                    .setTitle("Oops...");
+
+            builder.setPositiveButton("OK",
+                    new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(getApplicationContext(),
+                                    com.motorola.ghostbusters.SetPreferences.class);
+                            startActivity(intent);
+                        }
+                    });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+
         addCustom = userPref.getBoolean("custom", false);
         if (addCustom) {
             customPath = userPref.getString("custom_path", "");
@@ -494,59 +491,6 @@ public class MainActivity extends Activity {
         return touchCfg;
     }
 
-    /*
-    private void setDefaultPrefs() {
-
-        if (!userPref.getBoolean("isDefaultsSet", false)) {
-            SharedPreferences.Editor editor = userPref.edit();
-
-            editor.putString("freq_shift", freqShift);
-            editor.putString("fs_density", fsDensity);
-            editor.putString("medium_noise", medNoise);
-            editor.putString("fnm_exit", fnmExit);
-            editor.putString("noise", mNoise);
-            editor.putString("freq_scan", freqScan);
-            editor.putString("cid_im", cidIm);
-            editor.putString("quiet_im", quietIm);
-
-            editor.putBoolean("isDefaultsSet", true);
-
-            setMultiList(screenWidth);
-            //setMultiList(2160); //FOR TEST ONLY!!!!
-            if (!userPref.getBoolean("isListSet", false)) {
-                Set<String> defVals = new HashSet<String>(Arrays.asList(valSet));
-                editor.putStringSet("advanced", defVals);
-                editor.putBoolean("isListSet", true);
-                Log.d(TAG, "prefs are set");
-                //editor.commit();
-            }
-            editor.commit();
-        }
-    }
-
-    private void updateValuesByPrefs() {
-        //update files when prefs changed
-        String freqShift1 = userPref.getString("freq_shift", freqShift);
-        updateFile(touchFWPath + "/f54" + "/quiet_threshold", freqShift1);
-        String fsDensity1 = userPref.getString("fs_density", fsDensity);
-        updateFile(touchFWPath + "/f54" + "/noise_density", fsDensity1);
-        String medNoise1 = userPref.getString("medium_noise", medNoise);
-        updateFile(touchFWPath + "/f54" + "/medium_noise_threshold", medNoise1);
-        String fnmExit1 = userPref.getString("fnm_exit", fnmExit);
-        updateFile(touchFWPath + "/f54" + "/frame_count", fnmExit1);
-
-        String mNoise1 = userPref.getString("noise", mNoise);
-        updatePairValue(touchFWPath + "/f54" + "/c93_freq_shift_noise_threshold", mNoise1);
-        String freqScan1 = userPref.getString("noise", freqScan);
-        updatePairValue(touchFWPath + "/f54" + "/c89_freq_scan_threshold", freqScan1);
-        String cidIm1 = userPref.getString("noise", cidIm);
-        updatePairValue(touchFWPath + "/f54" + "/c89_cid_im_noise_threshold", cidIm1);
-        String quietIm1 = userPref.getString("noise", quietIm);
-        updatePairValue(touchFWPath + "/f54" + "/c89_quiet_im_threshold", quietIm1);
-
-    }
-    */
-
     public static String readFile(String fileToRead) {
         FileInputStream is;
         BufferedReader reader;
@@ -579,14 +523,6 @@ public class MainActivity extends Activity {
             panel += "-v" + tmpVersion.substring(tmpVersion.length() - 3, tmpVersion.length() - 2); // begin index inclusive, end index exclusive!!!
         }
         return panel;
-    }
-
-    public static int readPairValue(String fileToRead) {
-        String resStr = "";
-        //Log.d(TAG, "_msb " + readFile(fileToRead + "_msb") + "; _lsb " + readFile(fileToRead + "_lsb"));
-        resStr = decToHex(readFile(fileToRead + "_msb")) + decToHex(readFile(fileToRead + "_lsb"));
-        int res = hexToDec(resStr);
-        return res;
     }
 
     public static String decToHex(String decToConvert) {
@@ -637,17 +573,6 @@ public class MainActivity extends Activity {
         return 1;
     }
 
-    public static int updatePairValue(String fileName, String decValue) {
-        //String tmp = decToHex(decValue);
-        int lsbValue = Integer.parseInt(decValue) & 0x00FF;
-        int msbValue = (Integer.parseInt(decValue) & 0xFF00) >> 8;
-        //Log.d(TAG, "_msb " + msbValue + "; _lsb " + lsbValue);
-        updateFile(fileName + "_msb", Integer.toString(msbValue));
-        updateFile(fileName + "_lsb", Integer.toString(lsbValue));
-
-        return 1;
-    }
-
     public static boolean checkCustomPath(String customPath) {
         boolean res = false;
         File file = new File(customPath);
@@ -661,6 +586,8 @@ public class MainActivity extends Activity {
     }
 
     private void setMultiList(int resolution) {
+
+        Log.d(TAG, "setting defaults for resolution: " + resolution);
 
         switch (resolution) {
             case 720:
@@ -803,6 +730,7 @@ public class MainActivity extends Activity {
         if (currentUri != null) {
             infoText += " + user image";
         }
+        infoText += " Test type: " + testType;
         testInfo.setText(infoText);
     }
 
@@ -857,6 +785,7 @@ public class MainActivity extends Activity {
 
     }
 
+/*
     public class DialogSelectionClickHandler implements
             DialogInterface.OnMultiChoiceClickListener {
         public void onClick(DialogInterface dialog, int clicked,
@@ -865,6 +794,7 @@ public class MainActivity extends Activity {
             // Log.i("ME", _options[clicked] + " selected: " + selected);
         }
     }
+*/
 
     private static boolean checkSELinuxStatus() {
         String cmd_out = "";

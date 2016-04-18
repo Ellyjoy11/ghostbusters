@@ -16,6 +16,7 @@ public class TouchDevice {
     public native static int diagPowerIM();
     public native static int diagCoherentIM();
     public native static int diagDeltaPeaks(int loops);
+    public native static int diagRxDeltaPeaks(int loops);
     public native static int diagFrameY();
     public native static int diagFrameX();
     public native static short[] diagDeltaFrame();
@@ -29,6 +30,15 @@ public class TouchDevice {
     public native static String[] diagStats();
     public native static void diagResetTouch();
     public native static void diagClose();
+
+    public native static int diagHasHybridBaselineControl();
+    public native static int diagEnHybridOnRx();
+    public native static int diagEnHybridOnTx();
+    public native static int diagTxObjThresh();
+    public native static int diagRxObjThresh();
+    public native static int diagSetTxObjThresh(int thresh);
+    public native static int diagSetRxObjThresh(int thresh);
+    public native static int[] diagRxTxDeltaPeaks(int loops, int report_type);
 
     public static int gearCount;
     private final String TAG = "Ghostbusters";

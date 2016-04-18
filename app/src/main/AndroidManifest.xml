@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.motorola.ghostbusters"
     android:versionCode="1"
-    android:versionName="1.1">  <!-- The version MUST be updated in gradle.build!!!-->
+    android:versionName="1.1"> <!-- The version MUST be updated in gradle.build!!! -->
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -12,12 +12,13 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        >
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -29,38 +30,32 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_slide_show"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.NoTitleBar" >
-        </activity>
+            android:theme="@style/Theme.NoTitleBar"></activity>
         <activity
             android:name=".ChartShow"
             android:configChanges="orientation"
             android:label="@string/title_activity_chart_show"
-            android:screenOrientation="portrait" >
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".SetPreferences"
-            android:label="@string/title_activity_set_preferences" >
-        </activity>
+            android:label="@string/title_activity_set_preferences"></activity>
         <activity
             android:name=".TouchRpt"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_touch_rpt"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.NoTitleBar" >
-        </activity>
+            android:theme="@style/Theme.NoTitleBar"></activity>
         <activity
             android:name=".DisplayTest"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_display_test"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.NoTitleBar" >
-        </activity>
+            android:theme="@style/Theme.NoTitleBar"></activity>
         <activity
             android:name=".PieChartShow"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_pie_chart_show" >
-        </activity>
+            android:label="@string/title_activity_pie_chart_show"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

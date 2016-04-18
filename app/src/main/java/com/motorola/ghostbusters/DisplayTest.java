@@ -48,20 +48,15 @@ public class DisplayTest extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /*
-        View decorView = getWindow().getDecorView();
-        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
-        decorView.setSystemUiVisibility(uiOptions);
-        */
         setContentView(R.layout.activity_display_test);
+
         mFlipper = (ViewFlipper) findViewById(R.id.mDisplay);
         imReadySemaphore = new Semaphore(0);
         testCounter = 0;
         isStarted = false;
+
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
-
-        //inst = new Instrumentation();
 
         mHandler = new Handler() {
             @Override
@@ -79,7 +74,6 @@ public class DisplayTest extends Activity {
                             mBitmap.recycle();
                         }
                         mBitmap = null;
-                        //System.gc();
 
                         testCounter++;
 
@@ -92,25 +86,12 @@ public class DisplayTest extends Activity {
                             Log.d(TAG, "Setting brightness to 0");
                             getWindow().setAttributes(params);
 
-                            /*
-                            try {
-                                Process p = Runtime.getRuntime().exec("input keyevent 26");
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            */
                         }
                         if ((res5 == 0) && (res2 == 0)) {
                             params.screenBrightness = -1;
                             Log.d(TAG, "Setting brightness back to normal");
                             getWindow().setAttributes(params);
-                            /*
-                            try {
-                                Process p = Runtime.getRuntime().exec("input keyevent 26");
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            */
+
                         }
 
                         if (imCounter < standardImgMap.length) {
@@ -147,7 +128,6 @@ public class DisplayTest extends Activity {
         mCheck = 0;
         stopTest = false;
         mFlipper.removeAllViews();
-        //imgNames = getImgNames();
 
         CYCLES = MainActivity.standardEntries;
 
@@ -211,19 +191,6 @@ public class DisplayTest extends Activity {
         //Log.d(TAG, "images in flipper: " + mFlipper.getChildCount());
     }
 
-    /*
-    private void blockTouch() {
-        TouchDevice.diagDisableTouch();
-        TouchDevice.diagGearAuto(0);
-    }
-
-    private void unBlockTouch() {
-
-        TouchDevice.diagGearAuto(0);
-        TouchDevice.diagEnableTouch();
-    }
-    */
-
     public void onBackPressed() {
         super.onBackPressed();
         stopTest = true;
@@ -265,17 +232,6 @@ public class DisplayTest extends Activity {
                         Log.d(TAG, "sent request to change image");
                         imReadySemaphore.acquire();
                         long time1 = SystemClock.elapsedRealtime();
-
-                        if (i % 5 == 0) {
-                            //inst.sendKeyDownUpSync(KeyEvent.KEYCODE_POWER);
-                            /*
-                            try {
-                                Process p = Runtime.getRuntime().exec("input keyevent 26");
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            */
-                        }
 
                         for (int j = 0; j < 300; j++) {
                             try {

@@ -12,9 +12,11 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 
-import java.util.Random;
-
-import static android.graphics.Color.*;
+import static android.graphics.Color.GRAY;
+import static android.graphics.Color.GREEN;
+import static android.graphics.Color.MAGENTA;
+import static android.graphics.Color.WHITE;
+import static android.graphics.Color.parseColor;
 
 /**
  * Created by elenalast on 8/2/15.
@@ -26,29 +28,16 @@ public class MyPie extends View {
     Paint paintLimits, paint;
     Paint paintText;
 
-    float axisX1, axisX2, axisX_Y;
-    float axisY_X, axisY1, axisY2;
     float xC, yC, radius1, radius2, radius3, xLegend, yLegend;
-    public int axisPad = 20;
     public int mTextSize;
-    //public int gearsNum;
-    float xSize;
-    float xStep;
-    float paintWidth;
+
     float startAngle;
     float sweepAngle;
-    //float step;
-    //public static int mProgress = 0;
-    public static int threshold;
-    public static int satCap;
-    public static int hysteresis;
-    public static float xZeroLine;
-    public static float xScale;
-    public static float upperLine;
+
     int realScreenHeight;
     int screenWidth;
     int screenHeight;
-    Random rand = new Random();
+
     public static int[] gearsStats;
     public static int[] nStats;
     public static int[] mStats;
@@ -145,17 +134,12 @@ public class MyPie extends View {
 
     }
 
-    public static void arrangeArrays(int gearsCount) {
-
-    }
-
     @Override
     protected void onDraw(Canvas canvas) {
 
         String stats[] = MainActivity.mDevice.diagStats();
         String value1 = "";
         String value2 = "";
-        //String tttt = "G1: 56%";
         String pattern1 = ".*:\\s+(\\d+)\\s*.*\\n";
         int countG = 0;
         int countN = 0;
@@ -223,8 +207,6 @@ public class MyPie extends View {
                 startAngle += sweepAngle;
             }
 
-            //canvas.drawCircle(xC, yC, radius2, paintWhite);
-
             //Drawing Metal Plate Detection stats in med circle
             canvas.drawCircle(xC, yC, radius2, paintWhite);
 
@@ -248,7 +230,6 @@ public class MyPie extends View {
             yLegend += mTextSize;
             canvas.drawText("M1", xLegend + mTextSize, yLegend - 15, paintText);
 
-            //canvas.drawCircle(xC, yC, radius3, paintWhite);
             //Drawing Noise Mitigation stats in inner circle
             canvas.drawCircle(xC, yC, radius3, paintWhite);
             startAngle = 0;

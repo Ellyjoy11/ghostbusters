@@ -10,62 +10,138 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.Set;
 
 
 public class ChartShow extends Activity {
     MyChart chartView;
+    MyAbsChart absChartView;
     public static final String TAG = "Ghostbusters";
     public static SharedPreferences userPref;
     public static int[] maxV;
     public static int[] minV;
+
+    public static int[] maxRxV;
+    public static int[] minRxV;
+
+    public static int[] maxTxV;
+    public static int[] minTxV;
+
     public static int mMaxImV[][];
     public static int mMinImV[][];
+
+    public static int mMaxRxImV[][];
+    public static int mMinRxImV[][];
+
+    public static int mMaxTxImV[][];
+    public static int mMinTxImV[][];
+
     private static int tmpMax;
     private static int tmpMin;
+
     public static String[] imgNames;
     public static String imgMaskAsHex = "";
     public static String maskAsBinaryString;
     public static String[][] standardImgMap;
-    public static boolean runFromChart = false;
     public static boolean addCustom;
     public static boolean needRetest;
     TextView touchInfo;
+    String testTypeToRun;
+    public static boolean isRxEnabled;
+    public static boolean isTxEnabled;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chart_show);
         chartView = (MyChart) findViewById(R.id.myChart);
+        absChartView = (MyAbsChart) findViewById(R.id.myAbsChart);
 
         userPref = PreferenceManager
                 .getDefaultSharedPreferences(this);
         standardImgMap = new String[MainActivity.standardEntries][3];
-        boolean dataExists = false;
-        if (SlideShow.standardImgMap != null) {
-            for (int k = 0; k < SlideShow.standardImgMap.length; k++) {
-                if (SlideShow.standardImgMap[k][2] == "1") {
-                    dataExists = true;
-                    break;
-                }
-            }
+
+        if (MainActivity.testType.contains("59") && MainActivity.mDevice.diagHasHybridBaselineControl() != 1) {
+            AlertDialog.Builder builder = new AlertDialog.Builder((new ContextThemeWrapper(this, R.style.Theme_CustDialog)));
+            builder.setMessage(
+                    "Report 59 is not supported in device SW")
+                    .setTitle("Oops...");
+
+            builder.setPositiveButton("OK",
+                    new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(getApplicationContext(),
+                                    com.motorola.ghostbusters.SetPreferences.class);
+                            startActivity(intent);
+                        }
+                    });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        } else {
+            isRxEnabled = SlideShow.isRxEnabled;
+            isTxEnabled = SlideShow.isTxEnabled;
         }
-        if (!dataExists) {
-            Toast.makeText(getApplicationContext(), "Please run test first",
-                    Toast.LENGTH_SHORT).show();
-        }
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        //maxV = getIntent().getIntArrayExtra("mMax");
-        //minV = getIntent().getIntArrayExtra("mMin");
-        //imgNames = getImgNames();
-        //imgMaskAsHex = getImgMask();
+        //Log.d(TAG, "call onResume");
+
+        testTypeToRun = MainActivity.testType;
+
+        Button switchButton = (Button) findViewById(R.id.switchType);
+
+        if (testTypeToRun.contains("2")) {
+            chartView.setVisibility(View.VISIBLE);
+            absChartView.setVisibility(View.INVISIBLE);
+            switchButton.setText("Report 2 // Switch report type");
+        } else if (testTypeToRun.contains("59")) {
+            chartView.setVisibility(View.INVISIBLE);
+            absChartView.setVisibility(View.VISIBLE);
+            switchButton.setText("Report 59 // Switch report type");
+        }
+
+        boolean dataExists = false;
+        if (SlideShow.standardImgMap != null && SlideShow.mMaxIm != null) {
+            for (int k = 0; k < SlideShow.standardImgMap.length; k++) {
+                if (SlideShow.standardImgMap[k][2] == "1") {
+                    for (int l=0; l < SlideShow.mMaxIm[k].length; l++) {
+                        if (SlideShow.mMaxIm[k][l] > 0) {
+                            dataExists = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        boolean absDataExists = false;
+        if (SlideShow.standardImgMap != null && SlideShow.mRxMax != null) {
+            for (int k = 0; k < SlideShow.standardImgMap.length; k++) {
+                    if (SlideShow.standardImgMap[k][2] == "1") {
+                        for (int l=0; l < SlideShow.mRxMax[k].length; l++) {
+                            if (SlideShow.mRxMax[k][l] > 0) {
+                                absDataExists = true;
+                                break;
+                            }
+                        }
+                    }
+            }
+        }
+        Log.d(TAG, "dataExist: " + dataExists + "... absDataExist: " + absDataExists);
+        if ((!dataExists && switchButton.getText().toString().contains("2"))
+                || (!absDataExists && switchButton.getText().toString().contains("59"))) {
+            Toast.makeText(getApplicationContext(), "Please run test first",
+                    Toast.LENGTH_SHORT).show();
+        }
+
         imgMaskAsHex = userPref.getString("hexMask", MainActivity.imgMaskAsString);
         if (SlideShow.isDefault) {
             standardImgMap = SlideShow.standardImgMap;
@@ -76,41 +152,73 @@ public class ChartShow extends Activity {
 
         //Log.d(TAG, "getting string mask: " + maskAsBinaryString + " -> " + imgMaskAsHex);
         addCustom = userPref.getBoolean("custom", false);
-
         ActionBar actionBar = getActionBar();
 
         mMaxImV = SlideShow.mMaxIm;
         mMinImV = SlideShow.mMinIm;
 
+        mMaxRxImV = SlideShow.mRxMax;
+        mMinRxImV = SlideShow.mRxMin;
+
+        mMaxTxImV = SlideShow.mTxMax;
+        mMinTxImV = SlideShow.mTxMin;
+
         maxV = new int[MainActivity.gearsCount+1];
         minV = new int[MainActivity.gearsCount+1];
+
+        maxRxV = new int[MainActivity.gearsCount+1];
+        minRxV = new int[MainActivity.gearsCount+1];
+
+        maxTxV = new int[MainActivity.gearsCount+1];
+        minTxV = new int[MainActivity.gearsCount+1];
+
         if (SlideShow.standardImgMap != null) {
             checkData();
         }
         getTotalValues();
+        getAbsData();
+
         if (mMaxImV != null) {
             if ((mMaxImV.length > MainActivity.standardEntries && addCustom)
-            || (mMaxImV.length > MainActivity.standardEntries && MainActivity.currentUri != null)){
+                    || (mMaxImV.length > MainActivity.standardEntries && MainActivity.currentUri != null)){
                 imgMaskAsHex += "/cust";
             }
         }
-            if (actionBar != null) {
-                actionBar.setTitle(" Set '" + imgMaskAsHex + "'-" + MainActivity.product + "-" + MainActivity.barcode);
+
+        if (mMaxRxImV != null && !imgMaskAsHex.contains("/cust")) {
+            if ((mMaxRxImV.length > MainActivity.standardEntries && addCustom)
+                    || (mMaxRxImV.length > MainActivity.standardEntries && MainActivity.currentUri != null)){
+                imgMaskAsHex += "/cust";
             }
-        chartView.setArrays(minV, maxV);
+        }
 
-        // int threshold = MainActivity.mDevice.diagFingerThreshold();
-        // int satLevel =  MainActivity.mDevice.diagSaturationLevel();
-        // int hysteresis = MainActivity.mDevice.diagFingerHysteresis();
+        if (mMaxTxImV != null && !imgMaskAsHex.contains("/cust")) {
+            if ((mMaxTxImV.length > MainActivity.standardEntries && addCustom)
+                    || (mMaxTxImV.length > MainActivity.standardEntries && MainActivity.currentUri != null)){
+                imgMaskAsHex += "/cust";
+            }
+        }
 
-        chartView.setThresholds(MainActivity.threshold, MainActivity.satLevel, MainActivity.hysteresis);
+        if (actionBar != null) {
+            actionBar.setTitle(" Set '" + imgMaskAsHex + "'-" + MainActivity.product + "-" + MainActivity.barcode);
+            //actionBar.
+        }
+
+        if (testTypeToRun.contains("59")) {
+            absChartView.setArrays(minRxV, maxRxV, minTxV, maxTxV);
+            absChartView.setThresholds(MainActivity.TxThreshold, MainActivity.RxThreshold);
+        } else {
+            chartView.setArrays(minV, maxV);
+            chartView.setThresholds(MainActivity.threshold, MainActivity.satLevel, MainActivity.hysteresis);
+        }
+
         touchInfo = (TextView) findViewById(R.id.infoText);
         String textToShowAtBottom = "Product: " + MainActivity.productInfo + "  Config: " + MainActivity.getTouchCfg();
         if (!MainActivity.panel.isEmpty()) {
             textToShowAtBottom += " Panel: " + MainActivity.panel;
         }
         touchInfo.setText(textToShowAtBottom);
-        //chartView.invalidate();
+
     }
 
     public void checkData(){
@@ -119,7 +227,7 @@ public class ChartShow extends Activity {
         for (int i = 0; i < standardImgMap.length; i++) {
             if (i < standardImgMap.length && standardImgMap[i][1].equals("1")
                             && SlideShow.standardImgMap[i][2].equals("1")) {
-                Log.d(TAG, "Data for image " + i + " OK");
+                //Log.d(TAG, "Data for image " + i + " OK");
                 tmp[i] = "0";
             } else if (i < standardImgMap.length && standardImgMap[i][1].equals("1")
                     && SlideShow.standardImgMap[i][2].equals("0")) {
@@ -129,16 +237,15 @@ public class ChartShow extends Activity {
             }
         }
         int samples = Integer.parseInt(userPref.getString("samples", "100"));
-        int gearsSet = userPref.getInt("gearsMask", 255);
+        //int gearsSet = userPref.getInt("gearsMask", 255);
         String imgUri = userPref.getString("uri", null);
         //boolean isModeAuto = userPref.getBoolean("isAuto", true);
-        if (samples != SlideShow.samplesDone || gearsSet != SlideShow.gearsSetDone
-                || (imgUri != null && !imgUri.equals(SlideShow.imgUriDone))) {
+        if (samples != SlideShow.samplesDone ||
+                (imgUri != null && !imgUri.equals(SlideShow.imgUriDone))) {
             needRetest = true;
         }
         if (needRetest) {
 
-            //runFromChart = true;
             needRetest = false;
 
             AlertDialog.Builder builder = new AlertDialog.Builder((new ContextThemeWrapper(this, R.style.Theme_CustDialog)));
@@ -180,7 +287,7 @@ public class ChartShow extends Activity {
                if ((i >= standardImgMap.length && (addCustom || MainActivity.currentUri != null)) ||
                        (i < standardImgMap.length && standardImgMap[i][1].equals("1")
                        && SlideShow.standardImgMap[i][2].equals("1"))) {
-                   Log.d(TAG, "check data for image " + i);
+                   //Log.d(TAG, "check data for image " + i);
                     if (tmpMax < mMaxImV[i][gear]) {
                         tmpMax = mMaxImV[i][gear];
                     }
@@ -197,105 +304,96 @@ public class ChartShow extends Activity {
             Log.d(TAG, "Getting total max/min for gear " + gear + ": " + maxV[gear] + "/" + minV[gear]);
         }
     }
-/*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_chart_show, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if (item.getItemId() == R.id.action_settings) {
-            Intent intent = new Intent(this, SetPreferences.class);
-            startActivity(intent);
-            return true;
-        }
-        if (item.getItemId() == R.id.about) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-            builder.setMessage(MainActivity.ABOUT_TITLE).setTitle(
-                    MainActivity.ABOUT_VERSION);
-
-            builder.setPositiveButton("OK",
-                    new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
+    public static void getAbsData() {
+        if (isRxEnabled) {
+            for (int gear = 0; gear <= MainActivity.gearsCount; gear++) {
+                tmpMax = 0;
+                tmpMin = 0;
+                for (int i = 0; i < SlideShow.CYCLES; i++) {
+                    if ((i >= standardImgMap.length && (addCustom || MainActivity.currentUri != null)) ||
+                            (i < standardImgMap.length && standardImgMap[i][1].equals("1")
+                                    && SlideShow.standardImgMap[i][2].equals("1"))) {
+                        //Log.d(TAG, "check data for Rx for image " + i);
+                        if (tmpMax < mMaxRxImV[i][gear]) {
+                            tmpMax = mMaxRxImV[i][gear];
                         }
-                    });
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-
-    }
-    */
-
-    public static String[] getImgNames() {
-        Set<String> selections = userPref.getStringSet("advanced", null);
-        String[] imgs = new String[selections.size()];
-        imgs = selections.toArray(new String[]{});
-        return imgs;
-    }
-
-    public static String getImgMask() {
-        //String[] bitsToAdd = new String [MainActivity.valSet.length];
-        maskAsBinaryString = "";
-        String imgMaskAsString = "";
-
-        boolean[] checked = new boolean[MainActivity.valSet.length];
-        for (int i=0; i < MainActivity.valSet.length; i++) {
-            checked[i] = false;
-            for (int j=0; j < imgNames.length; j++) {
-                if (MainActivity.valSet[i].equals(imgNames[j])) {
-                    checked[i] = true;
-                    continue;
+                        if (tmpMin < mMinRxImV[i][gear]) {
+                            tmpMin = mMinRxImV[i][gear];
+                        }
+                    } else if (i < standardImgMap.length && standardImgMap[i][1].equals("1")
+                            && SlideShow.standardImgMap[i][2].equals("0")) {
+                        Log.d(TAG, "No data for Rx for image " + i + " - need to run test again!");
+                    }
                 }
-            }
-            if (SlideShow.isDefault) {
-                checked[0] = true;
-            }
-
-            standardImgMap[i][0] = MainActivity.valSet[i];
-            //standardImgMap[i][2] = "0";
-            if (checked[i]) {
-                maskAsBinaryString += "1";
-                standardImgMap[i][1] = "1";
-            } else {
-                maskAsBinaryString += "0";
-                standardImgMap[i][1] = "0";
+                maxRxV[gear] = tmpMax;
+                minRxV[gear] = tmpMin;
+                Log.d(TAG, "Getting total Rx max/min for gear " + gear + ": " + maxRxV[gear] + "/" + minRxV[gear]);
             }
         }
-        String imgMask = new StringBuilder(maskAsBinaryString).reverse().toString();
-        Log.d(TAG, "string mask for images: " + maskAsBinaryString + "; length is " + maskAsBinaryString.length());
-        int decimal = Integer.parseInt(imgMask,2);
-        imgMaskAsString = "0x" + Integer.toString(decimal,16);
-        Log.d(TAG, "try to save mask as hex: " + imgMask + " -> " + imgMaskAsString);
-        return imgMaskAsString;
-    }
+        if (isTxEnabled) {
+            for (int gear = 0; gear <= MainActivity.gearsCount; gear++) {
+                tmpMax = 0;
+                tmpMin = 0;
+                for (int i = 0; i < SlideShow.CYCLES; i++) {
+                    if ((i >= standardImgMap.length && (addCustom || MainActivity.currentUri != null)) ||
+                            (i < standardImgMap.length && standardImgMap[i][1].equals("1")
+                                    && SlideShow.standardImgMap[i][2].equals("1"))) {
+                        //Log.d(TAG, "check data for Tx for image " + i);
+                        if (tmpMax < mMaxTxImV[i][gear]) {
+                            tmpMax = mMaxTxImV[i][gear];
+                        }
+                        if (tmpMin < mMinTxImV[i][gear]) {
+                            tmpMin = mMinTxImV[i][gear];
+                        }
+                    } else if (i < standardImgMap.length && standardImgMap[i][1].equals("1")
+                            && SlideShow.standardImgMap[i][2].equals("0")) {
+                        Log.d(TAG, "No data for Tx for image " + i + " - need to run test again!");
+                    }
+                }
+                maxTxV[gear] = tmpMax;
+                minTxV[gear] = tmpMin;
+                Log.d(TAG, "Getting total Tx max/min for gear " + gear + ": " + maxTxV[gear] + "/" + minTxV[gear]);
+            }
+        }
+        }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        //MainActivity.currentUri = null;
+    public void switchChart(View view) {
+
+        AlertDialog.Builder b = new AlertDialog.Builder((new ContextThemeWrapper(this, R.style.Theme_CustDialog)));
+        b.setTitle("Select report type");
+        String[] types = {"Report 2", "Report 59"};
+        b.setItems(types, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                switch (which) {
+                    case 0:
+                        MainActivity.testType = "Report 2";
+                        break;
+                    case 1:
+                        MainActivity.testType = "Report 59";
+                        break;
+                }
+                dialog.dismiss();
+            }
+
+        });
+        b.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                finish();
+                startActivity(getIntent());
+            }
+        });
+
+        b.show();
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        //finish();
-
         Intent intent = new Intent(getApplicationContext(),
                 MainActivity.class);
         startActivity(intent);
