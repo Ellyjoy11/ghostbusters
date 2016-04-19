@@ -99,7 +99,7 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
     		return -1;
     	}
 
-    reset_touch();
+//    reset_touch();
 
 	sprintf(path, "%s/f54/num_of_mapped_tx", dpath);
 	fd = open(path, O_RDONLY);

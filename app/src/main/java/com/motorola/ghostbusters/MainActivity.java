@@ -91,6 +91,8 @@ public class MainActivity extends Activity {
     private static File[] list2;
 
     public static String testType;
+    public static boolean isRxEnabled;
+    public static boolean isTxEnabled;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -308,6 +310,19 @@ public class MainActivity extends Activity {
         TxThreshold = mDevice.diagTxObjThresh();
         RxThreshold = mDevice.diagRxObjThresh();
         Log.d(TAG, "Report 59 thresholds: Tx=" + TxThreshold + "; Rx=" + RxThreshold);
+
+        if (mDevice.diagEnHybridOnRx() == 1) {
+            isRxEnabled = true;
+        } else {
+            isRxEnabled = false;
+        }
+
+        if (mDevice.diagEnHybridOnTx() == 1) {
+            isTxEnabled = true;
+        } else {
+            isTxEnabled = false;
+        }
+        Log.d(TAG, "Rx and Tx enabled: " + isRxEnabled + "; " + isTxEnabled);
 
         //check if custom path to addl images entered and correct
         testType = userPref.getString("test_type", "Report 2");

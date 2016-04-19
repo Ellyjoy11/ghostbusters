@@ -84,8 +84,8 @@ public class ChartShow extends Activity {
             AlertDialog dialog = builder.create();
             dialog.show();
         } else {
-            isRxEnabled = SlideShow.isRxEnabled;
-            isTxEnabled = SlideShow.isTxEnabled;
+            isRxEnabled = MainActivity.isRxEnabled;
+            isTxEnabled = MainActivity.isTxEnabled;
         }
 
     }

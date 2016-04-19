@@ -193,18 +193,8 @@ public class SlideShow extends Activity {
         c = 0;
         tmpCount = -1;
 
-        if (MainActivity.mDevice.diagEnHybridOnRx() == 1) {
-            isRxEnabled = true;
-        } else {
-            isRxEnabled = false;
-        }
-
-        if (MainActivity.mDevice.diagEnHybridOnTx() == 1) {
-            isTxEnabled = true;
-        } else {
-            isTxEnabled = false;
-        }
-        Log.d(TAG, "Rx and Tx enabled: " + isRxEnabled + "; " + isTxEnabled);
+        isRxEnabled = MainActivity.isRxEnabled;
+        isTxEnabled = MainActivity.isTxEnabled;
 
         isDone = false;
         needSleep = true;

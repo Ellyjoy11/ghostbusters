@@ -11,36 +11,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e87afab4-dce9-405c-aa80-2fb22a4e3930" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/MyAbsChart.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.2.1/taskArtifacts/cache.properties.lock" afterPath="$PROJECT_DIR$/.gradle/2.2.1/taskArtifacts/cache.properties.lock" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.2.1/taskArtifacts/fileHashes.bin" afterPath="$PROJECT_DIR$/.gradle/2.2.1/taskArtifacts/fileHashes.bin" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.2.1/taskArtifacts/fileSnapshots.bin" afterPath="$PROJECT_DIR$/.gradle/2.2.1/taskArtifacts/fileSnapshots.bin" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.2.1/taskArtifacts/outputFileStates.bin" afterPath="$PROJECT_DIR$/.gradle/2.2.1/taskArtifacts/outputFileStates.bin" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.2.1/taskArtifacts/taskArtifacts.bin" afterPath="$PROJECT_DIR$/.gradle/2.2.1/taskArtifacts/taskArtifacts.bin" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/gradle.xml" afterPath="$PROJECT_DIR$/.idea/gradle.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/app.iml" afterPath="$PROJECT_DIR$/app/app.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/build.gradle" afterPath="$PROJECT_DIR$/app/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/ChartShow.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/ChartShow.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/DisplayTest.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/DisplayTest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/MainActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/MainActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/MyChart.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/MyChart.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/MyPie.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/MyPie.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/SettingsFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/SettingsFragment.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/MyAbsChart.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/MyAbsChart.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/SlideShow.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/SlideShow.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/TouchDevice.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/TouchDevice.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/TouchRpt.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/TouchRpt.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/jni/synaptics.c" afterPath="$PROJECT_DIR$/app/src/main/jni/synaptics.c" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_chart_show.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_chart_show.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/menu/menu_main.xml" afterPath="$PROJECT_DIR$/app/src/main/res/menu/menu_main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/values/arrays.xml" afterPath="$PROJECT_DIR$/app/src/main/res/values/arrays.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/xml/pref_general.xml" afterPath="$PROJECT_DIR$/app/src/main/res/xml/pref_general.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.gradle" afterPath="$PROJECT_DIR$/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gradle.properties" afterPath="$PROJECT_DIR$/gradle.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" />
     </list>
     <ignored path="Ghostbusters.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -71,12 +48,10 @@
       <file leaf-file-name="ChartShow.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/ChartShow.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.8148148">
-              <caret line="70" column="41" selection-start-line="70" selection-start-column="41" selection-end-line="70" selection-end-column="41" />
+            <state vertical-scroll-proportion="-6.111111">
+              <caret line="91" column="0" selection-start-line="91" selection-start-column="0" selection-end-line="91" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#2434#2853#0" expanded="true" />
-                <element signature="e#2852#2853#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -85,32 +60,30 @@
       <file leaf-file-name="MyAbsChart.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/MyAbsChart.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="130" column="50" selection-start-line="130" selection-start-column="50" selection-end-line="130" selection-end-column="50" />
+            <state vertical-scroll-proportion="-15.592592">
+              <caret line="206" column="40" selection-start-line="206" selection-start-column="40" selection-end-line="206" selection-end-column="40" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MainActivity.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="MainActivity.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/MainActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-4.037037">
-              <caret line="316" column="60" selection-start-line="316" selection-start-column="21" selection-end-line="316" selection-end-column="60" />
+            <state vertical-scroll-proportion="0.60402685">
+              <caret line="319" column="46" selection-start-line="319" selection-start-column="46" selection-end-line="319" selection-end-column="46" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#11809#12228#0" expanded="true" />
-                <element signature="e#12227#12228#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TouchDevice.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/TouchDevice.java">
+      <file leaf-file-name="SlideShow.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/SlideShow.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="33" column="60" selection-start-line="33" selection-start-column="60" selection-end-line="33" selection-end-column="60" />
+              <caret line="85" column="38" selection-start-line="84" selection-start-column="4" selection-end-line="85" selection-end-column="38" />
               <folding />
             </state>
           </provider>
@@ -119,43 +92,11 @@
       <file leaf-file-name="synaptics.c" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/jni/synaptics.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-2.0370371">
-              <caret line="890" column="30" selection-start-line="890" selection-start-column="30" selection-end-line="890" selection-end-column="30" />
+            <state vertical-scroll-proportion="-6.6666665">
+              <caret line="101" column="2" selection-start-line="101" selection-start-column="2" selection-end-line="101" selection-end-column="2" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SlideShow.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/SlideShow.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.68488747">
-              <caret line="666" column="69" selection-start-line="666" selection-start-column="69" selection-end-line="666" selection-end-column="69" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SettingsFragment.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/SettingsFragment.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="20" column="35" selection-start-line="20" selection-start-column="35" selection-end-line="20" selection-end-column="35" />
-              <folding>
-                <element signature="imports" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="pref_general.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/res/xml/pref_general.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="115" column="33" selection-start-line="115" selection-start-column="33" selection-end-line="115" selection-end-column="33" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -1673,11 +1614,11 @@
         <option value="$PROJECT_DIR$/app/src/main/res/xml/pref_general.xml" />
         <option value="$PROJECT_DIR$/app/build.gradle" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/TouchDevice.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/MyAbsChart.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/MainActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/ChartShow.java" />
         <option value="$PROJECT_DIR$/app/src/main/jni/synaptics.c" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/MyAbsChart.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/SlideShow.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/ChartShow.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/MainActivity.java" />
       </list>
     </option>
   </component>
@@ -1718,8 +1659,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
-      <pane id="Scope" />
+      <pane id="PackagesPane" />
+      <pane id="ProjectPane" />
       <pane id="AndroidView">
         <subPane>
           <PATH>
@@ -1752,32 +1693,14 @@
               <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidModuleNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
+              <option name="myItemId" value="jni" />
               <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidSourceTypeNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Ghostbusters" />
-              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidModuleNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidSourceTypeNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ghostbusters" />
-              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidPsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
-      <pane id="ProjectPane" />
+      <pane id="Scope" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -1794,7 +1717,7 @@
     <property name="settings.editor.splitter.proportion" value="0.2" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../LatencyMeter" />
     <property name="restartRequiresConfirmation" value="true" />
-    <property name="device.picker.selection" value="NV8W2G0180" />
+    <property name="device.picker.selection" value="NVTV2Q0030" />
   </component>
   <component name="RecentsManager">
     <key name="CopyClassDialog.RECENTS_KEY">
@@ -2181,14 +2104,14 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1366" height="677" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32976827" sideWeight="0.49697885" order="14" side_tool="false" content_ui="tabs" />
       <window_info id="Android Model" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Android Monitor" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34759358" sideWeight="0.49093655" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.41889483" sideWeight="0.49093655" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="true" content_ui="tabs" />
@@ -2521,7 +2444,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="157" column="47" selection-start-line="157" selection-start-column="47" selection-end-line="157" selection-end-column="47" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2529,7 +2451,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="52" column="61" selection-start-line="52" selection-start-column="61" selection-end-line="52" selection-end-column="61" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2552,7 +2473,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.6741573">
           <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2579,61 +2499,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/SettingsFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="20" column="35" selection-start-line="20" selection-start-column="35" selection-end-line="20" selection-end-column="35" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/xml/pref_general.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="115" column="33" selection-start-line="115" selection-start-column="33" selection-end-line="115" selection-end-column="33" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.51086956">
           <caret line="31" column="6" selection-start-line="31" selection-start-column="6" selection-end-line="31" selection-end-column="6" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/MyAbsChart.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="130" column="50" selection-start-line="130" selection-start-column="50" selection-end-line="130" selection-end-column="50" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/MainActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-4.037037">
-          <caret line="316" column="60" selection-start-line="316" selection-start-column="21" selection-end-line="316" selection-end-column="60" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#11809#12228#0" expanded="true" />
-            <element signature="e#12227#12228#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/ChartShow.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.8148148">
-          <caret line="70" column="41" selection-start-line="70" selection-start-column="41" selection-end-line="70" selection-end-column="41" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#2434#2853#0" expanded="true" />
-            <element signature="e#2852#2853#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2645,10 +2515,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/xml/pref_general.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.8501292">
+          <caret line="141" column="28" selection-start-line="141" selection-start-column="28" selection-end-line="141" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/SettingsFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.03649635">
+          <caret line="20" column="35" selection-start-line="20" selection-start-column="35" selection-end-line="20" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/jni/synaptics.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.0370371">
-          <caret line="890" column="30" selection-start-line="890" selection-start-column="30" selection-end-line="890" selection-end-column="30" />
+        <state vertical-scroll-proportion="-6.6666665">
+          <caret line="101" column="2" selection-start-line="101" selection-start-column="2" selection-end-line="101" selection-end-column="2" />
           <folding>
             <element signature="e#0#16#0" expanded="true" />
           </folding>
@@ -2657,9 +2543,37 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/SlideShow.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.68488747">
-          <caret line="666" column="69" selection-start-line="666" selection-start-column="69" selection-end-line="666" selection-end-column="69" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="85" column="38" selection-start-line="84" selection-start-column="4" selection-end-line="85" selection-end-column="38" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/MyAbsChart.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-15.592592">
+          <caret line="206" column="40" selection-start-line="206" selection-start-column="40" selection-end-line="206" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/ChartShow.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-6.111111">
+          <caret line="91" column="0" selection-start-line="91" selection-start-column="0" selection-end-line="91" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/motorola/ghostbusters/MainActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.60402685">
+          <caret line="319" column="46" selection-start-line="319" selection-start-column="46" selection-end-line="319" selection-end-column="46" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

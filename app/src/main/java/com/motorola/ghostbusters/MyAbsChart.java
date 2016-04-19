@@ -133,7 +133,7 @@ public class MyAbsChart extends View {
 
         if (ChartShow.isRxEnabled && ChartShow.isTxEnabled) {
             paintWidth = xStep / 4;
-            shiftSize = paintWidth/2;
+            shiftSize = (float) Math.ceil(paintWidth/1.55);
         } else {
             shiftSize = 0;
         }
@@ -144,7 +144,28 @@ public class MyAbsChart extends View {
         //Log.d(TAG, "upper line is " + upperLine);
         xZeroLine = axisX_Y;
         //Log.d(TAG, "zero line is " + xZeroLine + "; topY " + axisY1);
-        xScale = upperLine / (xZeroLine - axisY1 - 5 * axisPad);
+        xScale = upperLine / (xZeroLine - axisY1 - 8 * axisPad);
+
+        //draw Tx thresholds
+        if (ChartShow.isTxEnabled) {
+            paintThresholds.setColor(Color.parseColor("#db5da9"));
+            paintText.setColor(Color.parseColor("#db5da9"));
+            canvas.drawLine(axisX1, xZeroLine - mTxThreshold / xScale, axisX2, xZeroLine - mTxThreshold / xScale, paintThresholds);
+            canvas.drawText(Integer.toString(mTxThreshold), axisX1 + mTextSize - axisPad/2, xZeroLine - mTxThreshold / xScale - mTextSize / 3 - 2*axisPad, paintText);
+            canvas.drawText("Tx", axisX2 - mTextSize - axisPad, xZeroLine + mTxThreshold / xScale + mTextSize, paintText);
+            canvas.drawLine(axisX1, xZeroLine + mTxThreshold / xScale, axisX2, xZeroLine + mTxThreshold / xScale, paintThresholds);
+            canvas.drawText(Integer.toString(-1 * mTxThreshold), axisX1 + mTextSize - axisPad/2, xZeroLine + mTxThreshold / xScale + mTextSize + 2*axisPad, paintText);
+        }
+        //draw Rx thresholds
+        if (ChartShow.isRxEnabled) {
+            paintThresholds.setColor(Color.parseColor("#11e7ac"));
+            paintText.setColor(Color.parseColor("#11e7ac"));
+            canvas.drawLine(axisX1, xZeroLine - mRxThreshold / xScale, axisX2, xZeroLine - mRxThreshold / xScale, paintThresholds);
+            canvas.drawText(Integer.toString(mRxThreshold), axisX1 + mTextSize - 2*axisPad, xZeroLine - mRxThreshold / xScale - mTextSize / 3, paintText);
+            canvas.drawText("Rx", axisX2 - mTextSize - axisPad, xZeroLine - mRxThreshold / xScale - mTextSize / 3, paintText);
+            canvas.drawLine(axisX1, xZeroLine + mRxThreshold / xScale, axisX2, xZeroLine + mRxThreshold / xScale, paintThresholds);
+            canvas.drawText(Integer.toString(-1 * mRxThreshold), axisX1 + mTextSize - 2*axisPad, xZeroLine + mRxThreshold / xScale + mTextSize, paintText);
+        }
 
         for (int i = 1; i <= MainActivity.gearsCount + 1; i++) {
             String gearName = "";
@@ -180,26 +201,11 @@ public class MyAbsChart extends View {
                 canvas.drawText(Integer.toString(mTxMax[i - 1]), axisX1 + i * xStep - 5 * mTextSize / 10 + shiftSize, axisY1 + axisPad + mTextSize, paintText);
             }
             paintText.setColor(Color.BLACK);
-            canvas.drawText(gearName, axisX1 + i * xStep - mTextSize / 2, xZeroLine - mTextSize / 3, paintText);
+            canvas.drawText(gearName, axisX1 + i * xStep - mTextSize, xZeroLine - mTextSize / 3, paintText);
 
         }
         paintText.setColor(Color.BLACK);
-        //draw Tx thresholds
-        if (ChartShow.isTxEnabled) {
-            paintThresholds.setColor(Color.parseColor("#db5da9"));
-            canvas.drawLine(axisX1, xZeroLine - mTxThreshold / xScale, axisX2, xZeroLine - mTxThreshold / xScale, paintThresholds);
-            canvas.drawText(Integer.toString(mTxThreshold), axisX1 + mTextSize - 2* axisPad, xZeroLine - mTxThreshold / xScale + mTextSize, paintText);
-            canvas.drawLine(axisX1, xZeroLine + mTxThreshold / xScale, axisX2, xZeroLine + mTxThreshold / xScale, paintThresholds);
-            canvas.drawText(Integer.toString(-1 * mTxThreshold), axisX1 + mTextSize - 2*axisPad, xZeroLine + mTxThreshold / xScale + mTextSize, paintText);
-        }
-        //draw Rx thresholds
-        if (ChartShow.isRxEnabled) {
-            paintThresholds.setColor(Color.parseColor("#11e7ac"));
-            canvas.drawLine(axisX1, xZeroLine - mRxThreshold / xScale, axisX2, xZeroLine - mRxThreshold / xScale, paintThresholds);
-            canvas.drawText(Integer.toString(mRxThreshold), axisX1 + mTextSize - 2*axisPad, xZeroLine - mRxThreshold / xScale - mTextSize / 3, paintText);
-            canvas.drawLine(axisX1, xZeroLine + mRxThreshold / xScale, axisX2, xZeroLine + mRxThreshold / xScale, paintThresholds);
-            canvas.drawText(Integer.toString(-1 * mRxThreshold), axisX1 + mTextSize - 2*axisPad, xZeroLine + mRxThreshold / xScale - mTextSize / 3, paintText);
-        }
+
     }
 
     public static void setArrays (int[] rxMin, int[] rxMax, int[] txMin, int[] txMax) {
