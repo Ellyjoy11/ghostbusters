@@ -33,7 +33,7 @@ import java.util.Arrays;
 
 
 public class MainActivity extends Activity {
-    public static final String ABOUT_TITLE = "\u00a9 Moto Hackathon 2015\n" +
+    public static final String ABOUT_TITLE = "\u00a9 2015-2016\n" +
             "Igor Kovalenko\nElena Last\nAlex Filonenko\nKonstantin Makariev";
     public static String ABOUT_VERSION;
     private final static String TAG = "Ghostbusters";
