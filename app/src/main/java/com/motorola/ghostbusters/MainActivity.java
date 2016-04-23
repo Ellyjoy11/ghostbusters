@@ -94,6 +94,7 @@ public class MainActivity extends Activity {
     //public static boolean isCycleTest = true;
     public static boolean isRxEnabled;
     public static boolean isTxEnabled;
+    public static int baseStretch;
 
     public static int mMaxImC[][][];
     public static int mMinImC[][][];
@@ -394,6 +395,9 @@ public class MainActivity extends Activity {
             isTxEnabled = false;
         }
         Log.d(TAG, "Rx and Tx enabled: " + isRxEnabled + "; " + isTxEnabled);
+
+        baseStretch = mDevice.diagHybridStretchDur();
+        Log.d(TAG, "read base stretch: " + baseStretch);
 
 //check if custom path to addl images entered and correct
         addCustom = userPref.getBoolean("custom", false);

@@ -43,6 +43,9 @@ public class TouchDevice {
     public native static int diagSetHybridIntDur(int val);
     public native static int diagHybridIntDur();
 
+    public native static int diagSetHybridStretchDur(int val);
+    public native static int diagHybridStretchDur();
+
     public static int gearCount;
     private final String TAG = "Ghostbusters";
 

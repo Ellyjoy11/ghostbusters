@@ -159,11 +159,12 @@ public class SlideShow extends Activity {
                     unBlockTouch();
                     if (MainActivity.testType.contains("2")) {
                         //TODO replace with report 2 function
-                        MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTimeBase2);
+                        //MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTimeBase2);
                         Log.d(TAG, "setting int time back to: " + MainActivity.intTimeBase2);
                     } else if (MainActivity.testType.contains("59")) {
                         MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTimeBase59);
                         Log.d(TAG, "setting int time back to: " + MainActivity.intTimeBase59);
+                        TouchDevice.diagSetHybridStretchDur(MainActivity.baseStretch);
                     }
                     isDone = true;
 
@@ -222,7 +223,7 @@ public class SlideShow extends Activity {
         cycleTestCounter = userPref.getInt("cycle_counter", 0);
         if (MainActivity.testType.contains("2")) {
             //TODO replace with report 2 function
-            MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTime2[cycleTestCounter]);
+            //MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTime2[cycleTestCounter]);
         } else if (MainActivity.testType.contains("59")) {
             MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTime59[cycleTestCounter]);
         }
@@ -571,11 +572,12 @@ public class SlideShow extends Activity {
             unBlockTouch();
             if (MainActivity.testType.contains("2")) {
                 //TODO replace with report 2 function
-                MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTimeBase2);
+                //MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTimeBase2);
                 Log.d(TAG, "setting int time back to: " + MainActivity.intTimeBase2);
             } else if (MainActivity.testType.contains("59")) {
                 MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTimeBase59);
                 Log.d(TAG, "setting int time back to: " + MainActivity.intTimeBase59);
+                TouchDevice.diagSetHybridStretchDur(MainActivity.baseStretch);
             }
             finish();
             Intent intent = new Intent(getApplicationContext(),
@@ -648,114 +650,114 @@ public class SlideShow extends Activity {
                             needSleep = false;
                         }
 
-                        for (int gear = 0; gear <= MainActivity.gearsCount; gear++) {
+                        ////////report type 2 test loop
+                        if (MainActivity.testType.contains("2")) {
+                            for (int gear = 0; gear <= MainActivity.gearsCount; gear++) {
 
-                            msg = mHandler.obtainMessage(gear+1000);
-                            mHandler.sendMessage(msg);
-                            //Log.d(TAG, "sent request to change progress");
-                            imReadySemaphore.acquire();
+                                msg = mHandler.obtainMessage(gear + 1000);
+                                mHandler.sendMessage(msg);
+                                //Log.d(TAG, "sent request to change progress");
+                                imReadySemaphore.acquire();
 
-                            if (gear == 0) {
-                                //Log.d(TAG, "sleeping 2 s to get image on screen...");
-                                try {
-                                    Thread.sleep(2000);
+                                if (gear == 0) {
+                                    //Log.d(TAG, "sleeping 2 s to get image on screen...");
+                                    try {
+                                        Thread.sleep(2000);
 
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-                            }
 
-                            //Log.d(TAG, "start test for gear " + gear);
-                            if (gear < MainActivity.gearsCount && String.valueOf(MainActivity.gearsEnabled[gear]).equals("0")) {
-                                continue;
-                            } else {
-                                if (gear == MainActivity.gearsCount) {
-                                    int tmpMinValue = 0;
-                                    int bestGear = 0;
-                                    if (MainActivity.testType.contains("2") && mMaxIm != null) {
-                                        bestGear = 0;
-                                        tmpMinValue = mMaxIm[i][0];
-                                        for (int ll = 1; ll < gear; ll++) {
-                                            if (String.valueOf(MainActivity.gearsEnabled[ll]).equals("1") &&
-                                                    (mMaxIm[i][ll] < tmpMinValue ||
-                                                            String.valueOf(MainActivity.gearsEnabled[bestGear]).equals("0"))) {
-                                                tmpMinValue = mMaxIm[i][ll];
-                                                bestGear = ll;
-                                            } else {
-                                                continue;
-                                            }
-                                        }
-                                    }
-                                    if (MainActivity.testType.contains("59") && isTxEnabled && mTxMax != null) {
-                                        bestGear = 0;
-                                        tmpMinValue = mTxMax[i][0];
-                                        for (int ll = 1; ll < gear; ll++) {
-                                            if (String.valueOf(MainActivity.gearsEnabled[ll]).equals("1") &&
-                                                    (mTxMax[i][ll] < tmpMinValue ||
-                                                            String.valueOf(MainActivity.gearsEnabled[bestGear]).equals("0"))) {
-                                                tmpMinValue = mTxMax[i][ll];
-                                                bestGear = ll;
-                                            } else {
-                                                continue;
-                                            }
-                                        }
-                                    }
-                                    if (MainActivity.testType.contains("59") && isRxEnabled && mRxMax != null) {
-                                        bestGear = 0;
-                                        tmpMinValue = mRxMax[i][0];
-                                        for (int ll = 1; ll < gear; ll++) {
-                                            if (String.valueOf(MainActivity.gearsEnabled[ll]).equals("1") &&
-                                                    (mRxMax[i][ll] < tmpMinValue ||
-                                                            String.valueOf(MainActivity.gearsEnabled[bestGear]).equals("0"))) {
-                                                tmpMinValue = mRxMax[i][ll];
-                                                bestGear = ll;
-                                            } else {
-                                                continue;
-                                            }
-                                        }
-                                    }
-                                    TouchDevice.diagGearSelect(bestGear);
-                                    Log.d(TAG, "Switch to best gear before auto test: Gear " + bestGear);
-                                    TouchDevice.diagGearAuto(0);
+                                //Log.d(TAG, "start test for gear " + gear);
+                                if (gear < MainActivity.gearsCount && String.valueOf(MainActivity.gearsEnabled[gear]).equals("0")) {
+                                    continue;
                                 } else {
-                                    TouchDevice.diagGearAuto(1);
-                                    TouchDevice.diagGearSelect(gear);
-                                }
+                                    if (gear == MainActivity.gearsCount) {
+                                        int tmpMinValue = 0;
+                                        int bestGear = 0;
+                                        if (mMaxIm != null) {
+                                            bestGear = 0;
+                                            tmpMinValue = mMaxIm[i][0];
+                                            for (int ll = 1; ll < gear; ll++) {
+                                                if (String.valueOf(MainActivity.gearsEnabled[ll]).equals("1") &&
+                                                        (mMaxIm[i][ll] < tmpMinValue ||
+                                                                String.valueOf(MainActivity.gearsEnabled[bestGear]).equals("0"))) {
+                                                    tmpMinValue = mMaxIm[i][ll];
+                                                    bestGear = ll;
+                                                } else {
+                                                    continue;
+                                                }
+                                            }
+                                        }
 
-                            }
-                            //Log.d(TAG, "getting data using diagDeltaPeaks for " + samples + " samples");
-                            if (MainActivity.testType.contains("2")) {
-                                Log.d(TAG, "test type is " + MainActivity.testType);
-                                maxmin = MainActivity.mDevice.diagDeltaPeaks(samples);
-                                //Log.d(TAG, "getting max and min from data");
-                                mMaxIm[i][gear] = maxmin / 65536;
-                                mMinIm[i][gear] = maxmin % 65536;
-                               // if (MainActivity.isCycleTest) {
+                                        TouchDevice.diagGearSelect(bestGear);
+                                        Log.d(TAG, "Switch to best gear before auto test: Gear " + bestGear);
+                                        TouchDevice.diagGearAuto(0);
+                                    } else {
+                                        TouchDevice.diagGearAuto(1);
+                                        TouchDevice.diagGearSelect(gear);
+                                    }
+
+                                }
+                                //Log.d(TAG, "getting data using diagDeltaPeaks for " + samples + " samples");
+                                    Log.d(TAG, "test type is " + MainActivity.testType);
+                                    maxmin = MainActivity.mDevice.diagDeltaPeaks(samples);
+                                    //Log.d(TAG, "getting max and min from data");
+                                    mMaxIm[i][gear] = maxmin / 65536;
+                                    mMinIm[i][gear] = maxmin % 65536;
+                                    // if (MainActivity.isCycleTest) {
                                     MainActivity.mMaxImC[cycleTestCounter][i][gear] = mMaxIm[i][gear];
                                     MainActivity.mMinImC[cycleTestCounter][i][gear] = mMaxIm[i][gear];
-                               // }
+                                    // }
 
-                                Log.d(TAG, "max/min for image " + imgNamesToShow[i] + " for gear " + gear + ": " + mMaxIm[i][gear] + "/" + mMinIm[i][gear]);
-                            } else {
-                                Log.d(TAG, "test type is " + MainActivity.testType);
-                                //maxminRx = MainActivity.mDevice.diagRxDeltaPeaks(samples);
-                                maxminRxTx = MainActivity.mDevice.diagRxTxDeltaPeaks(samples, 59);
-                                //Log.d(TAG, "getting max and min from data");
-                                mRxMax[i][gear] = maxminRxTx[3];
-                                mRxMin[i][gear] = maxminRxTx[2];
-                                mTxMax[i][gear] = maxminRxTx[1];
-                                mTxMin[i][gear] = maxminRxTx[0];
+                                    Log.d(TAG, "max/min for image " + imgNamesToShow[i] + " for gear " + gear + ": " + mMaxIm[i][gear] + "/" + mMinIm[i][gear]);
 
-                               // if (MainActivity.isCycleTest) {
-                                    MainActivity.mMaxRxImC[cycleTestCounter][i][gear] = mRxMax[i][gear];
-                                    MainActivity.mMinRxImC[cycleTestCounter][i][gear] = mRxMin[i][gear];
-                                    MainActivity.mMaxTxImC[cycleTestCounter][i][gear] = mTxMax[i][gear];
-                                    MainActivity.mMinTxImC[cycleTestCounter][i][gear] = mTxMin[i][gear];
-                               // }
-                                Log.d(TAG, "Rx max/min for image " + imgNamesToShow[i] + " for gear " + gear + ": " + mRxMax[i][gear] + "/" + mRxMin[i][gear]);
-                                Log.d(TAG, "Tx max/min for image " + imgNamesToShow[i] + " for gear " + gear + ": " + mTxMax[i][gear] + "/" + mTxMin[i][gear]);
+                            }
+                        } else if (MainActivity.testType.contains("59")) {
+                            ////////////////////////////////////
+                            //report 59 test as separate loop
+                            for (int stretch = MainActivity.baseStretch; stretch <= MainActivity.baseStretch + MainActivity.gearsCount; stretch++) {
+
+                                msg = mHandler.obtainMessage(stretch + 1000);
+                                mHandler.sendMessage(msg);
+                                //Log.d(TAG, "sent request to change progress");
+                                imReadySemaphore.acquire();
+
+                                if (stretch == 0) {
+                                    //Log.d(TAG, "sleeping 2 s to get image on screen...");
+                                    try {
+                                        Thread.sleep(2000);
+
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                TouchDevice.diagSetHybridStretchDur(stretch);
+
+                                //Log.d(TAG, "start test for gear " + gear);
+
+                                    Log.d(TAG, "test type is " + MainActivity.testType);
+                                    //maxminRx = MainActivity.mDevice.diagRxDeltaPeaks(samples);
+                                    maxminRxTx = MainActivity.mDevice.diagRxTxDeltaPeaks(samples, 59);
+                                    //Log.d(TAG, "getting max and min from data");
+                                    mRxMax[i][stretch] = maxminRxTx[3];
+                                    mRxMin[i][stretch] = maxminRxTx[2];
+                                    mTxMax[i][stretch] = maxminRxTx[1];
+                                    mTxMin[i][stretch] = maxminRxTx[0];
+
+                                    // if (MainActivity.isCycleTest) {
+                                    MainActivity.mMaxRxImC[cycleTestCounter][i][stretch] = mRxMax[i][stretch];
+                                    MainActivity.mMinRxImC[cycleTestCounter][i][stretch] = mRxMin[i][stretch];
+                                    MainActivity.mMaxTxImC[cycleTestCounter][i][stretch] = mTxMax[i][stretch];
+                                    MainActivity.mMinTxImC[cycleTestCounter][i][stretch] = mTxMin[i][stretch];
+                                    // }
+                                    Log.d(TAG, "Rx max/min for image " + imgNamesToShow[i] + " for gear " + stretch + ": " + mRxMax[i][stretch] + "/" + mRxMin[i][stretch]);
+                                    Log.d(TAG, "Tx max/min for image " + imgNamesToShow[i] + " for gear " + stretch + ": " + mTxMax[i][stretch] + "/" + mTxMin[i][stretch]);
+
                             }
                         }
+                        ///////////////////////////////////////////
                         if (i < standardImgMap.length) {
                             standardImgMap[i][2] = "1";
                             //Log.d(TAG, "Setting tested value to true for image " + i);

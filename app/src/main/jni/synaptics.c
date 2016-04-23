@@ -163,9 +163,11 @@ int get##reg##field() { \
 DEFINE_WORD_REG(c146, int_dur, has_c146)
 EXPORT_REG(int, c146, int_dur, HybridIntDur)
 
-
 DEFINE_BYTE_REG(c113, rx_obj_thresh, hasCtrl113)
 EXPORT_REG(int, c113, rx_obj_thresh, RxObjThresh)
+
+DEFINE_BYTE_REG(c146, stretch_dur, has_c146)
+EXPORT_REG(int, c146, stretch_dur, HybridStretchDur)
 
 static void reset_touch()
 {
@@ -183,8 +185,6 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 	char path[256];
 	char val[6];
 	int fd = -1;
-
-	//int hyb_int_dur;
 
 	printf("entering %s\n", __FUNCTION__);
 

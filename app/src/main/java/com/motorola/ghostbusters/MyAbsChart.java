@@ -168,34 +168,23 @@ public class MyAbsChart extends View {
         }
 
         for (int i = 1; i <= MainActivity.gearsCount + 1; i++) {
-            String gearName = "";
-            if (i == MainActivity.gearsCount + 1) {
-                gearName = "auto";
-            } else {
-                gearName = Integer.toString(i - 1);
-            }
+            String gearName = Integer.toString(i - 1);
             if (MainActivity.isRxEnabled &&
                     ((i < MainActivity.gearsCount + 1 && Character.toString(MainActivity.gearsEnabled[i - 1]).equals("1")) || i == MainActivity.gearsCount + 1)) {
-                if (i == MainActivity.gearsCount+1) {
-                    paintValues.setColor(Color.parseColor("#0a6b50"));
-                    paintText.setColor(Color.parseColor("#0a6b50"));
-                } else {
+
                     paintValues.setColor(Color.parseColor("#11e7ac"));
                     paintText.setColor(Color.parseColor("#11e7ac"));
-                }
+
                 canvas.drawLine(axisX1 + i * xStep - shiftSize, xZeroLine + mRxMin[i - 1] / xScale, axisX1 + i * xStep - shiftSize, xZeroLine - mRxMax[i - 1] / xScale, paintValues);
                 canvas.drawText(Integer.toString(-1 * mRxMin[i - 1]), axisX1 + i * xStep - 5 * mTextSize / 10 - shiftSize, axisY2 - 2*mTextSize, paintText);
                 canvas.drawText(Integer.toString(mRxMax[i - 1]), axisX1 + i * xStep - 5 * mTextSize / 10 - shiftSize, axisY1 + axisPad + 2*mTextSize, paintText);
             }
             if (MainActivity.isTxEnabled &&
                     ((i < MainActivity.gearsCount + 1 && Character.toString(MainActivity.gearsEnabled[i - 1]).equals("1")) || i == MainActivity.gearsCount + 1)) {
-                if (i == MainActivity.gearsCount+1) {
-                    paintValues.setColor(Color.parseColor("#b20c70"));
-                    paintText.setColor(Color.parseColor("#b20c70"));
-                } else {
+
                     paintValues.setColor(Color.parseColor("#db5da9"));
                     paintText.setColor(Color.parseColor("#db5da9"));
-                }
+
                 canvas.drawLine(axisX1 + i * xStep + shiftSize, xZeroLine + mTxMin[i - 1] / xScale, axisX1 + i * xStep + shiftSize, xZeroLine - mTxMax[i - 1] / xScale, paintValues);
                 canvas.drawText(Integer.toString(-1 * mTxMin[i - 1]), axisX1 + i * xStep - 5 * mTextSize / 10 + shiftSize, axisY2 - mTextSize, paintText);
                 canvas.drawText(Integer.toString(mTxMax[i - 1]), axisX1 + i * xStep - 5 * mTextSize / 10 + shiftSize, axisY1 + axisPad + mTextSize, paintText);

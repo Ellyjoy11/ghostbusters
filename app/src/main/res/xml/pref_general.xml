@@ -109,6 +109,7 @@
 
     <EditTextPreference
         android:inputType="number"
+        android:enabled="false"
         android:key="int_base"
         android:maxLines="1"
         android:persistent="true"
