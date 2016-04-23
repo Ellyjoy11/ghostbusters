@@ -37,6 +37,11 @@
             android:label="@string/title_activity_chart_show"
             android:screenOrientation="portrait"></activity>
         <activity
+            android:name=".CycleTestChart"
+            android:configChanges="orientation"
+            android:label="@string/title_activity_cycle_test_chart"
+            android:screenOrientation="portrait"></activity>
+        <activity
             android:name=".SetPreferences"
             android:label="@string/title_activity_set_preferences"></activity>
         <activity

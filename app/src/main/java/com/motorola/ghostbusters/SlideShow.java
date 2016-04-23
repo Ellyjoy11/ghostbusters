@@ -62,6 +62,8 @@ public class SlideShow extends Activity {
     public static int mMaxIm[][];
     public static int mMinIm[][];
 
+    public static int cycleTestCounter;
+
     public static String imgNamesToShow[];
 
     public int imCounter;
@@ -95,6 +97,10 @@ public class SlideShow extends Activity {
         setContentView(R.layout.activity_slide_show);
         mFlipper = (ViewFlipper) findViewById(R.id.mFlipper);
         myView = (ProgressLine) findViewById(R.id.progressLine);
+
+        userPref = PreferenceManager
+                .getDefaultSharedPreferences(this);
+        //cycleTestCounter = userPref.getInt("cycle_counter", 0);
 
         imReadySemaphore = new Semaphore(0);
 
@@ -149,28 +155,49 @@ public class SlideShow extends Activity {
                 }
 
                  else if (msg.what == FINISH) {
+
                     unBlockTouch();
-                    isDone = true;
-                    samplesDone = samples;
-                    testTypeDone = MainActivity.testType;
-                    Log.d(TAG, "record: " + testTypeDone);
-                    if (testTypeDone.contains("2")) {
-                        gearsSetDone = gearsSet;
-                    } else if (testTypeDone.contains("59")) {
-                        gearsSetDoneRx = gearsSet;
+                    if (MainActivity.testType.contains("2")) {
+                        //TODO replace with report 2 function
+                        MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTimeBase2);
+                        Log.d(TAG, "setting int time back to: " + MainActivity.intTimeBase2);
+                    } else if (MainActivity.testType.contains("59")) {
+                        MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTimeBase59);
+                        Log.d(TAG, "setting int time back to: " + MainActivity.intTimeBase59);
                     }
-                    Log.d(TAG, "gearsSet done: " + gearsSetDone + "gearsSetRx done: " + gearsSetDoneRx);
-                    imgUriDone = imgUri;
+                    isDone = true;
 
                     mFlipper.removeAllViews();
                     if (mBitmap != null) {
                         mBitmap.recycle();
                     }
                     mBitmap = null;
-
-                    showResults();
+                    Log.d(TAG, "test counter="+cycleTestCounter);
+                        if (cycleTestCounter < MainActivity.TEST_CYCLES-1) {
+                            gearsSetDone = 0;
+                            gearsSetDoneRx = 0;
+                            cycleTestCounter++;
+                            SharedPreferences.Editor editor = userPref.edit();
+                            editor.putInt("cycle_counter", cycleTestCounter);
+                            editor.commit();
+                            Log.d(TAG, "increase counter: " + cycleTestCounter);
+                            finish();
+                            startActivity(getIntent());
+                        } else {
+                            samplesDone = samples;
+                            testTypeDone = MainActivity.testType;
+                            Log.d(TAG, "record: " + testTypeDone);
+                            if (testTypeDone.contains("2")) {
+                                gearsSetDone = gearsSet;
+                            } else if (testTypeDone.contains("59")) {
+                                gearsSetDoneRx = gearsSet;
+                            }
+                            Log.d(TAG, "gearsSet done: " + gearsSetDone + "gearsSetRx done: " + gearsSetDoneRx);
+                            imgUriDone = imgUri;
+                            showResults();
+                        }
+                    }
                 }
-            }
         };
 
         DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -179,9 +206,6 @@ public class SlideShow extends Activity {
 
         screenWidth = displaymetrics.widthPixels;
         Log.d(TAG, "screen width is " + screenWidth);
-
-        userPref = PreferenceManager
-                .getDefaultSharedPreferences(this);
 
     }
 
@@ -192,6 +216,23 @@ public class SlideShow extends Activity {
         isDefault = false;
         c = 0;
         tmpCount = -1;
+
+        userPref = PreferenceManager
+                .getDefaultSharedPreferences(this);
+        cycleTestCounter = userPref.getInt("cycle_counter", 0);
+        if (MainActivity.testType.contains("2")) {
+            //TODO replace with report 2 function
+            MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTime2[cycleTestCounter]);
+        } else if (MainActivity.testType.contains("59")) {
+            MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTime59[cycleTestCounter]);
+        }
+
+        if (MainActivity.testType.contains("2") && MainActivity.TEST_CYCLES != userPref.getInt("cycles_done_2", 0)) {
+            gearsSetDone = 0;
+        }
+        if (MainActivity.testType.contains("59") && MainActivity.TEST_CYCLES != userPref.getInt("cycles_done_59", 0)) {
+            gearsSetDoneRx = 0;
+        }
 
         isRxEnabled = MainActivity.isRxEnabled;
         isTxEnabled = MainActivity.isTxEnabled;
@@ -256,6 +297,9 @@ public class SlideShow extends Activity {
              if (testTypeDone.isEmpty() ||
                      (!testTypeDone.isEmpty() && !testTypeDone.equals(MainActivity.testType) && testTypeDone.contains("59")) ||
                      (testTypeDone.equals(MainActivity.testType) && testTypeDone.contains("2")) || gearsSetDone != gearsSet) {
+
+                 editor.putBoolean("report2_data_exists", false);
+                 editor.commit();
                  mMaxIm = new int[CYCLES][TouchDevice.diagGearCount() + 1];
                  mMinIm = new int[CYCLES][TouchDevice.diagGearCount() + 1];
              }
@@ -263,6 +307,9 @@ public class SlideShow extends Activity {
              if (testTypeDone.isEmpty() ||
                      (!testTypeDone.isEmpty() && !testTypeDone.equals(MainActivity.testType) && testTypeDone.contains("2")) ||
                      (testTypeDone.equals(MainActivity.testType) && testTypeDone.contains("59")) || gearsSetDoneRx != gearsSet) {
+
+                 editor.putBoolean("report59_data_exists", false);
+                 editor.commit();
                  mRxMax = new int[CYCLES][TouchDevice.diagGearCount() + 1];
                  mRxMin = new int[CYCLES][TouchDevice.diagGearCount() + 1];
                  mTxMax = new int[CYCLES][TouchDevice.diagGearCount() + 1];
@@ -481,10 +528,20 @@ public class SlideShow extends Activity {
 
         public void showResults() {
             if (isDone && !isStopped) {
-            Intent intent = new Intent(this, ChartShow.class);
-            Toast.makeText(getApplicationContext(), "Test is done",
-                    Toast.LENGTH_SHORT).show();
-            startActivity(intent);
+                Toast.makeText(getApplicationContext(), "Test is done",
+                        Toast.LENGTH_SHORT).show();
+                SharedPreferences.Editor editor = userPref.edit();
+                editor.putInt("cycle_counter", 0);
+                if (testTypeDone.contains("2")) {
+                    editor.putInt("cycles_done_2", cycleTestCounter+1);
+                }
+                if (testTypeDone.contains("59")) {
+                    editor.putInt("cycles_done_59", cycleTestCounter+1);
+                }
+
+                editor.commit();
+                    Intent intent = new Intent(this, CycleTestChart.class);
+                    startActivity(intent);
         } else {
                 finish();
                 Intent intent = new Intent(getApplicationContext(),
@@ -512,6 +569,14 @@ public class SlideShow extends Activity {
         if (!isDone) {
             isStopped = true;
             unBlockTouch();
+            if (MainActivity.testType.contains("2")) {
+                //TODO replace with report 2 function
+                MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTimeBase2);
+                Log.d(TAG, "setting int time back to: " + MainActivity.intTimeBase2);
+            } else if (MainActivity.testType.contains("59")) {
+                MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTimeBase59);
+                Log.d(TAG, "setting int time back to: " + MainActivity.intTimeBase59);
+            }
             finish();
             Intent intent = new Intent(getApplicationContext(),
                     MainActivity.class);
@@ -665,6 +730,10 @@ public class SlideShow extends Activity {
                                 //Log.d(TAG, "getting max and min from data");
                                 mMaxIm[i][gear] = maxmin / 65536;
                                 mMinIm[i][gear] = maxmin % 65536;
+                               // if (MainActivity.isCycleTest) {
+                                    MainActivity.mMaxImC[cycleTestCounter][i][gear] = mMaxIm[i][gear];
+                                    MainActivity.mMinImC[cycleTestCounter][i][gear] = mMaxIm[i][gear];
+                               // }
 
                                 Log.d(TAG, "max/min for image " + imgNamesToShow[i] + " for gear " + gear + ": " + mMaxIm[i][gear] + "/" + mMinIm[i][gear]);
                             } else {
@@ -676,6 +745,13 @@ public class SlideShow extends Activity {
                                 mRxMin[i][gear] = maxminRxTx[2];
                                 mTxMax[i][gear] = maxminRxTx[1];
                                 mTxMin[i][gear] = maxminRxTx[0];
+
+                               // if (MainActivity.isCycleTest) {
+                                    MainActivity.mMaxRxImC[cycleTestCounter][i][gear] = mRxMax[i][gear];
+                                    MainActivity.mMinRxImC[cycleTestCounter][i][gear] = mRxMin[i][gear];
+                                    MainActivity.mMaxTxImC[cycleTestCounter][i][gear] = mTxMax[i][gear];
+                                    MainActivity.mMinTxImC[cycleTestCounter][i][gear] = mTxMin[i][gear];
+                               // }
                                 Log.d(TAG, "Rx max/min for image " + imgNamesToShow[i] + " for gear " + gear + ": " + mRxMax[i][gear] + "/" + mRxMin[i][gear]);
                                 Log.d(TAG, "Tx max/min for image " + imgNamesToShow[i] + " for gear " + gear + ": " + mTxMax[i][gear] + "/" + mTxMin[i][gear]);
                             }

@@ -42,7 +42,7 @@ int fd_report_type = -1;
 int fd_get_report = -1;
 int fd_report_size = -1;
 int fd_report_data = -1;
-int fd_rxObjThresh = -1;
+//int fd_rxObjThresh = -1;
 int fd_txObjThresh = -1;
 
 int SatCap = 0;
@@ -53,7 +53,7 @@ int gearCount = 0;
 int hasCtrl113 = 0;
 int enHybridOnRx = 0;
 int enHybridOnTx = 0;
-int rxObjThresh;
+//int rxObjThresh;
 int txObjThresh;
 
 jshort *fill = NULL;
@@ -64,6 +64,108 @@ int sloc_panel = 0;
 int receivers_on_x = 0;
 int dimX = 0;
 int dimY = 0;
+
+int has_c146 = 1; 
+
+#define DEFINE_BYTE_REG(reg, field, cond) \
+int fd_##reg##field = -1; \
+int set##reg##field(char val) { \
+	if (cond && dpath) { \
+    		char val_str[6]; \
+		char path[256]; \
+		if (fd_##reg##field == -1) { \
+			sprintf(path, "%s/f54/" #reg  "_" #field, dpath); \
+			LOGE("opening %s\n", path); \
+			fd_##reg##field = open(path, O_RDWR); \
+			if (fd_##reg##field < 0) { \
+				printf("failed to open fd_%s\n", #reg "_" #field); \
+				return -1; \
+			} \
+		} \
+		if (fd_##reg##field > 0) { \
+			LOGE("setting %s to %d\n", #reg "_" #field, val); \
+			sprintf(val_str, "%d", val); \
+			lseek(fd_##reg##field, 0, SEEK_SET); \
+			write(fd_##reg##field, val_str, strlen(val_str)); \
+		} \
+		else { \
+			LOGE( "error writing %s\n",  #reg "_" #field); \
+			return -1; \
+		} \
+		return 0; \
+	} \
+	else \
+		return -1; \
+} \
+char get##reg##field() { \
+	if (cond && dpath) { \
+    		char val_str[6] = {0}; \
+		char path[256]; \
+		char val = 0; \
+		if (fd_##reg##field == -1) { \
+			sprintf(path, "%s/f54/" #reg  "_" #field, dpath); \
+			LOGE("opening %s\n", path); \
+			fd_##reg##field = open(path, O_RDWR); \
+			if (fd_##reg##field < 0) { \
+				printf("failed to open fd_%s\n", #reg "_" #field); \
+				return -1; \
+			} \
+		} \
+		if (fd_##reg##field > 0) { \
+			lseek(fd_##reg##field, 0, SEEK_SET); \
+			read(fd_##reg##field, val_str, sizeof(val_str)-1); \
+			val = atoi(val_str); \
+			LOGE( "%s is %s\n",  #reg "_" #field, val_str); \
+			return val; \
+		} \
+		else { \
+			LOGE( "error reading %s\n",  #reg "_" #field); \
+			return -1; \
+		} \
+	} \
+	else \
+		return -1; \
+}
+
+#define EXPORT_REG(type, reg, field, javaname) \
+JNIEXPORT int JNICALL \
+Java_com_motorola_ghostbusters_TouchDevice_diagSet##javaname(JNIEnv* env, jobject obj, type val) \
+{ \
+	return set##reg##field(val); \
+} \
+JNIEXPORT type JNICALL \
+Java_com_motorola_ghostbusters_TouchDevice_diag##javaname(JNIEnv* env, jobject obj) \
+{ \
+	return (type)get##reg##field(); \
+}
+
+#define DEFINE_WORD_REG(reg, field, cond) \
+DEFINE_BYTE_REG(reg, field##_lsb, cond) \
+DEFINE_BYTE_REG(reg, field##_msb, cond) \
+int set##reg##field(unsigned short val) { \
+	if (set##reg##field##_lsb(val & 0xFF) || set##reg##field##_msb(val >> 8)) \
+		return -1; \
+	else { \
+		return 0; \
+	} \
+} \
+int get##reg##field() { \
+	char lsb = get##reg##field##_lsb(); \
+	char msb = get##reg##field##_msb(); \
+	int val; \
+	LOGE( "lsb is %d\n",  lsb); \
+	LOGE( "msb is %d\n",  msb); \
+	val = (msb << 8) | lsb; \
+	LOGE( "%s is %d\n",  #reg "_" #field, val); \
+	return val; \
+}
+
+DEFINE_WORD_REG(c146, int_dur, has_c146)
+EXPORT_REG(int, c146, int_dur, HybridIntDur)
+
+
+DEFINE_BYTE_REG(c113, rx_obj_thresh, hasCtrl113)
+EXPORT_REG(int, c113, rx_obj_thresh, RxObjThresh)
 
 static void reset_touch()
 {
@@ -81,6 +183,8 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 	char path[256];
 	char val[6];
 	int fd = -1;
+
+	//int hyb_int_dur;
 
 	printf("entering %s\n", __FUNCTION__);
 
@@ -222,27 +326,27 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 
 	if (hasCtrl113) {
 		sprintf(path, "%s/f54/c113_en_hybrid_on_tx", dpath);
-    	fd = open(path, O_RDONLY);
-    	if (fd < 0) {
-    		printf("failed to open c113_en_hybrid_on_tx\n");
-    		return -1;
-    	}
-    	read(fd, val, 6);
-        close(fd);
-        enHybridOnTx = atoi(val);
-        printf("hybrid on tx is %s\n", enHybridOnTx ? "enabled" : "not enabled");
+		fd = open(path, O_RDONLY);
+		if (fd < 0) {
+			printf("failed to open c113_en_hybrid_on_tx\n");
+			return -1;
+		}
+		read(fd, val, 6);
+		close(fd);
+		enHybridOnTx = atoi(val);
+		printf("hybrid on tx is %s\n", enHybridOnTx ? "enabled" : "not enabled");
 
 		sprintf(path, "%s/f54/c113_en_hybrid_on_rx", dpath);
-    	fd = open(path, O_RDONLY);
-    	if (fd < 0) {
-    		printf("failed to open c113_en_hybrid_on_rx\n");
-    		return -1;
-    	}
-    	read(fd, val, 6);
-        close(fd);
-        enHybridOnRx = atoi(val);
-        printf("hybrid on rx is %s\n", enHybridOnRx ? "enabled" : "not enabled");
-
+		fd = open(path, O_RDONLY);
+		if (fd < 0) {
+			printf("failed to open c113_en_hybrid_on_rx\n");
+			return -1;
+		}
+		read(fd, val, 6);
+		close(fd);
+		enHybridOnRx = atoi(val);
+		printf("hybrid on rx is %s\n", enHybridOnRx ? "enabled" : "not enabled");
+/*
 		sprintf(path, "%s/f54/c113_rx_obj_thresh", dpath);
 		fd_rxObjThresh = open(path, O_RDWR);
 		if (fd_rxObjThresh < 0) {
@@ -251,14 +355,14 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 		}
 
 		read(fd_rxObjThresh, val, 6);
-        rxObjThresh = atoi(val);
-
+        	rxObjThresh = atoi(val);
+*/
 		sprintf(path, "%s/f54/c113_tx_obj_thresh", dpath);
-        fd_txObjThresh = open(path, O_RDWR);
-        if (fd_txObjThresh < 0) {
-        	printf("failed to open c113_tx_obj_thresh\n");
-        	return -1;
-        }
+		fd_txObjThresh = open(path, O_RDWR);
+		if (fd_txObjThresh < 0) {
+			printf("failed to open c113_tx_obj_thresh\n");
+			return -1;
+		}
 
 		read(fd_txObjThresh, val, 6);
 		txObjThresh = atoi(val);
@@ -361,7 +465,7 @@ Java_com_motorola_ghostbusters_TouchDevice_diagTxObjThresh(JNIEnv* env, jobject 
 	else
 		return -1;
 }
-
+/*
 // returns Rx Object Threshold
 JNIEXPORT int JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagRxObjThresh(JNIEnv* env, jobject obj)
@@ -371,7 +475,7 @@ Java_com_motorola_ghostbusters_TouchDevice_diagRxObjThresh(JNIEnv* env, jobject 
 	else
 		return -1;
 }
-
+*/
 // sets Tx Object Threshold
 JNIEXPORT int JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagSetTxObjThresh(JNIEnv* env, jobject obj, int thresh)
@@ -388,7 +492,7 @@ Java_com_motorola_ghostbusters_TouchDevice_diagSetTxObjThresh(JNIEnv* env, jobje
 	} else
 		return -1;
 }
-
+/*
 // sets Rx Object Threshold
 JNIEXPORT int JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagSetRxObjThresh(JNIEnv* env, jobject obj, int thresh)
@@ -405,7 +509,7 @@ Java_com_motorola_ghostbusters_TouchDevice_diagSetRxObjThresh(JNIEnv* env, jobje
 	} else
 		return -1;
 }
-
+*/
 // returns true if hybrid is using rx
 JNIEXPORT int JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagEnHybridOnRx(JNIEnv* env, jobject obj)
@@ -652,11 +756,11 @@ int synaptics_report2(int16_t* data)
 
 	if (size != frameTx * frameRx * sizeof(uint16_t))
 	{
-		LOGE("report size mismatch %d != %d*%d*%ld\n",
+		LOGE("report size mismatch %d != %d*%d*%u\n",
 			size,
 			frameRx,
 			frameTx,
-			sizeof(uint16_t));
+			(unsigned int)sizeof(uint16_t));
 		return -1;
 	}
 
@@ -740,11 +844,11 @@ int synaptics_rx_tx_report(char report_type, int32_t* data)
 
 	if (size != (frameTx + frameRx) * sizeof(int32_t))
 	{
-		LOGE("report size mismatch %d != (%d+%d)*%lu\n",
+		LOGE("report size mismatch %d != (%d+%d)*%u\n",
 			size,
 			frameRx,
 			frameTx,
-			sizeof(jint));
+			(unsigned int)sizeof(jint));
 		return -1;
 	}
 

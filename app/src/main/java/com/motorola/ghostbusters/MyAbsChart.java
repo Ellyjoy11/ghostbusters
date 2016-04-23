@@ -131,7 +131,7 @@ public class MyAbsChart extends View {
         canvas.drawLine(axisX1, axisX_Y, axisX2, axisX_Y, paintAxis);
         canvas.drawLine(axisY_X, axisY1, axisY_X, axisY2, paintAxis);
 
-        if (ChartShow.isRxEnabled && ChartShow.isTxEnabled) {
+        if (MainActivity.isRxEnabled && MainActivity.isTxEnabled) {
             paintWidth = xStep / 4;
             shiftSize = (float) Math.ceil(paintWidth/1.55);
         } else {
@@ -147,7 +147,7 @@ public class MyAbsChart extends View {
         xScale = upperLine / (xZeroLine - axisY1 - 8 * axisPad);
 
         //draw Tx thresholds
-        if (ChartShow.isTxEnabled) {
+        if (MainActivity.isTxEnabled) {
             paintThresholds.setColor(Color.parseColor("#db5da9"));
             paintText.setColor(Color.parseColor("#db5da9"));
             canvas.drawLine(axisX1, xZeroLine - mTxThreshold / xScale, axisX2, xZeroLine - mTxThreshold / xScale, paintThresholds);
@@ -157,7 +157,7 @@ public class MyAbsChart extends View {
             canvas.drawText(Integer.toString(-1 * mTxThreshold), axisX1 + mTextSize - axisPad/2, xZeroLine + mTxThreshold / xScale + mTextSize + 2*axisPad, paintText);
         }
         //draw Rx thresholds
-        if (ChartShow.isRxEnabled) {
+        if (MainActivity.isRxEnabled) {
             paintThresholds.setColor(Color.parseColor("#11e7ac"));
             paintText.setColor(Color.parseColor("#11e7ac"));
             canvas.drawLine(axisX1, xZeroLine - mRxThreshold / xScale, axisX2, xZeroLine - mRxThreshold / xScale, paintThresholds);
@@ -174,7 +174,7 @@ public class MyAbsChart extends View {
             } else {
                 gearName = Integer.toString(i - 1);
             }
-            if (ChartShow.isRxEnabled &&
+            if (MainActivity.isRxEnabled &&
                     ((i < MainActivity.gearsCount + 1 && Character.toString(MainActivity.gearsEnabled[i - 1]).equals("1")) || i == MainActivity.gearsCount + 1)) {
                 if (i == MainActivity.gearsCount+1) {
                     paintValues.setColor(Color.parseColor("#0a6b50"));
@@ -187,7 +187,7 @@ public class MyAbsChart extends View {
                 canvas.drawText(Integer.toString(-1 * mRxMin[i - 1]), axisX1 + i * xStep - 5 * mTextSize / 10 - shiftSize, axisY2 - 2*mTextSize, paintText);
                 canvas.drawText(Integer.toString(mRxMax[i - 1]), axisX1 + i * xStep - 5 * mTextSize / 10 - shiftSize, axisY1 + axisPad + 2*mTextSize, paintText);
             }
-            if (ChartShow.isTxEnabled &&
+            if (MainActivity.isTxEnabled &&
                     ((i < MainActivity.gearsCount + 1 && Character.toString(MainActivity.gearsEnabled[i - 1]).equals("1")) || i == MainActivity.gearsCount + 1)) {
                 if (i == MainActivity.gearsCount+1) {
                     paintValues.setColor(Color.parseColor("#b20c70"));

@@ -91,8 +91,25 @@ public class MainActivity extends Activity {
     private static File[] list2;
 
     public static String testType;
+    //public static boolean isCycleTest = true;
     public static boolean isRxEnabled;
     public static boolean isTxEnabled;
+
+    public static int mMaxImC[][][];
+    public static int mMinImC[][][];
+
+    public static int mMaxRxImC[][][];
+    public static int mMinRxImC[][][];
+
+    public static int mMaxTxImC[][][];
+    public static int mMinTxImC[][][];
+
+    public static int intTime2[];
+    public static int intTimeBase2;
+    public static int intTime59[];
+    public static int intTimeBase59;
+    public static int intTimeRange;
+    public static int TEST_CYCLES;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,11 +165,6 @@ public class MainActivity extends Activity {
         mDevice.diagInit(touchFWPath);
         gearsCount = mDevice.diagGearCount();
 
-        gearsNames = new String[gearsCount + 1];
-        selectedGear = new boolean[gearsCount + 1];
-        gearsNames[0] = "Automatic";
-        selectedGear[0] = userPref.getBoolean("isAuto", true);
-        isModeAuto = userPref.getBoolean("isAuto", true);
     }
 
     @Override
@@ -193,6 +205,66 @@ public class MainActivity extends Activity {
         //Log.d(TAG, "memoryClass:" + Integer.toString(memoryClass));
         //Log.d(TAG, "largeMemoryClass:" + Integer.toString(largeMemoryClass));
 
+        gearsNames = new String[gearsCount + 1];
+        selectedGear = new boolean[gearsCount + 1];
+        gearsNames[0] = "Automatic";
+        selectedGear[0] = userPref.getBoolean("isAuto", true);
+        isModeAuto = userPref.getBoolean("isAuto", true);
+
+        testType = userPref.getString("test_type", "Report 2");
+        if (testType.contains("59") && mDevice.diagHasHybridBaselineControl() != 1) {
+            AlertDialog.Builder builder = new AlertDialog.Builder((new ContextThemeWrapper(this, R.style.Theme_CustDialog)));
+            builder.setMessage(
+                    "Report 59 is not supported in device SW")
+                    .setTitle("Oops...");
+
+            builder.setPositiveButton("OK",
+                    new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(getApplicationContext(),
+                                    com.motorola.ghostbusters.SetPreferences.class);
+                            startActivity(intent);
+                        }
+                    });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+
+        SharedPreferences.Editor editor = userPref.edit();
+
+        intTimeRange = Integer.parseInt(userPref.getString("int_time", "0"));
+        TEST_CYCLES = 2 * intTimeRange +1;
+
+        intTime2 = new int[TEST_CYCLES];
+        intTime59 = new int[TEST_CYCLES];
+        if (testType.contains("59")) {
+            intTimeBase59 = Integer.parseInt(userPref.getString("int_base", Integer.toString(mDevice.diagHybridIntDur())));
+        }
+        if (testType.contains("2")) {
+            intTimeBase2 = Integer.parseInt(userPref.getString("int_base", "50"));
+        }
+        for (int j=0; j < TEST_CYCLES; j++) {
+            intTime2[j] = intTimeBase2 - intTimeRange + j;
+            intTime59[j] = intTimeBase59 - intTimeRange + j;
+        }
+        if (!userPref.getBoolean("report2_data_exists", false) || TEST_CYCLES != userPref.getInt("cycles_done_2", 0) || mMaxImC == null) {
+            mMaxImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
+            mMinImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
+        }
+        if (!userPref.getBoolean("report59_data_exists", false) || TEST_CYCLES != userPref.getInt("cycles_done_59", 0)  || mMaxRxImC == null) {
+            mMaxRxImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
+            mMinRxImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
+            mMaxTxImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
+            mMinTxImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
+        }
+
+        editor = userPref.edit();
+        editor.putInt("cycle_counter", 0);
+        editor.commit();
+
         product = Build.DEVICE;
         barcode = Build.SERIAL;
         touchCfg = getTouchCfg();
@@ -224,7 +296,7 @@ public class MainActivity extends Activity {
             Log.d(TAG, "gear "+i+" enabled: " + gearsEnabled[i]);
         }
 
-        SharedPreferences.Editor editor = userPref.edit();
+        editor = userPref.edit();
         StringBuilder str = new StringBuilder("");
         str.append(MainActivity.gearsEnabled);
         String toSave = str.reverse().toString();
@@ -324,29 +396,7 @@ public class MainActivity extends Activity {
         }
         Log.d(TAG, "Rx and Tx enabled: " + isRxEnabled + "; " + isTxEnabled);
 
-        //check if custom path to addl images entered and correct
-        testType = userPref.getString("test_type", "Report 2");
-        if (testType.contains("59") && mDevice.diagHasHybridBaselineControl() != 1) {
-            AlertDialog.Builder builder = new AlertDialog.Builder((new ContextThemeWrapper(this, R.style.Theme_CustDialog)));
-            builder.setMessage(
-                    "Report 59 is not supported in device SW")
-                    .setTitle("Oops...");
-
-            builder.setPositiveButton("OK",
-                    new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent intent = new Intent(getApplicationContext(),
-                                    com.motorola.ghostbusters.SetPreferences.class);
-                            startActivity(intent);
-                        }
-                    });
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
-        }
-
+//check if custom path to addl images entered and correct
         addCustom = userPref.getBoolean("custom", false);
         if (addCustom) {
             customPath = userPref.getString("custom_path", "");
@@ -400,7 +450,7 @@ public class MainActivity extends Activity {
         }
 
         if (item.getItemId() == R.id.action_show_chart) {
-            Intent intent = new Intent(this, ChartShow.class);
+            Intent intent = new Intent(this, CycleTestChart.class);
             startActivity(intent);
             return true;
         }
@@ -855,6 +905,16 @@ public class MainActivity extends Activity {
         Intent intent = new Intent(getApplicationContext(),
                 com.motorola.ghostbusters.DisplayTest.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onDestroy() {
+        SharedPreferences.Editor editor = userPref.edit();
+        editor.putInt("cycle_counter", 0);
+        editor.putInt("cycles_done_2", 0);
+        editor.putInt("cycles_done_59", 0);
+        editor.commit();
+        super.onDestroy();
     }
 
 

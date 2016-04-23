@@ -107,6 +107,26 @@
         android:singleLine="true"
         android:title="Samples per image" />
 
+    <EditTextPreference
+        android:inputType="number"
+        android:key="int_base"
+        android:maxLines="1"
+        android:persistent="true"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Integration time base" />
+
+
+    <EditTextPreference
+        android:defaultValue="0"
+        android:inputType="number"
+        android:key="int_time"
+        android:maxLines="1"
+        android:persistent="true"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Integration time range (+/-)" />
+
     <!--
     <EditTextPreference
         android:defaultValue="100"

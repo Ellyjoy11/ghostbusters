@@ -40,6 +40,9 @@ public class TouchDevice {
     public native static int diagSetRxObjThresh(int thresh);
     public native static int[] diagRxTxDeltaPeaks(int loops, int report_type);
 
+    public native static int diagSetHybridIntDur(int val);
+    public native static int diagHybridIntDur();
+
     public static int gearCount;
     private final String TAG = "Ghostbusters";
 

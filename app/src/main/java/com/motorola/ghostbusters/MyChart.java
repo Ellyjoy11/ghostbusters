@@ -143,7 +143,7 @@ public class MyChart extends View {
         //Log.d(TAG, "upper line is " + upperLine);
         xZeroLine = axisX_Y;
         //Log.d(TAG, "zero line is " + xZeroLine + "; topY " + axisY1);
-        xScale = upperLine / (xZeroLine - axisY1 - 5*axisPad);
+        xScale = upperLine / (xZeroLine - axisY1 - 8 * axisPad);
         //Log.d(TAG, "scale factor is " + xScale);
 
         for (int i=1; i <= MainActivity.gearsCount+1; i++) {
@@ -159,8 +159,8 @@ public class MyChart extends View {
             }
             if ((i < MainActivity.gearsCount+1 && Character.toString(MainActivity.gearsEnabled[i-1]).equals("1")) || i == MainActivity.gearsCount+1) {
                 canvas.drawLine(axisX1 + i * xStep, xZeroLine + mMin[i - 1] / xScale, axisX1 + i * xStep, xZeroLine - mMax[i - 1] / xScale, paintValues);
-                canvas.drawText(Integer.toString(-1 * mMin[i - 1]), axisX1 + i * xStep - 5 * mTextSize / 10, axisY2 - mTextSize, paintText);
-                canvas.drawText(Integer.toString(mMax[i - 1]), axisX1 + i * xStep - 5 * mTextSize / 10, axisY1 + axisPad + mTextSize, paintText);
+                canvas.drawText(Integer.toString(-1 * mMin[i - 1]), axisX1 + i * xStep - 5 * mTextSize / 10, axisY2 - 2*mTextSize, paintText);
+                canvas.drawText(Integer.toString(mMax[i - 1]), axisX1 + i * xStep - 5 * mTextSize / 10, axisY1 + axisPad + 2* mTextSize, paintText);
             }
             paintText.setColor(Color.BLACK);
             canvas.drawText(gearName, axisX1 + i * xStep - mTextSize, xZeroLine - mTextSize / 3, paintText);
@@ -203,18 +203,25 @@ public class MyChart extends View {
     public static int getMaxToDraw(int upThresh, int[] maxPlus, int[] maxMinus) {
         int maxToDraw = upThresh;
 
-        for (int i=0; i < maxPlus.length; i++){
+        for (int i=0; i < maxPlus.length-1; i++){
             //Log.d (TAG, "array[" + i + "] = " + maxPlus[i]);
-            if (maxPlus[i] > maxToDraw) {
+            if (maxPlus[i] > maxToDraw && Character.toString(MainActivity.gearsEnabled[i]).equals("1")) {
                 maxToDraw = maxPlus[i];
             }
         }
-        for (int i=0; i < maxMinus.length; i++){
+        for (int i=0; i < maxMinus.length-1; i++){
             //Log.d (TAG, "array[" + i + "] = " + maxMinus[i]);
-            if (maxMinus[i] > maxToDraw) {
+            if (maxMinus[i] > maxToDraw && Character.toString(MainActivity.gearsEnabled[i]).equals("1")) {
                 maxToDraw = maxMinus[i];
             }
         }
+        if (maxPlus[maxPlus.length-1] > maxToDraw) {
+            maxToDraw = maxPlus[maxPlus.length-1];
+        }
+        if (maxMinus[maxMinus.length-1] > maxToDraw) {
+            maxToDraw = maxMinus[maxMinus.length-1];
+        }
+
         //Log.d(TAG, "max to draw " + maxToDraw);
         return maxToDraw;
 

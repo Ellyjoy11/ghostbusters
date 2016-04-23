@@ -15,7 +15,7 @@ import java.util.Set;
 public class SettingsFragment extends PreferenceFragment implements
         SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private final String[] keys = { "test_type", "samples", "custom_path"};
+    private final String[] keys = { "test_type", "int_base", "int_time", "samples", "custom_path"};
     private static String[] entrySet;
     private static String[] valSet;
     private static String[] defSet;
@@ -28,6 +28,15 @@ public class SettingsFragment extends PreferenceFragment implements
         addPreferencesFromResource(R.xml.pref_general);
         userPref = PreferenceManager
                 .getDefaultSharedPreferences(getActivity());
+
+        SharedPreferences.Editor editor = userPref.edit();
+        if (userPref.getString("test_type", "Report 2").contains("59")) {
+            editor.putString("int_base", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
+        } else if (userPref.getString("test_type", "Report 2").contains("2")) {
+            editor.putString("int_base", Integer.toString(50));
+        }
+        editor.commit();
+
         setSummary();
     }
 
@@ -49,6 +58,14 @@ public class SettingsFragment extends PreferenceFragment implements
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
                                           String key) {
+
+        SharedPreferences.Editor editor = userPref.edit();
+        if (userPref.getString("test_type", "Report 2").contains("59")) {
+            editor.putString("int_base", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
+        } else if (userPref.getString("test_type", "Report 2").contains("2")) {
+            editor.putString("int_base", Integer.toString(50));
+        }
+        editor.commit();
         setSummary();
     }
 
