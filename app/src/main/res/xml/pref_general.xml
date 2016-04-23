@@ -114,7 +114,7 @@
         android:persistent="true"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="Integration time base" />
+        android:title="Integration duration base" />
 
 
     <EditTextPreference
@@ -125,7 +125,7 @@
         android:persistent="true"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="Integration time range (+/-)" />
+        android:title="Integration duration range (+/-)" />
 
     <!--
     <EditTextPreference

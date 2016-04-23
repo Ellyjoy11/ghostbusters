@@ -49,6 +49,7 @@ public class SettingsFragment extends PreferenceFragment implements
 
     public void onResume() {
         super.onResume();
+
         setSummary();
         Context context = getActivity();
         PreferenceManager.getDefaultSharedPreferences(context)

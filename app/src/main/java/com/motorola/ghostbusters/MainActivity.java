@@ -242,8 +242,7 @@ public class MainActivity extends Activity {
         intTime59 = new int[TEST_CYCLES];
         if (testType.contains("59")) {
             intTimeBase59 = Integer.parseInt(userPref.getString("int_base", Integer.toString(mDevice.diagHybridIntDur())));
-        }
-        if (testType.contains("2")) {
+        } else if (testType.contains("2")) {
             intTimeBase2 = Integer.parseInt(userPref.getString("int_base", "50"));
         }
         for (int j=0; j < TEST_CYCLES; j++) {
