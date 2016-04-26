@@ -168,19 +168,18 @@ public class MyAbsChart extends View {
         }
 
         for (int i = 1; i <= MainActivity.gearsCount + 1; i++) {
-            String gearName = Integer.toString(i - 1);
-            if (MainActivity.isRxEnabled &&
-                    ((i < MainActivity.gearsCount + 1 && Character.toString(MainActivity.gearsEnabled[i - 1]).equals("1")) || i == MainActivity.gearsCount + 1)) {
+            String gearName = Integer.toString(MainActivity.baseStretch + i - 1);
+            if (MainActivity.isRxEnabled) {
 
                     paintValues.setColor(Color.parseColor("#11e7ac"));
                     paintText.setColor(Color.parseColor("#11e7ac"));
 
+                Log.d(TAG, "drawing stretch " + gearName);
                 canvas.drawLine(axisX1 + i * xStep - shiftSize, xZeroLine + mRxMin[i - 1] / xScale, axisX1 + i * xStep - shiftSize, xZeroLine - mRxMax[i - 1] / xScale, paintValues);
                 canvas.drawText(Integer.toString(-1 * mRxMin[i - 1]), axisX1 + i * xStep - 5 * mTextSize / 10 - shiftSize, axisY2 - 2*mTextSize, paintText);
                 canvas.drawText(Integer.toString(mRxMax[i - 1]), axisX1 + i * xStep - 5 * mTextSize / 10 - shiftSize, axisY1 + axisPad + 2*mTextSize, paintText);
             }
-            if (MainActivity.isTxEnabled &&
-                    ((i < MainActivity.gearsCount + 1 && Character.toString(MainActivity.gearsEnabled[i - 1]).equals("1")) || i == MainActivity.gearsCount + 1)) {
+            if (MainActivity.isTxEnabled) {
 
                     paintValues.setColor(Color.parseColor("#db5da9"));
                     paintText.setColor(Color.parseColor("#db5da9"));
