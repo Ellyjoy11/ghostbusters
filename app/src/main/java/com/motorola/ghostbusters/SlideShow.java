@@ -165,6 +165,7 @@ public class SlideShow extends Activity {
                         MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTimeBase59);
                         Log.d(TAG, "setting int time back to: " + MainActivity.intTimeBase59);
                         TouchDevice.diagSetHybridStretchDur(MainActivity.baseStretch);
+                        TouchDevice.diagForceUpdate();
                     }
                     isDone = true;
 
@@ -226,6 +227,8 @@ public class SlideShow extends Activity {
             //MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTime2[cycleTestCounter]);
         } else if (MainActivity.testType.contains("59")) {
             MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTime59[cycleTestCounter]);
+            TouchDevice.diagForceUpdate();
+            Log.d(TAG, "called force update after set intDur");
         }
 
         if (MainActivity.testType.contains("2") && MainActivity.TEST_CYCLES != userPref.getInt("cycles_done_2", 0)) {
@@ -578,6 +581,7 @@ public class SlideShow extends Activity {
                 MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTimeBase59);
                 Log.d(TAG, "setting int time back to: " + MainActivity.intTimeBase59);
                 TouchDevice.diagSetHybridStretchDur(MainActivity.baseStretch);
+                TouchDevice.diagForceUpdate();
             }
             finish();
             Intent intent = new Intent(getApplicationContext(),
@@ -734,6 +738,8 @@ public class SlideShow extends Activity {
                                     }
                                 }
                                 TouchDevice.diagSetHybridStretchDur(stretch);
+                                TouchDevice.diagForceUpdate();
+                                Log.d(TAG, "called force update after set stretch");
 
                                 //Log.d(TAG, "start test for gear " + gear);
 
