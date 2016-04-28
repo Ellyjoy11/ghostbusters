@@ -159,8 +159,9 @@ public class SlideShow extends Activity {
                     unBlockTouch();
                     if (MainActivity.testType.contains("2")) {
                         //TODO replace with report 2 function
-                        //MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTimeBase2);
+                        MainActivity.mDevice.diagSetTranscapIntDur(MainActivity.intTimeBase2);
                         Log.d(TAG, "setting int time back to: " + MainActivity.intTimeBase2);
+                        TouchDevice.diagForceUpdate();
                     } else if (MainActivity.testType.contains("59")) {
                         MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTimeBase59);
                         Log.d(TAG, "setting int time back to: " + MainActivity.intTimeBase59);
@@ -223,8 +224,9 @@ public class SlideShow extends Activity {
                 .getDefaultSharedPreferences(this);
         cycleTestCounter = userPref.getInt("cycle_counter", 0);
         if (MainActivity.testType.contains("2")) {
-            //TODO replace with report 2 function
-            //MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTime2[cycleTestCounter]);
+            MainActivity.mDevice.diagSetTranscapIntDur(MainActivity.intTime2[cycleTestCounter]);
+            TouchDevice.diagForceUpdate();
+            Log.d(TAG, "called force update after set intTranscapDur");
         } else if (MainActivity.testType.contains("59")) {
             MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTime59[cycleTestCounter]);
             TouchDevice.diagForceUpdate();
@@ -557,6 +559,7 @@ public class SlideShow extends Activity {
     private void blockTouch() {
         TouchDevice.diagDisableTouch();
         TouchDevice.diagGearAuto(1);
+        Log.d(TAG, "called disable touch function");
     }
 
     private void unBlockTouch() {
@@ -574,9 +577,9 @@ public class SlideShow extends Activity {
             isStopped = true;
             unBlockTouch();
             if (MainActivity.testType.contains("2")) {
-                //TODO replace with report 2 function
-                //MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTimeBase2);
+                MainActivity.mDevice.diagSetTranscapIntDur(MainActivity.intTimeBase2);
                 Log.d(TAG, "setting int time back to: " + MainActivity.intTimeBase2);
+                TouchDevice.diagForceUpdate();
             } else if (MainActivity.testType.contains("59")) {
                 MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTimeBase59);
                 Log.d(TAG, "setting int time back to: " + MainActivity.intTimeBase59);
@@ -713,10 +716,13 @@ public class SlideShow extends Activity {
                                     // if (MainActivity.isCycleTest) {
                                     MainActivity.mMaxImC[cycleTestCounter][i][gear] = mMaxIm[i][gear];
                                     MainActivity.mMinImC[cycleTestCounter][i][gear] = mMaxIm[i][gear];
+                                int tmpEvCount = TouchDevice.diagTouchEventCount();
+                                    MainActivity.eventCountReport2[cycleTestCounter][gear] += tmpEvCount;
                                     // }
 
                                     Log.d(TAG, "max/min for image " + imgNamesToShow[i] + " for gear " + gear + ": " + mMaxIm[i][gear] + "/" + mMinIm[i][gear]);
-
+                                    Log.d(TAG, "adding event counts: " + tmpEvCount + "; total events for test cycle " + cycleTestCounter +" for gear " + gear + " = " + MainActivity.eventCountReport2[cycleTestCounter][gear]);
+                                TouchDevice.diagDisableTouch();
                             }
                         } else if (MainActivity.testType.contains("59")) {
                             ////////////////////////////////////
@@ -757,10 +763,13 @@ public class SlideShow extends Activity {
                                     MainActivity.mMinRxImC[cycleTestCounter][i][stretch] = mRxMin[i][stretch];
                                     MainActivity.mMaxTxImC[cycleTestCounter][i][stretch] = mTxMax[i][stretch];
                                     MainActivity.mMinTxImC[cycleTestCounter][i][stretch] = mTxMin[i][stretch];
+                                int tmpEvCount = TouchDevice.diagTouchEventCount();
+                                MainActivity.eventCountReport59[cycleTestCounter][stretch] += tmpEvCount;
                                     // }
                                     Log.d(TAG, "Rx max/min for image " + imgNamesToShow[i] + " for gear " + stretch + ": " + mRxMax[i][stretch] + "/" + mRxMin[i][stretch]);
                                     Log.d(TAG, "Tx max/min for image " + imgNamesToShow[i] + " for gear " + stretch + ": " + mTxMax[i][stretch] + "/" + mTxMin[i][stretch]);
-
+                                Log.d(TAG, "adding event counts: " + tmpEvCount + "; total events for test cycle " + cycleTestCounter +" for stretch " + stretch + " = " + MainActivity.eventCountReport59[cycleTestCounter][stretch]);
+                                TouchDevice.diagDisableTouch();
                             }
                         }
                         ///////////////////////////////////////////

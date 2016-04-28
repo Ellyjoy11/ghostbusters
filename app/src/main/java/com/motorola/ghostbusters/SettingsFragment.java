@@ -33,7 +33,7 @@ public class SettingsFragment extends PreferenceFragment implements
         if (userPref.getString("test_type", "Report 2").contains("59")) {
             editor.putString("int_base", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
         } else if (userPref.getString("test_type", "Report 2").contains("2")) {
-            editor.putString("int_base", Integer.toString(50));
+            editor.putString("int_base", Integer.toString(MainActivity.mDevice.diagTranscapIntDur()));
         }
         editor.commit();
 
@@ -64,7 +64,7 @@ public class SettingsFragment extends PreferenceFragment implements
         if (userPref.getString("test_type", "Report 2").contains("59")) {
             editor.putString("int_base", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
         } else if (userPref.getString("test_type", "Report 2").contains("2")) {
-            editor.putString("int_base", Integer.toString(50));
+            editor.putString("int_base", Integer.toString(MainActivity.mDevice.diagTranscapIntDur()));
         }
         editor.commit();
         setSummary();

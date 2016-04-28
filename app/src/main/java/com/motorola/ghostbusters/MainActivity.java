@@ -105,6 +105,9 @@ public class MainActivity extends Activity {
     public static int mMaxTxImC[][][];
     public static int mMinTxImC[][][];
 
+    public static int eventCountReport2[][];
+    public static int eventCountReport59[][];
+
     public static int intTime2[];
     public static int intTimeBase2;
     public static int intTime59[];
@@ -244,7 +247,7 @@ public class MainActivity extends Activity {
         if (testType.contains("59")) {
             intTimeBase59 = Integer.parseInt(userPref.getString("int_base", Integer.toString(mDevice.diagHybridIntDur())));
         } else if (testType.contains("2")) {
-            intTimeBase2 = Integer.parseInt(userPref.getString("int_base", "50"));
+            intTimeBase2 = Integer.parseInt(userPref.getString("int_base", Integer.toString(mDevice.diagTranscapIntDur())));
         }
         for (int j=0; j < TEST_CYCLES; j++) {
             intTime2[j] = intTimeBase2 - intTimeRange + j;
@@ -253,12 +256,14 @@ public class MainActivity extends Activity {
         if (!userPref.getBoolean("report2_data_exists", false) || TEST_CYCLES != userPref.getInt("cycles_done_2", 0) || mMaxImC == null) {
             mMaxImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
             mMinImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
+            eventCountReport2 = new int[TEST_CYCLES][mDevice.diagGearCount() + 1];
         }
         if (!userPref.getBoolean("report59_data_exists", false) || TEST_CYCLES != userPref.getInt("cycles_done_59", 0)  || mMaxRxImC == null) {
             mMaxRxImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
             mMinRxImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
             mMaxTxImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
             mMinTxImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
+            eventCountReport59 = new int[TEST_CYCLES][mDevice.diagGearCount() + 1];
         }
 
         editor = userPref.edit();

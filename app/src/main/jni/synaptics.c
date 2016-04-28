@@ -65,9 +65,37 @@ int receivers_on_x = 0;
 int dimX = 0;
 int dimY = 0;
 
-int has_c146 = 1; 
+int has_c146 = 1; /* TODO: finish DEFINE_REG_EXISTS */ 
+int has_c99 = 1;
+/*
+#define DEFINE_REG_EXISTS(reg, field) \
+int reg##field##exists() { \
+	int fd; \
+	if (dpath) {\
+		sprintf(path, "%s/f54/" #reg  "_" #field, dpath); \
+		LOGE("opening %s\n", path); \
+		fd = open(path, O_RDWR); \
+		if (fd < 0) { \
+			LOGE("failed to open %s\n", #reg "_" #field); \
+			return 0; \
+		} \
+		else { \
+			close(fd); \
+			return 1; \
+		} \
+	} \
+	else \
+		LOGE("reg %s does not exist\n", #reg "_" #field); \
+		return 0; \
+}
 
-#define DEFINE_BYTE_REG(reg, field, cond) \
+
+#define DEFINE_WORD_REG_EXISTS(reg, field) \
+DEFINE()
+int reg##field##exists() { \
+*/
+
+#define DEFINE_REG(reg, field, cond) \
 int fd_##reg##field = -1; \
 int set##reg##field(char val) { \
 	if (cond && dpath) { \
@@ -78,7 +106,7 @@ int set##reg##field(char val) { \
 			LOGE("opening %s\n", path); \
 			fd_##reg##field = open(path, O_RDWR); \
 			if (fd_##reg##field < 0) { \
-				printf("failed to open fd_%s\n", #reg "_" #field); \
+				LOGE("failed to open fd_%s\n", #reg "_" #field); \
 				return -1; \
 			} \
 		} \
@@ -140,8 +168,8 @@ Java_com_motorola_ghostbusters_TouchDevice_diag##javaname(JNIEnv* env, jobject o
 }
 
 #define DEFINE_WORD_REG(reg, field, cond) \
-DEFINE_BYTE_REG(reg, field##_lsb, cond) \
-DEFINE_BYTE_REG(reg, field##_msb, cond) \
+DEFINE_REG(reg, field##_lsb, cond) \
+DEFINE_REG(reg, field##_msb, cond) \
 int set##reg##field(unsigned short val) { \
 	if (set##reg##field##_lsb(val & 0xFF) || set##reg##field##_msb(val >> 8)) \
 		return -1; \
@@ -160,13 +188,16 @@ int get##reg##field() { \
 	return val; \
 }
 
+DEFINE_WORD_REG(c99, int_dur, has_c99)
+EXPORT_REG(int, c99, int_dur, TranscapIntDur)
+
 DEFINE_WORD_REG(c146, int_dur, has_c146)
 EXPORT_REG(int, c146, int_dur, HybridIntDur)
 
-DEFINE_BYTE_REG(c113, rx_obj_thresh, hasCtrl113)
+DEFINE_REG(c113, rx_obj_thresh, hasCtrl113)
 EXPORT_REG(int, c113, rx_obj_thresh, RxObjThresh)
 
-DEFINE_BYTE_REG(c146, stretch_dur, has_c146)
+DEFINE_REG(c146, stretch_dur, has_c146)
 EXPORT_REG(int, c146, stretch_dur, HybridStretchDur)
 
 static void reset_touch()
@@ -439,7 +470,7 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 	read(fd, val, 6);
 	gearCount = atoi(val);
 	printf("gearCount=%d\n", gearCount);
-
+	
 	printf("exiting %s\n", __FUNCTION__);
 
 	return 0;
@@ -1148,7 +1179,30 @@ Java_com_motorola_ghostbusters_TouchDevice_diagEnableTouch(JNIEnv* env, jobject 
         return;
 }
 
-// restores reporting of touch events to framework
+int touch_event_count()
+{
+        char val[20] = {0};
+	const char prefix[] = "STOPPED(";
+	int touch_count = 0; 
+
+	LOGE("function called %s\n", __FUNCTION__);
+
+	lseek(fd_reporting, 0, SEEK_SET);
+        read(fd_reporting, val, sizeof(val) - 1);
+	if (!strncmp(val, prefix, sizeof(prefix) - 1)) {
+		touch_count = atoi(val + sizeof(prefix) - 1);
+		return touch_count;
+	}
+	else
+        	return -1;
+}
+
+JNIEXPORT int JNICALL
+Java_com_motorola_ghostbusters_TouchDevice_diagTouchEventCount(JNIEnv* env, jobject obj)
+{
+	return touch_event_count();
+}
+
 JNIEXPORT void JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagForceUpdate(JNIEnv* env, jobject obj)
 {
@@ -1274,10 +1328,6 @@ out:
         return(ret);
 }
 
-
-
-
-// restores reporting of touch events to framework
 JNIEXPORT void JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagResetTouch(JNIEnv* env, jobject obj)
 {

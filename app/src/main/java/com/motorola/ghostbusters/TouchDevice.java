@@ -22,6 +22,7 @@ public class TouchDevice {
     public native static short[] diagDeltaFrame();
     public native static void diagDisableTouch();
     public native static void diagEnableTouch();
+    public native static int diagTouchEventCount();
     public native static int diagFingerThreshold();
     public native static int diagFingerHysteresis();
     public native static int diagSaturationLevel();
@@ -45,6 +46,9 @@ public class TouchDevice {
 
     public native static int diagSetHybridStretchDur(int val);
     public native static int diagHybridStretchDur();
+
+    public native static int diagSetTranscapIntDur(int val);
+    public native static int diagTranscapIntDur();
 
     public static int gearCount;
     private final String TAG = "Ghostbusters";

@@ -184,6 +184,7 @@ public class MyAbsChart extends View {
                     paintValues.setColor(Color.parseColor("#db5da9"));
                     paintText.setColor(Color.parseColor("#db5da9"));
 
+                Log.d(TAG, "drawing stretch " + gearName);
                 canvas.drawLine(axisX1 + i * xStep + shiftSize, xZeroLine + mTxMin[i - 1] / xScale, axisX1 + i * xStep + shiftSize, xZeroLine - mTxMax[i - 1] / xScale, paintValues);
                 canvas.drawText(Integer.toString(-1 * mTxMin[i - 1]), axisX1 + i * xStep - 5 * mTextSize / 10 + shiftSize, axisY2 - mTextSize, paintText);
                 canvas.drawText(Integer.toString(mTxMax[i - 1]), axisX1 + i * xStep - 5 * mTextSize / 10 + shiftSize, axisY1 + axisPad + mTextSize, paintText);
