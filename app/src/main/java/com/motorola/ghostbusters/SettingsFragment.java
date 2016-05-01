@@ -79,14 +79,13 @@ public class SettingsFragment extends PreferenceFragment implements
         btn.setMinHeight(0);
         btn.setMinimumHeight(0);
 
-        LinearLayout.LayoutParams ll = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        ll.gravity = Gravity.CENTER;
-
+        LinearLayout.LayoutParams ll = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        ll.gravity = Gravity.BOTTOM|Gravity.CENTER;
         btn.setLayoutParams(ll);
 
         v.addView(btn);
-        v.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        v.setPadding(0,0,0,0);
+        v.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        v.setPadding(20,10,20,10);
 
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
