@@ -114,6 +114,10 @@ public class MainActivity extends Activity {
     public static int intTimeBase59;
     public static int intTimeRange;
     public static int TEST_CYCLES;
+    public static int stretches;
+
+    public static int intTimeBase2default;
+    public static int intTimeBase59default;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,6 +172,21 @@ public class MainActivity extends Activity {
         mDevice = new TouchDevice();
         mDevice.diagInit(touchFWPath);
         gearsCount = mDevice.diagGearCount();
+
+        intTimeBase2default = mDevice.diagTranscapIntDur();
+        intTimeBase59default = mDevice.diagHybridIntDur();
+
+
+        SharedPreferences.Editor editor = userPref.edit();
+
+        if (!userPref.getBoolean("intBasesSet", false)) {
+            editor = userPref.edit();
+            editor.putString("int_base2", Integer.toString(intTimeBase2default));
+            editor.putString("int_base59", Integer.toString(intTimeBase59default));
+            editor.putString("stretches", Integer.toString(gearsCount+1));
+            editor.putBoolean("intBasesSet", true);
+            editor.commit();
+        }
 
     }
 
@@ -244,11 +263,12 @@ public class MainActivity extends Activity {
 
         intTime2 = new int[TEST_CYCLES];
         intTime59 = new int[TEST_CYCLES];
-        if (testType.contains("59")) {
-            intTimeBase59 = Integer.parseInt(userPref.getString("int_base", Integer.toString(mDevice.diagHybridIntDur())));
-        } else if (testType.contains("2")) {
-            intTimeBase2 = Integer.parseInt(userPref.getString("int_base", Integer.toString(mDevice.diagTranscapIntDur())));
-        }
+
+        intTimeBase59 = Integer.parseInt(userPref.getString("int_base59", Integer.toString(intTimeBase59default)));
+        stretches = Integer.parseInt(userPref.getString("stretches", Integer.toString(gearsCount + 1)));
+
+        intTimeBase2 = Integer.parseInt(userPref.getString("int_base2", Integer.toString(intTimeBase2default)));
+
         for (int j=0; j < TEST_CYCLES; j++) {
             intTime2[j] = intTimeBase2 - intTimeRange + j;
             intTime59[j] = intTimeBase59 - intTimeRange + j;
@@ -258,12 +278,13 @@ public class MainActivity extends Activity {
             mMinImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
             eventCountReport2 = new int[TEST_CYCLES][mDevice.diagGearCount() + 1];
         }
-        if (!userPref.getBoolean("report59_data_exists", false) || TEST_CYCLES != userPref.getInt("cycles_done_59", 0)  || mMaxRxImC == null) {
-            mMaxRxImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
-            mMinRxImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
-            mMaxTxImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
-            mMinTxImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
-            eventCountReport59 = new int[TEST_CYCLES][mDevice.diagGearCount() + 1];
+        if (!userPref.getBoolean("report59_data_exists", false) || TEST_CYCLES != userPref.getInt("cycles_done_59", 0) ||
+        stretches > userPref.getInt("stretches_done", 0) || mMaxRxImC == null) {
+            mMaxRxImC = new int[TEST_CYCLES][standardEntries + 50][stretches];
+            mMinRxImC = new int[TEST_CYCLES][standardEntries + 50][stretches];
+            mMaxTxImC = new int[TEST_CYCLES][standardEntries + 50][stretches];
+            mMinTxImC = new int[TEST_CYCLES][standardEntries + 50][stretches];
+            eventCountReport59 = new int[TEST_CYCLES][stretches];
         }
 
         editor = userPref.edit();
@@ -921,6 +942,7 @@ public class MainActivity extends Activity {
         editor.putInt("cycle_counter", 0);
         editor.putInt("cycles_done_2", 0);
         editor.putInt("cycles_done_59", 0);
+        editor.putInt("stretches_done", 0);
         editor.commit();
         super.onDestroy();
     }

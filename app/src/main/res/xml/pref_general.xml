@@ -1,94 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    >
     <!--
-    <EditTextPreference
-        android:defaultValue="20"
-        android:inputType="number"
-        android:key="freq_shift"
-        android:maxLines="1"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="FNM Freq Shift" />
-    <EditTextPreference
-        android:defaultValue="30"
-        android:inputType="number"
-        android:key="fs_density"
-        android:maxLines="1"
-        android:persistent="true"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="FNM FS Density" />
-    <EditTextPreference
-        android:defaultValue="30"
-        android:inputType="number"
-        android:key="noise"
-        android:maxLines="1"
-        android:persistent="true"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="Noise" />
-    <EditTextPreference
-        android:defaultValue="30"
-        android:inputType="number"
-        android:key="medium_noise"
-        android:maxLines="1"
-        android:persistent="true"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="Medium Noise" />
-    <EditTextPreference
-        android:defaultValue="30"
-        android:inputType="number"
-        android:key="freq_scan"
-        android:maxLines="1"
-        android:persistent="true"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="Freq Scan" />
-    <EditTextPreference
-        android:defaultValue="30"
-        android:inputType="number"
-        android:key="cid_im"
-        android:maxLines="1"
-        android:persistent="true"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="CID IM" />
-    <EditTextPreference
-        android:defaultValue="30"
-        android:inputType="number"
-        android:key="quiet_im"
-        android:maxLines="1"
-        android:persistent="true"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="Quiet IM" />
-    <EditTextPreference
-        android:defaultValue="30"
-        android:inputType="number"
-        android:key="fnm_exit"
-        android:maxLines="1"
-        android:persistent="true"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="FNM Exit" />
-
-    -->
-
-    <!--
-    <MultiSelectListPreference
-        android:dialogTitle="@string/check_im"
-        android:key="advanced"
-        android:summary=""
-        android:title="@string/check_im"/>
-    -->
-
-        <!--
-        android:entries="@array/drawablesArray720"
-        android:entryValues="@array/drawablesValues720"
-        android:defaultValue="@array/empty"
+    <PreferenceCategory
+        android:key="settings_category"
+        style="@style/PreferencesTheme">
         -->
+
     <ListPreference
         android:defaultValue="Report 2"
         android:key="test_type"
@@ -109,13 +29,21 @@
 
     <EditTextPreference
         android:inputType="number"
-        android:enabled="false"
-        android:key="int_base"
+        android:key="int_base2"
         android:maxLines="1"
         android:persistent="true"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="Integration duration base" />
+        android:title="Report 2 integration duration base" />
+
+    <EditTextPreference
+        android:inputType="number"
+        android:key="int_base59"
+        android:maxLines="1"
+        android:persistent="true"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Report 59 integration duration base" />
 
 
     <EditTextPreference
@@ -128,28 +56,14 @@
         android:singleLine="true"
         android:title="Integration duration range (+/-)" />
 
-    <!--
     <EditTextPreference
-        android:defaultValue="100"
         android:inputType="number"
-        android:key="rx"
+        android:key="stretches"
         android:maxLines="1"
         android:persistent="true"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="Rx Threshold" />
-
-
-    <EditTextPreference
-        android:defaultValue="40"
-        android:inputType="number"
-        android:key="tx"
-        android:maxLines="1"
-        android:persistent="true"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="Tx Threshold" />
-        -->
+        android:title="Number of stretches for report 59" />
 
     <CheckBoxPreference
         android:defaultValue="false"
@@ -164,6 +78,8 @@
         android:persistent="true"
         android:selectAllOnFocus="true"
         android:singleLine="true" />
-
+<!--
+</PreferenceCategory>
+-->
 
 </PreferenceScreen>

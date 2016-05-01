@@ -72,10 +72,10 @@ public class MyAbsChart extends View {
         screenWidth = displaymetrics.widthPixels;
         screenHeight = displaymetrics.heightPixels;
 
-        mRxMax  = new int[MainActivity.gearsCount+1];
-        mRxMin = new int[MainActivity.gearsCount+1];
-        mTxMax  = new int[MainActivity.gearsCount+1];
-        mTxMin = new int[MainActivity.gearsCount+1];
+        mRxMax  = new int[MainActivity.stretches];
+        mRxMin = new int[MainActivity.stretches];
+        mTxMax  = new int[MainActivity.stretches];
+        mTxMin = new int[MainActivity.stretches];
 
         if (screenHeight < 1280) {
             //axisPad = 25;
@@ -96,7 +96,7 @@ public class MyAbsChart extends View {
         axisX_Y = 4 * screenHeight / 10;
 
         xSize = axisX2 - axisX1;
-        xStep = xSize / (MainActivity.gearsCount + 2);
+        xStep = xSize / (MainActivity.stretches + 2);
         paintWidth = xStep / 3;
 
         axisY1 = axisPad - 5;
@@ -167,7 +167,7 @@ public class MyAbsChart extends View {
             canvas.drawText(Integer.toString(-1 * mRxThreshold), axisX1 + mTextSize - 2*axisPad, xZeroLine + mRxThreshold / xScale + mTextSize, paintText);
         }
 
-        for (int i = 1; i <= MainActivity.gearsCount + 1; i++) {
+        for (int i = 1; i <= MainActivity.stretches; i++) {
             String gearName = Integer.toString(MainActivity.baseStretch + i - 1);
             if (MainActivity.isRxEnabled) {
 

@@ -2,11 +2,20 @@ package com.motorola.ghostbusters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,20 +24,35 @@ import java.util.Set;
 public class SettingsFragment extends PreferenceFragment implements
         SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private final String[] keys = { "test_type", "int_base", "int_time", "samples", "custom_path"};
+    private final String[] keys = { "test_type", "int_base2", "int_base59", "int_time", "samples", "stretches", "custom_path"};
     private static String[] entrySet;
     private static String[] valSet;
     private static String[] defSet;
     public static SharedPreferences userPref;
     private static MultiSelectListPreference myMultiList;
+    private final static String TAG = "Ghostbusters";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.pref_general);
+        Preference intBase2 = (Preference) findPreference("int_base2");
+        intBase2.setDefaultValue(Integer.toString(MainActivity.intTimeBase2default));
+        Preference intBase59 = (Preference) findPreference("int_base59");
+        intBase59.setDefaultValue(Integer.toString(MainActivity.intTimeBase59default));
+        Preference stretches = (Preference) findPreference("stretches");
+        stretches.setDefaultValue(Integer.toString(MainActivity.mDevice.diagGearCount()+1));
+        PreferenceManager.setDefaultValues(getActivity(), R.xml.pref_general, false);
+
         userPref = PreferenceManager
                 .getDefaultSharedPreferences(getActivity());
 
+        if (MainActivity.mDevice.diagHasHybridBaselineControl() != 1) {
+            intBase59.setEnabled(false);
+            stretches.setEnabled(false);
+        }
+
+        /*
         SharedPreferences.Editor editor = userPref.edit();
         if (userPref.getString("test_type", "Report 2").contains("59")) {
             editor.putString("int_base", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
@@ -36,8 +60,55 @@ public class SettingsFragment extends PreferenceFragment implements
             editor.putString("int_base", Integer.toString(MainActivity.mDevice.diagTranscapIntDur()));
         }
         editor.commit();
-
+        */
         setSummary();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        LinearLayout v = (LinearLayout) super.onCreateView(inflater, container, savedInstanceState);
+
+        Button btn = new Button(getActivity().getApplicationContext());
+        btn.setText("Restore defaults");
+        //btn.setBackgroundColor(Color.LTGRAY);
+        btn.setBackgroundColor(Color.parseColor("#d8e7f0"));
+        btn.setTextColor(Color.BLACK);
+        btn.setEnabled(true);
+        btn.setClickable(true);
+        btn.setTextSize(10);
+        btn.setMinHeight(0);
+        btn.setMinimumHeight(0);
+
+        LinearLayout.LayoutParams ll = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        ll.gravity = Gravity.CENTER;
+
+        btn.setLayoutParams(ll);
+
+        v.addView(btn);
+        v.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        v.setPadding(0,0,0,0);
+
+        btn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                SharedPreferences.Editor editor = userPref.edit();
+                MainActivity.mDevice.diagResetTouch();
+                    editor.putString("test_type", "Report 2");
+                    editor.putString("samples", "100");
+                    editor.putString("int_base2", Integer.toString(MainActivity.mDevice.diagTranscapIntDur()));
+                    editor.putString("int_base59", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
+                    editor.putString("int_time", "0");
+                    editor.putString("stretches", Integer.toString(MainActivity.gearsCount + 1));
+                    CheckBoxPreference checkCustImg = (CheckBoxPreference) findPreference("custom");
+                    checkCustImg.setChecked(false);
+                    editor.putString("custom_path", "Enter path to images");
+                editor.putBoolean("intBasesSet", true);
+
+                editor.commit();
+                setSummary();
+            }
+        });
+
+        return v;
     }
 
     public void onPause() {
@@ -59,7 +130,7 @@ public class SettingsFragment extends PreferenceFragment implements
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
                                           String key) {
-
+/*
         SharedPreferences.Editor editor = userPref.edit();
         if (userPref.getString("test_type", "Report 2").contains("59")) {
             editor.putString("int_base", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
@@ -67,6 +138,7 @@ public class SettingsFragment extends PreferenceFragment implements
             editor.putString("int_base", Integer.toString(MainActivity.mDevice.diagTranscapIntDur()));
         }
         editor.commit();
+        */
         setSummary();
     }
 

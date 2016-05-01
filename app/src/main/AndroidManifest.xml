@@ -43,7 +43,8 @@
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".SetPreferences"
-            android:label="@string/title_activity_set_preferences"></activity>
+            android:label="@string/title_activity_set_preferences"
+            android:theme="@style/PreferencesTheme"></activity>
         <activity
             android:name=".TouchRpt"
             android:configChanges="orientation|keyboardHidden|screenSize"

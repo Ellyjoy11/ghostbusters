@@ -1,6 +1,8 @@
 package com.motorola.ghostbusters;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -14,6 +16,7 @@ import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -236,7 +239,8 @@ public class SlideShow extends Activity {
         if (MainActivity.testType.contains("2") && MainActivity.TEST_CYCLES != userPref.getInt("cycles_done_2", 0)) {
             gearsSetDone = 0;
         }
-        if (MainActivity.testType.contains("59") && MainActivity.TEST_CYCLES != userPref.getInt("cycles_done_59", 0)) {
+        if (MainActivity.testType.contains("59") && (MainActivity.TEST_CYCLES != userPref.getInt("cycles_done_59", 0) ||
+                MainActivity.stretches != userPref.getInt("stretches_done", 0))) {
             gearsSetDoneRx = 0;
         }
 
@@ -316,10 +320,10 @@ public class SlideShow extends Activity {
 
                  editor.putBoolean("report59_data_exists", false);
                  editor.commit();
-                 mRxMax = new int[CYCLES][TouchDevice.diagGearCount() + 1];
-                 mRxMin = new int[CYCLES][TouchDevice.diagGearCount() + 1];
-                 mTxMax = new int[CYCLES][TouchDevice.diagGearCount() + 1];
-                 mTxMin = new int[CYCLES][TouchDevice.diagGearCount() + 1];
+                 mRxMax = new int[CYCLES][MainActivity.stretches];
+                 mRxMin = new int[CYCLES][MainActivity.stretches];
+                 mTxMax = new int[CYCLES][MainActivity.stretches];
+                 mTxMin = new int[CYCLES][MainActivity.stretches];
                  maxminRxTx = new int [4];
              }
             for (int i = 0; i < MainActivity.standardEntries; i++) {
@@ -543,6 +547,7 @@ public class SlideShow extends Activity {
                 }
                 if (testTypeDone.contains("59")) {
                     editor.putInt("cycles_done_59", cycleTestCounter+1);
+                    editor.putInt("stretches_done", MainActivity.stretches);
                 }
 
                 editor.commit();
@@ -713,21 +718,25 @@ public class SlideShow extends Activity {
                                     //Log.d(TAG, "getting max and min from data");
                                     mMaxIm[i][gear] = maxmin / 65536;
                                     mMinIm[i][gear] = maxmin % 65536;
+                                if (mMaxIm != null) {
                                     // if (MainActivity.isCycleTest) {
                                     MainActivity.mMaxImC[cycleTestCounter][i][gear] = mMaxIm[i][gear];
                                     MainActivity.mMinImC[cycleTestCounter][i][gear] = mMaxIm[i][gear];
-                                int tmpEvCount = TouchDevice.diagTouchEventCount();
+                                    int tmpEvCount = TouchDevice.diagTouchEventCount();
                                     MainActivity.eventCountReport2[cycleTestCounter][gear] += tmpEvCount;
                                     // }
 
                                     Log.d(TAG, "max/min for image " + imgNamesToShow[i] + " for gear " + gear + ": " + mMaxIm[i][gear] + "/" + mMinIm[i][gear]);
-                                    Log.d(TAG, "adding event counts: " + tmpEvCount + "; total events for test cycle " + cycleTestCounter +" for gear " + gear + " = " + MainActivity.eventCountReport2[cycleTestCounter][gear]);
-                                TouchDevice.diagDisableTouch();
+                                    Log.d(TAG, "adding event counts: " + tmpEvCount + "; total events for test cycle " + cycleTestCounter + " for gear " + gear + " = " + MainActivity.eventCountReport2[cycleTestCounter][gear]);
+                                    TouchDevice.diagDisableTouch();
+                                } else {
+                                    errorDialog();
+                                }
                             }
                         } else if (MainActivity.testType.contains("59")) {
                             ////////////////////////////////////
                             //report 59 test as separate loop
-                            for (int stretch = MainActivity.baseStretch; stretch <= MainActivity.baseStretch + MainActivity.gearsCount; stretch++) {
+                            for (int stretch = MainActivity.baseStretch; stretch < MainActivity.baseStretch + MainActivity.stretches; stretch++) {
 
                                 msg = mHandler.obtainMessage(stretch + 1000);
                                 mHandler.sendMessage(msg);
@@ -753,6 +762,7 @@ public class SlideShow extends Activity {
                                     //maxminRx = MainActivity.mDevice.diagRxDeltaPeaks(samples);
                                     maxminRxTx = MainActivity.mDevice.diagRxTxDeltaPeaks(samples, 59);
                                     //Log.d(TAG, "getting max and min from data");
+                                if (maxminRxTx != null) {
                                     mRxMax[i][stretch] = maxminRxTx[3];
                                     mRxMin[i][stretch] = maxminRxTx[2];
                                     mTxMax[i][stretch] = maxminRxTx[1];
@@ -763,13 +773,16 @@ public class SlideShow extends Activity {
                                     MainActivity.mMinRxImC[cycleTestCounter][i][stretch] = mRxMin[i][stretch];
                                     MainActivity.mMaxTxImC[cycleTestCounter][i][stretch] = mTxMax[i][stretch];
                                     MainActivity.mMinTxImC[cycleTestCounter][i][stretch] = mTxMin[i][stretch];
-                                int tmpEvCount = TouchDevice.diagTouchEventCount();
-                                MainActivity.eventCountReport59[cycleTestCounter][stretch] += tmpEvCount;
+                                    int tmpEvCount = TouchDevice.diagTouchEventCount();
+                                    MainActivity.eventCountReport59[cycleTestCounter][stretch] += tmpEvCount;
                                     // }
                                     Log.d(TAG, "Rx max/min for image " + imgNamesToShow[i] + " for gear " + stretch + ": " + mRxMax[i][stretch] + "/" + mRxMin[i][stretch]);
                                     Log.d(TAG, "Tx max/min for image " + imgNamesToShow[i] + " for gear " + stretch + ": " + mTxMax[i][stretch] + "/" + mTxMin[i][stretch]);
-                                Log.d(TAG, "adding event counts: " + tmpEvCount + "; total events for test cycle " + cycleTestCounter +" for stretch " + stretch + " = " + MainActivity.eventCountReport59[cycleTestCounter][stretch]);
-                                TouchDevice.diagDisableTouch();
+                                    Log.d(TAG, "adding event counts: " + tmpEvCount + "; total events for test cycle " + cycleTestCounter + " for stretch " + stretch + " = " + MainActivity.eventCountReport59[cycleTestCounter][stretch]);
+                                    TouchDevice.diagDisableTouch();
+                                } else {
+                                    errorDialog();
+                                }
                             }
                         }
                         ///////////////////////////////////////////
@@ -794,5 +807,25 @@ public class SlideShow extends Activity {
 
     }
 ///////////////////
+    public void errorDialog () {
+        AlertDialog.Builder builder = new AlertDialog.Builder((new ContextThemeWrapper(this, R.style.Theme_CustDialog)));
+        builder.setMessage(
+                "Something went wrong.\n"
+                        + "Please try again after HW reset")
+                .setTitle("Oops...");
+
+        builder.setPositiveButton("OK",
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //moveTaskToBack(true);
+                        finish();
+                    }
+                });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
 
 }

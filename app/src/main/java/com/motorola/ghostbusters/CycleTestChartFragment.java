@@ -163,11 +163,11 @@ public class CycleTestChartFragment extends Fragment {
             maxV = new int[MainActivity.gearsCount+1];
             minV = new int[MainActivity.gearsCount+1];
 
-            maxRxV = new int[MainActivity.gearsCount+1];
-            minRxV = new int[MainActivity.gearsCount+1];
+            maxRxV = new int[MainActivity.stretches];
+            minRxV = new int[MainActivity.stretches];
 
-            maxTxV = new int[MainActivity.gearsCount+1];
-            minTxV = new int[MainActivity.gearsCount+1];
+            maxTxV = new int[MainActivity.stretches];
+            minTxV = new int[MainActivity.stretches];
 
             if (SlideShow.standardImgMap != null) {
                 checkData();
@@ -258,7 +258,7 @@ public class CycleTestChartFragment extends Fragment {
 
     public static void getAbsData() {
         if (isRxEnabled) {
-            for (int gear = 0; gear <= MainActivity.gearsCount; gear++) {
+            for (int gear = 0; gear < MainActivity.stretches; gear++) {
                 tmpMax = 0;
                 tmpMin = 0;
                 for (int i = 0; i < SlideShow.CYCLES; i++) {
@@ -283,7 +283,7 @@ public class CycleTestChartFragment extends Fragment {
             }
         }
         if (isTxEnabled) {
-            for (int gear = 0; gear <= MainActivity.gearsCount; gear++) {
+            for (int gear = 0; gear < MainActivity.stretches; gear++) {
                 tmpMax = 0;
                 tmpMin = 0;
                 for (int i = 0; i < SlideShow.CYCLES; i++) {

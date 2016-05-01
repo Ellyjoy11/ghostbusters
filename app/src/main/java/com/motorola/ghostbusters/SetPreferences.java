@@ -16,4 +16,5 @@ public class SetPreferences extends Activity {
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment()).commit();
     }
+
 }
