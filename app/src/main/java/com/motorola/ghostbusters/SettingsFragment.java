@@ -9,6 +9,7 @@ import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,10 +37,11 @@ public class SettingsFragment extends PreferenceFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.pref_general);
+
         Preference intBase2 = (Preference) findPreference("int_base2");
-        intBase2.setDefaultValue(Integer.toString(MainActivity.intTimeBase2default));
+        intBase2.setDefaultValue(Integer.toString(MainActivity.mDevice.diagTranscapIntDur()));
         Preference intBase59 = (Preference) findPreference("int_base59");
-        intBase59.setDefaultValue(Integer.toString(MainActivity.intTimeBase59default));
+        intBase59.setDefaultValue(Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
         Preference stretches = (Preference) findPreference("stretches");
         stretches.setDefaultValue(Integer.toString(MainActivity.mDevice.diagGearCount()+1));
         PreferenceManager.setDefaultValues(getActivity(), R.xml.pref_general, false);
@@ -47,20 +49,16 @@ public class SettingsFragment extends PreferenceFragment implements
         userPref = PreferenceManager
                 .getDefaultSharedPreferences(getActivity());
 
+        SharedPreferences.Editor editor = userPref.edit();
+        editor.putString("int_base2", Integer.toString(MainActivity.mDevice.diagTranscapIntDur()));
+        editor.putString("int_base59", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
+        editor.commit();
+
         if (MainActivity.mDevice.diagHasHybridBaselineControl() != 1) {
             intBase59.setEnabled(false);
             stretches.setEnabled(false);
         }
 
-        /*
-        SharedPreferences.Editor editor = userPref.edit();
-        if (userPref.getString("test_type", "Report 2").contains("59")) {
-            editor.putString("int_base", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
-        } else if (userPref.getString("test_type", "Report 2").contains("2")) {
-            editor.putString("int_base", Integer.toString(MainActivity.mDevice.diagTranscapIntDur()));
-        }
-        editor.commit();
-        */
         setSummary();
     }
 
@@ -69,7 +67,7 @@ public class SettingsFragment extends PreferenceFragment implements
         LinearLayout v = (LinearLayout) super.onCreateView(inflater, container, savedInstanceState);
 
         Button btn = new Button(getActivity().getApplicationContext());
-        btn.setText("Restore defaults");
+        btn.setText("Restore default app settings");
         //btn.setBackgroundColor(Color.LTGRAY);
         btn.setBackgroundColor(Color.parseColor("#d8e7f0"));
         btn.setTextColor(Color.BLACK);
@@ -90,17 +88,17 @@ public class SettingsFragment extends PreferenceFragment implements
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 SharedPreferences.Editor editor = userPref.edit();
-                MainActivity.mDevice.diagResetTouch();
+                //MainActivity.mDevice.diagResetTouch();
                     editor.putString("test_type", "Report 2");
                     editor.putString("samples", "100");
-                    editor.putString("int_base2", Integer.toString(MainActivity.mDevice.diagTranscapIntDur()));
-                    editor.putString("int_base59", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
+                    //editor.putString("int_base2", Integer.toString(MainActivity.mDevice.diagTranscapIntDur()));
+                    //editor.putString("int_base59", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
                     editor.putString("int_time", "0");
                     editor.putString("stretches", Integer.toString(MainActivity.gearsCount + 1));
                     CheckBoxPreference checkCustImg = (CheckBoxPreference) findPreference("custom");
                     checkCustImg.setChecked(false);
                     editor.putString("custom_path", "Enter path to images");
-                editor.putBoolean("intBasesSet", true);
+                //editor.putBoolean("intBasesSet", true);
 
                 editor.commit();
                 setSummary();
@@ -119,6 +117,11 @@ public class SettingsFragment extends PreferenceFragment implements
 
     public void onResume() {
         super.onResume();
+
+        SharedPreferences.Editor editor = userPref.edit();
+        editor.putString("int_base2", Integer.toString(MainActivity.mDevice.diagTranscapIntDur()));
+        editor.putString("int_base59", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
+        editor.commit();
 
         setSummary();
         Context context = getActivity();
@@ -149,7 +152,17 @@ public class SettingsFragment extends PreferenceFragment implements
             String value = userPref.getString(key_string, "5");
             pref.setSummary(value);
         }
-
+        if (MainActivity.mDevice.diagHasHybridBaselineControl() == 1) {
+            MainActivity.mDevice.diagSetHybridIntDur(Integer.parseInt(userPref.getString("int_base59",
+                    Integer.toString(MainActivity.mDevice.diagHybridIntDur()))));
+        }
+        MainActivity.mDevice.diagSetTranscapIntDur(Integer.parseInt(userPref.getString("int_base2",
+                Integer.toString(MainActivity.mDevice.diagTranscapIntDur()))));
+        MainActivity.mDevice.diagForceUpdate();
+        Log.d(TAG, "set IntDur 59 to: " + Integer.parseInt(userPref.getString("int_base59",
+                Integer.toString(MainActivity.mDevice.diagHybridIntDur()))));
+        Log.d(TAG, "set IntDur 2 to: " + Integer.parseInt(userPref.getString("int_base2",
+                Integer.toString(MainActivity.mDevice.diagTranscapIntDur()))));
     }
 
     private void setMultiList(int resolution) {

@@ -90,6 +90,13 @@ public class SlideShow extends Activity {
     public static boolean isRxEnabled;
     public static boolean isTxEnabled;
 
+    public static int intTime2[];
+    public static int intTimeBase2;
+    public static int intTime59[];
+    public static int intTimeBase59;
+    public static int intTimeRange;
+    public static int TEST_CYCLES;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -161,13 +168,12 @@ public class SlideShow extends Activity {
 
                     unBlockTouch();
                     if (MainActivity.testType.contains("2")) {
-                        //TODO replace with report 2 function
-                        MainActivity.mDevice.diagSetTranscapIntDur(MainActivity.intTimeBase2);
-                        Log.d(TAG, "setting int time back to: " + MainActivity.intTimeBase2);
+                        TouchDevice.diagSetTranscapIntDur(userPref.getInt("startIntDur2", intTimeBase2));
+                        Log.d(TAG, "setting int time back to: " + userPref.getInt("startIntDur2", intTimeBase2));
                         TouchDevice.diagForceUpdate();
                     } else if (MainActivity.testType.contains("59")) {
-                        MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTimeBase59);
-                        Log.d(TAG, "setting int time back to: " + MainActivity.intTimeBase59);
+                        TouchDevice.diagSetHybridIntDur(userPref.getInt("startIntDur59", intTimeBase59));
+                        Log.d(TAG, "setting int time back to: " + userPref.getInt("startIntDur59", intTimeBase59));
                         TouchDevice.diagSetHybridStretchDur(MainActivity.baseStretch);
                         TouchDevice.diagForceUpdate();
                     }
@@ -225,21 +231,44 @@ public class SlideShow extends Activity {
 
         userPref = PreferenceManager
                 .getDefaultSharedPreferences(this);
+
         cycleTestCounter = userPref.getInt("cycle_counter", 0);
+
+        if (cycleTestCounter == 0) {
+            intTimeBase2 = TouchDevice.diagTranscapIntDur();
+            intTimeBase59 = TouchDevice.diagHybridIntDur();
+            SharedPreferences.Editor editor = userPref.edit();
+            editor.putInt("startIntDur2", intTimeBase2);
+            editor.putInt("startIntDur59", intTimeBase59);
+            editor.commit();
+        }
+
+        intTimeRange = Integer.parseInt(userPref.getString("int_time", "0"));
+        TEST_CYCLES = MainActivity.TEST_CYCLES;
+
+        intTime2 = new int[TEST_CYCLES];
+        intTime59 = new int[TEST_CYCLES];
+
+        for (int j=0; j < TEST_CYCLES; j++) {
+            intTime2[j] = userPref.getInt("startIntDur2", intTimeBase2) - intTimeRange + j;
+            //Log.d(TAG, "set to array: " + intTime2[j]);
+            intTime59[j] = userPref.getInt("startIntDur59", intTimeBase59) - intTimeRange + j;
+        }
+
         if (MainActivity.testType.contains("2")) {
-            MainActivity.mDevice.diagSetTranscapIntDur(MainActivity.intTime2[cycleTestCounter]);
+            TouchDevice.diagSetTranscapIntDur(intTime2[cycleTestCounter]);
             TouchDevice.diagForceUpdate();
             Log.d(TAG, "called force update after set intTranscapDur");
         } else if (MainActivity.testType.contains("59")) {
-            MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTime59[cycleTestCounter]);
+            TouchDevice.diagSetHybridIntDur(intTime59[cycleTestCounter]);
             TouchDevice.diagForceUpdate();
             Log.d(TAG, "called force update after set intDur");
         }
 
-        if (MainActivity.testType.contains("2") && MainActivity.TEST_CYCLES != userPref.getInt("cycles_done_2", 0)) {
+        if (MainActivity.testType.contains("2") && TEST_CYCLES != userPref.getInt("cycles_done_2", 0)) {
             gearsSetDone = 0;
         }
-        if (MainActivity.testType.contains("59") && (MainActivity.TEST_CYCLES != userPref.getInt("cycles_done_59", 0) ||
+        if (MainActivity.testType.contains("59") && (TEST_CYCLES != userPref.getInt("cycles_done_59", 0) ||
                 MainActivity.stretches != userPref.getInt("stretches_done", 0))) {
             gearsSetDoneRx = 0;
         }
@@ -582,12 +611,12 @@ public class SlideShow extends Activity {
             isStopped = true;
             unBlockTouch();
             if (MainActivity.testType.contains("2")) {
-                MainActivity.mDevice.diagSetTranscapIntDur(MainActivity.intTimeBase2);
-                Log.d(TAG, "setting int time back to: " + MainActivity.intTimeBase2);
+                TouchDevice.diagSetTranscapIntDur(userPref.getInt("startIntDur2", intTimeBase2));
+                Log.d(TAG, "setting int time back to: " + userPref.getInt("startIntDur2", intTimeBase2));
                 TouchDevice.diagForceUpdate();
             } else if (MainActivity.testType.contains("59")) {
-                MainActivity.mDevice.diagSetHybridIntDur(MainActivity.intTimeBase59);
-                Log.d(TAG, "setting int time back to: " + MainActivity.intTimeBase59);
+                TouchDevice.diagSetHybridIntDur(userPref.getInt("startIntDur59", intTimeBase59));
+                Log.d(TAG, "setting int time back to: " + userPref.getInt("startIntDur59", intTimeBase59));
                 TouchDevice.diagSetHybridStretchDur(MainActivity.baseStretch);
                 TouchDevice.diagForceUpdate();
             }

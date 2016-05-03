@@ -173,22 +173,8 @@ public class MainActivity extends Activity {
         mDevice.diagInit(touchFWPath);
         gearsCount = mDevice.diagGearCount();
 
-        intTimeBase2default = mDevice.diagTranscapIntDur();
-        intTimeBase59default = mDevice.diagHybridIntDur();
-
-
-        SharedPreferences.Editor editor = userPref.edit();
-
-        if (!userPref.getBoolean("intBasesSet", false)) {
-            editor = userPref.edit();
-            editor.putString("int_base2", Integer.toString(intTimeBase2default));
-            editor.putString("int_base59", Integer.toString(intTimeBase59default));
-            editor.putString("stretches", Integer.toString(gearsCount+1));
-            editor.putBoolean("intBasesSet", true);
-            editor.commit();
-        }
-
     }
+
 
     @Override
     public void onResume() {
@@ -228,6 +214,21 @@ public class MainActivity extends Activity {
         //Log.d(TAG, "memoryClass:" + Integer.toString(memoryClass));
         //Log.d(TAG, "largeMemoryClass:" + Integer.toString(largeMemoryClass));
 
+        intTimeBase2default = mDevice.diagTranscapIntDur();
+        intTimeBase59default = mDevice.diagHybridIntDur();
+
+
+        SharedPreferences.Editor editor = userPref.edit();
+
+        editor = userPref.edit();
+        editor.putString("int_base2", Integer.toString(intTimeBase2default));
+        editor.putString("int_base59", Integer.toString(intTimeBase59default));
+        if (!userPref.getBoolean("intBasesSet", false)) {
+            editor.putString("stretches", Integer.toString(gearsCount + 1));
+            editor.putBoolean("intBasesSet", true);
+        }
+        editor.commit();
+
         gearsNames = new String[gearsCount + 1];
         selectedGear = new boolean[gearsCount + 1];
         gearsNames[0] = "Automatic";
@@ -256,11 +257,12 @@ public class MainActivity extends Activity {
             dialog.show();
         }
 
-        SharedPreferences.Editor editor = userPref.edit();
+        //SharedPreferences.Editor editor = userPref.edit();
 
         intTimeRange = Integer.parseInt(userPref.getString("int_time", "0"));
         TEST_CYCLES = 2 * intTimeRange +1;
-
+        stretches = Integer.parseInt(userPref.getString("stretches", Integer.toString(gearsCount + 1)));
+/*
         intTime2 = new int[TEST_CYCLES];
         intTime59 = new int[TEST_CYCLES];
 
@@ -273,6 +275,7 @@ public class MainActivity extends Activity {
             intTime2[j] = intTimeBase2 - intTimeRange + j;
             intTime59[j] = intTimeBase59 - intTimeRange + j;
         }
+        */
         if (!userPref.getBoolean("report2_data_exists", false) || TEST_CYCLES != userPref.getInt("cycles_done_2", 0) || mMaxImC == null) {
             mMaxImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
             mMinImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];

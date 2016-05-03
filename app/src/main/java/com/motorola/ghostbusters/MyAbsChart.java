@@ -21,10 +21,12 @@ public class MyAbsChart extends View {
     public static final String TAG = "Ghostbusters";
     Paint paintAxis, paintValues;
     Paint paintThresholds;
-    Paint paintText;
+    Paint paintText, paintSwipes;
 
     float axisX1, axisX2, axisX_Y;
     float axisY_X, axisY1, axisY2;
+    float xCenter;
+    float yDrawSwipes;
     public int axisPad = 20;
     public int mTextSize;
     //public int gearsNum;
@@ -47,6 +49,8 @@ public class MyAbsChart extends View {
     public static int[] mRxMin;
     public static int[] mTxMax;
     public static int[] mTxMin;
+
+    public static int swipeIndex;
 
     public MyAbsChart(Context context) {
         super(context);
@@ -94,6 +98,7 @@ public class MyAbsChart extends View {
         axisX1 = axisPad - 5;
         axisX2 = screenWidth - axisPad;
         axisX_Y = 4 * screenHeight / 10;
+        xCenter = (axisX2 - axisX1)/2;
 
         xSize = axisX2 - axisX1;
         xStep = xSize / (MainActivity.stretches + 2);
@@ -123,6 +128,12 @@ public class MyAbsChart extends View {
         paintText.setStrokeWidth(2);
         paintText.setStyle(Paint.Style.FILL_AND_STROKE);
 
+        paintSwipes = new Paint();
+        paintSwipes.setColor(Color.GRAY);
+        paintSwipes.setStrokeWidth(3);
+        paintSwipes.setStyle(Paint.Style.STROKE);
+
+
     }
 
     @Override
@@ -140,6 +151,7 @@ public class MyAbsChart extends View {
         Log.d(TAG, "shift: " + shiftSize);
 
         upperLine = (float) getMaxToDraw(mTxThreshold, mRxThreshold, mTxMax, mTxMin, mRxMax, mRxMin);
+        yDrawSwipes = axisY1 + 4*axisPad + 2*mTextSize;
 
         //Log.d(TAG, "upper line is " + upperLine);
         xZeroLine = axisX_Y;
@@ -195,6 +207,15 @@ public class MyAbsChart extends View {
         }
         paintText.setColor(Color.BLACK);
 
+        for (int j=0; j < MainActivity.TEST_CYCLES; j++) {
+            if (j == swipeIndex) {
+                paintSwipes.setStyle(Paint.Style.FILL_AND_STROKE);
+            } else {
+                paintSwipes.setStyle(Paint.Style.STROKE);
+            }
+            canvas.drawCircle(xCenter - 50 * SlideShow.intTimeRange + 50 * j, yDrawSwipes, 15, paintSwipes);
+        }
+
     }
 
     public static void setArrays (int[] rxMin, int[] rxMax, int[] txMin, int[] txMax) {
@@ -203,6 +224,10 @@ public class MyAbsChart extends View {
         mTxMax = txMax;
         mTxMin = txMin;
         //Log.d(TAG, "trying to set arrays");
+    }
+
+    public static void setSwipeProgress (int index) {
+        swipeIndex = index;
     }
 
     public static void setThresholds(int txThreshold, int rxThreshold) {

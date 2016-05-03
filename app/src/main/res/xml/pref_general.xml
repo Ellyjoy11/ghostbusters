@@ -3,11 +3,11 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     >
-    <!--
+
     <PreferenceCategory
         android:key="settings_category"
+        android:title="App settings"
         style="@style/PreferencesTheme">
-        -->
 
     <ListPreference
         android:defaultValue="Report 2"
@@ -27,6 +27,46 @@
         android:singleLine="true"
         android:title="Samples per image" />
 
+        <EditTextPreference
+            android:defaultValue="0"
+            android:inputType="number"
+            android:key="int_time"
+            android:maxLines="1"
+            android:persistent="true"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Integration duration range (+/-)" />
+
+        <EditTextPreference
+            android:inputType="number"
+            android:key="stretches"
+            android:maxLines="1"
+            android:persistent="true"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Number of stretches for report 59" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="custom"
+            android:title="Add images from custom folder" />
+
+        <EditTextPreference
+            android:defaultValue="Enter path to images"
+            android:inputType="text"
+            android:key="custom_path"
+            android:maxLines="1"
+            android:persistent="true"
+            android:selectAllOnFocus="true"
+            android:singleLine="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="settings_category"
+        android:title="Touch FW parameters"
+        style="@style/PreferencesTheme">
+
     <EditTextPreference
         android:inputType="number"
         android:key="int_base2"
@@ -45,41 +85,6 @@
         android:singleLine="true"
         android:title="Report 59 integration duration base" />
 
-
-    <EditTextPreference
-        android:defaultValue="0"
-        android:inputType="number"
-        android:key="int_time"
-        android:maxLines="1"
-        android:persistent="true"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="Integration duration range (+/-)" />
-
-    <EditTextPreference
-        android:inputType="number"
-        android:key="stretches"
-        android:maxLines="1"
-        android:persistent="true"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="Number of stretches for report 59" />
-
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="custom"
-        android:title="Add images from custom folder" />
-
-    <EditTextPreference
-        android:defaultValue="Enter path to images"
-        android:inputType="text"
-        android:key="custom_path"
-        android:maxLines="1"
-        android:persistent="true"
-        android:selectAllOnFocus="true"
-        android:singleLine="true" />
-<!--
 </PreferenceCategory>
--->
 
 </PreferenceScreen>
