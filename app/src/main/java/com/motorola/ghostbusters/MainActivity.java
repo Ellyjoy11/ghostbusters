@@ -262,10 +262,10 @@ public class MainActivity extends Activity {
         intTimeRange = Integer.parseInt(userPref.getString("int_time", "0"));
         TEST_CYCLES = 2 * intTimeRange +1;
         stretches = Integer.parseInt(userPref.getString("stretches", Integer.toString(gearsCount + 1)));
-/*
+
         intTime2 = new int[TEST_CYCLES];
         intTime59 = new int[TEST_CYCLES];
-
+/*
         intTimeBase59 = Integer.parseInt(userPref.getString("int_base59", Integer.toString(intTimeBase59default)));
         stretches = Integer.parseInt(userPref.getString("stretches", Integer.toString(gearsCount + 1)));
 

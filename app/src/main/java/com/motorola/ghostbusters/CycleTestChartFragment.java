@@ -84,11 +84,11 @@ public class CycleTestChartFragment extends Fragment {
             if (testTypeToRun.contains("2")) {
                 chartView.setVisibility(View.VISIBLE);
                 absChartView.setVisibility(View.INVISIBLE);
-                intTime.setText("Int. Duration = " + SlideShow.intTime2[currPage]);
+                intTime.setText("Int. Duration = " + MainActivity.intTime2[currPage]);
                 } else if (testTypeToRun.contains("59")) {
                 chartView.setVisibility(View.INVISIBLE);
                 absChartView.setVisibility(View.VISIBLE);
-                intTime.setText("Int. Duration = " + SlideShow.intTime59[currPage]);
+                intTime.setText("Int. Duration = " + MainActivity.intTime59[currPage]);
             }
 
             imgMaskAsHex = userPref.getString("hexMask", MainActivity.imgMaskAsString);

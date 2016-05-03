@@ -254,6 +254,8 @@ public class SlideShow extends Activity {
             //Log.d(TAG, "set to array: " + intTime2[j]);
             intTime59[j] = userPref.getInt("startIntDur59", intTimeBase59) - intTimeRange + j;
         }
+        MainActivity.intTime2 = intTime2;
+        MainActivity.intTime59 = intTime59;
 
         if (MainActivity.testType.contains("2")) {
             TouchDevice.diagSetTranscapIntDur(intTime2[cycleTestCounter]);
