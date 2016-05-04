@@ -1,10 +1,14 @@
 package com.motorola.ghostbusters;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,14 +85,67 @@ public class CycleTestChartFragment extends Fragment {
         //intTime.setText(showIntTime);
 /////////////
             testTypeToRun = MainActivity.testType;
-            if (testTypeToRun.contains("2")) {
+        if (MainActivity.TEST_CYCLES > 9 && MainActivity.TEST_CYCLES < 15) {
+            intTime.setTextSize(10);
+        }
+
+        if (testTypeToRun.contains("2")) {
                 chartView.setVisibility(View.VISIBLE);
                 absChartView.setVisibility(View.INVISIBLE);
-                intTime.setText("Int. Duration = " + MainActivity.intTime2[currPage]);
+                String intDurText = "IntDur: ";
+                for (int j=0; j< MainActivity.TEST_CYCLES; j++) {
+                    if (MainActivity.TEST_CYCLES < 15) {
+                        if (j == currPage && j != MainActivity.TEST_CYCLES - 1) {
+                            intDurText += "<b><big>" + MainActivity.intTime2[j] + "</b></big>" + " .. ";
+                        } else if (j == currPage && j == MainActivity.TEST_CYCLES - 1) {
+                            intDurText += "<b><big>" + MainActivity.intTime2[j] + "</b></big>";
+                        } else if (j != MainActivity.TEST_CYCLES - 1) {
+                            intDurText += "<small>" + MainActivity.intTime2[j] + "</small>" + " .. ";
+                        } else {
+                            intDurText += "<small>" + MainActivity.intTime2[j] + "</small>";
+                        }
+                    } else {
+                        if (j == currPage && j != MainActivity.TEST_CYCLES - 1) {
+                            intDurText += "<b><big>" + MainActivity.intTime2[j] + "</b></big>" + " ..... ";
+                        } else if (j == currPage && j == MainActivity.TEST_CYCLES - 1) {
+                            intDurText += "<b><big>" + MainActivity.intTime2[j] + "</b></big>";
+                        } else if (j == MainActivity.TEST_CYCLES - 1) {
+                            intDurText += "<small>" + MainActivity.intTime2[j] + "</small>";
+                        } else if (j == 0){
+                            intDurText += "<small>" + MainActivity.intTime2[j] + "</small>" + " ..... ";
+                        }
+                    }
+                }
+                intTime.setText(Html.fromHtml(intDurText));
                 } else if (testTypeToRun.contains("59")) {
                 chartView.setVisibility(View.INVISIBLE);
                 absChartView.setVisibility(View.VISIBLE);
-                intTime.setText("Int. Duration = " + MainActivity.intTime59[currPage]);
+                String intDurText = "IntDur: ";
+                for (int j=0; j< MainActivity.TEST_CYCLES; j++) {
+                    if (MainActivity.TEST_CYCLES < 15) {
+                        if (j == currPage && j != MainActivity.TEST_CYCLES - 1) {
+                            intDurText += "<b><big>" + MainActivity.intTime59[j] + "</b></big>" + " .. ";
+                        } else if (j == currPage && j == MainActivity.TEST_CYCLES - 1) {
+                            intDurText += "<b><big>" + MainActivity.intTime59[j] + "</b></big>";
+                        } else if (j != MainActivity.TEST_CYCLES - 1) {
+                            intDurText += "<small>" + MainActivity.intTime59[j] + "</small>" + " .. ";
+                        } else {
+                            intDurText += "<small>" + MainActivity.intTime59[j] + "</small>";
+                        }
+                    } else {
+                        if (j == currPage && j != MainActivity.TEST_CYCLES - 1) {
+                            intDurText += "<b><big>" + MainActivity.intTime59[j] + "</b></big>" + " ..... ";
+                        } else if (j == currPage && j == MainActivity.TEST_CYCLES - 1) {
+                            intDurText += "<b><big>" + MainActivity.intTime59[j] + "</b></big>";
+                        } else if (j == MainActivity.TEST_CYCLES - 1) {
+                            intDurText += "<small>" + MainActivity.intTime59[j] + "</small>";
+                        } else if (j == 0){
+                            intDurText += "<small>" + MainActivity.intTime59[j] + "</small>" + " ..... ";
+                        }
+                    }
+                }
+                intTime.setText(Html.fromHtml(intDurText));
+                //intTime.setText("Int. Duration = " + MainActivity.intTime59[currPage]);
             }
 
             imgMaskAsHex = userPref.getString("hexMask", MainActivity.imgMaskAsString);
@@ -134,10 +191,30 @@ public class CycleTestChartFragment extends Fragment {
 
         Log.d(TAG, "dataExist: " + dataExists + "... absDataExist: " + absDataExists);
 
-        if ((!dataExists && CycleTestChart.btnText.contains("2"))
-                || (!absDataExists && CycleTestChart.btnText.contains("59"))) {
+        if ((!dataExists && CycleTestChart.btnText.contains("2") && (!SlideShow.isDone || userPref.getInt("cycles_done_2", 0) == 0))
+                || (!absDataExists && CycleTestChart.btnText.contains("59") && (!SlideShow.isDone || userPref.getInt("cycles_done_59", 0) == 0))) {
             Toast.makeText(getActivity(), "Please run test first",
                     Toast.LENGTH_SHORT).show();
+        } else if ((!dataExists && CycleTestChart.btnText.contains("2") && SlideShow.isDone && userPref.getInt("cycles_done_2", 0) == MainActivity.TEST_CYCLES)
+                || (!absDataExists && CycleTestChart.btnText.contains("59") && SlideShow.isDone && userPref.getInt("cycles_done_59", 0) == MainActivity.TEST_CYCLES)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder((new ContextThemeWrapper(getActivity(), R.style.Theme_CustDialog)));
+            builder.setMessage(
+                    "Something is wrong.\n"
+                            + "Please try again after HW reset")
+                    .setTitle("Oops...");
+
+            builder.setPositiveButton("OK",
+                    new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            getActivity().moveTaskToBack(true);
+                        }
+                    });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
         }
 
 

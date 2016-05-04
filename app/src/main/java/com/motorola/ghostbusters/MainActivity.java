@@ -118,6 +118,7 @@ public class MainActivity extends Activity {
 
     public static int intTimeBase2default;
     public static int intTimeBase59default;
+    //public static boolean isHWresetRequired;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -207,7 +208,13 @@ public class MainActivity extends Activity {
             AlertDialog dialog = builder.create();
             dialog.show();
         }
+/*
+        isHWresetRequired = userPref.getBoolean("need_reset", false);
 
+        if (isHWresetRequired) {
+            errorDialog();
+        }
+*/
         ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         int memoryClass = am.getMemoryClass();
         int largeMemoryClass = am.getLargeMemoryClass();
@@ -257,25 +264,17 @@ public class MainActivity extends Activity {
             dialog.show();
         }
 
-        //SharedPreferences.Editor editor = userPref.edit();
-
         intTimeRange = Integer.parseInt(userPref.getString("int_time", "0"));
         TEST_CYCLES = 2 * intTimeRange +1;
         stretches = Integer.parseInt(userPref.getString("stretches", Integer.toString(gearsCount + 1)));
 
-        intTime2 = new int[TEST_CYCLES];
-        intTime59 = new int[TEST_CYCLES];
-/*
-        intTimeBase59 = Integer.parseInt(userPref.getString("int_base59", Integer.toString(intTimeBase59default)));
-        stretches = Integer.parseInt(userPref.getString("stretches", Integer.toString(gearsCount + 1)));
-
-        intTimeBase2 = Integer.parseInt(userPref.getString("int_base2", Integer.toString(intTimeBase2default)));
-
-        for (int j=0; j < TEST_CYCLES; j++) {
-            intTime2[j] = intTimeBase2 - intTimeRange + j;
-            intTime59[j] = intTimeBase59 - intTimeRange + j;
+        if (intTime2 == null) {
+            intTime2 = new int[TEST_CYCLES];
         }
-        */
+        if (intTime59 == null) {
+            intTime59 = new int[TEST_CYCLES];
+        }
+
         if (!userPref.getBoolean("report2_data_exists", false) || TEST_CYCLES != userPref.getInt("cycles_done_2", 0) || mMaxImC == null) {
             mMaxImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
             mMinImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];

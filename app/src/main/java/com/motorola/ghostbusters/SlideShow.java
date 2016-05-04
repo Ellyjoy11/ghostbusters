@@ -1,8 +1,6 @@
 package com.motorola.ghostbusters;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -16,7 +14,6 @@ import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,7 +34,7 @@ public class SlideShow extends Activity {
     private final static String TAG = "Ghostbusters";
     ArrayList<String> mFiles = new ArrayList<String>();
     ArrayList<Integer> stat = new ArrayList<Integer>();
-    private boolean isDone = false;
+    public static boolean isDone = false;
 
     ProgressLine myView;
     public static int lineToDraw;
@@ -760,8 +757,6 @@ public class SlideShow extends Activity {
                                     Log.d(TAG, "max/min for image " + imgNamesToShow[i] + " for gear " + gear + ": " + mMaxIm[i][gear] + "/" + mMinIm[i][gear]);
                                     Log.d(TAG, "adding event counts: " + tmpEvCount + "; total events for test cycle " + cycleTestCounter + " for gear " + gear + " = " + MainActivity.eventCountReport2[cycleTestCounter][gear]);
                                     TouchDevice.diagDisableTouch();
-                                } else {
-                                    errorDialog();
                                 }
                             }
                         } else if (MainActivity.testType.contains("59")) {
@@ -811,8 +806,6 @@ public class SlideShow extends Activity {
                                     Log.d(TAG, "Tx max/min for image " + imgNamesToShow[i] + " for gear " + stretch + ": " + mTxMax[i][stretch] + "/" + mTxMin[i][stretch]);
                                     Log.d(TAG, "adding event counts: " + tmpEvCount + "; total events for test cycle " + cycleTestCounter + " for stretch " + stretch + " = " + MainActivity.eventCountReport59[cycleTestCounter][stretch]);
                                     TouchDevice.diagDisableTouch();
-                                } else {
-                                    errorDialog();
                                 }
                             }
                         }
@@ -838,25 +831,6 @@ public class SlideShow extends Activity {
 
     }
 ///////////////////
-    public void errorDialog () {
-        AlertDialog.Builder builder = new AlertDialog.Builder((new ContextThemeWrapper(this, R.style.Theme_CustDialog)));
-        builder.setMessage(
-                "Something went wrong.\n"
-                        + "Please try again after HW reset")
-                .setTitle("Oops...");
 
-        builder.setPositiveButton("OK",
-                new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //moveTaskToBack(true);
-                        finish();
-                    }
-                });
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
 
 }

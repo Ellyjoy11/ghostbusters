@@ -150,7 +150,7 @@ public class MyChart extends View {
         canvas.drawLine(axisY_X, axisY1, axisY_X, axisY2, paintAxis);
 
         upperLine = (float) getMaxToDraw(threshold, mMax, mMin);
-        yDrawSwipes = axisY1 + 4*axisPad + 2*mTextSize;
+        yDrawSwipes = axisY1 + 5*axisPad + 2*mTextSize;
         //Log.d(TAG, "upper line is " + upperLine);
         xZeroLine = axisX_Y;
         //Log.d(TAG, "zero line is " + xZeroLine + "; topY " + axisY1);
@@ -195,15 +195,6 @@ public class MyChart extends View {
         canvas.drawText(Integer.toString(threshold), axisX1 + mTextSize - 2*axisPad, xZeroLine - threshold/xScale - mTextSize / 3, paintText);
         canvas.drawLine(axisX1, xZeroLine + threshold / xScale, axisX2, xZeroLine + threshold / xScale, paintThresholds);
         canvas.drawText(Integer.toString(-1 * threshold), axisX1 + mTextSize - 2*axisPad, xZeroLine + threshold / xScale - mTextSize / 3, paintText);
-
-        for (int j=0; j < MainActivity.TEST_CYCLES; j++) {
-            if (j == swipeIndex) {
-                paintSwipes.setStyle(Paint.Style.FILL_AND_STROKE);
-            } else {
-                paintSwipes.setStyle(Paint.Style.STROKE);
-            }
-            canvas.drawCircle(xCenter - 50 * SlideShow.intTimeRange + 50 * j, yDrawSwipes, 15, paintSwipes);
-        }
 
     }
 
