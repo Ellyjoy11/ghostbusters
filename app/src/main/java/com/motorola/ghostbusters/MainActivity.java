@@ -268,6 +268,29 @@ public class MainActivity extends Activity {
         TEST_CYCLES = 2 * intTimeRange +1;
         stretches = Integer.parseInt(userPref.getString("stretches", Integer.toString(gearsCount + 1)));
 
+
+        if (Integer.parseInt(userPref.getString("int_base2", Integer.toString(intTimeBase2default))) - intTimeRange < 1 ||
+                Integer.parseInt(userPref.getString("int_base59", Integer.toString(intTimeBase59default))) - intTimeRange < 1) {
+            AlertDialog.Builder builder = new AlertDialog.Builder((new ContextThemeWrapper(this, R.style.Theme_CustDialog)));
+            builder.setMessage(
+                    "Range is too big, IntDur can't be negative!")
+                    .setTitle("Oops...");
+
+            builder.setPositiveButton("OK",
+                    new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(getApplicationContext(),
+                                    com.motorola.ghostbusters.SetPreferences.class);
+                            startActivity(intent);
+                        }
+                    });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+
         if (intTime2 == null) {
             intTime2 = new int[TEST_CYCLES];
         }
