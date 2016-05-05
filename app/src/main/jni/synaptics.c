@@ -50,7 +50,6 @@ int Threshold = 0;
 int frameTx = 0;
 int frameRx = 0;
 int gearCount = 0;
-int hasCtrl113 = 0;
 int enHybridOnRx = 0;
 int enHybridOnTx = 0;
 //int rxObjThresh;
@@ -65,56 +64,26 @@ int receivers_on_x = 0;
 int dimX = 0;
 int dimY = 0;
 
-int has_c146 = 1; /* TODO: finish DEFINE_REG_EXISTS */ 
-int has_c99 = 1;
-/*
-#define DEFINE_REG_EXISTS(reg, field) \
-int reg##field##exists() { \
-	int fd; \
-	if (dpath) {\
-		sprintf(path, "%s/f54/" #reg  "_" #field, dpath); \
-		LOGE("opening %s\n", path); \
-		fd = open(path, O_RDWR); \
-		if (fd < 0) { \
-			LOGE("failed to open %s\n", #reg "_" #field); \
-			return 0; \
-		} \
-		else { \
-			close(fd); \
-			return 1; \
-		} \
-	} \
-	else \
-		LOGE("reg %s does not exist\n", #reg "_" #field); \
-		return 0; \
-}
-
-
-#define DEFINE_WORD_REG_EXISTS(reg, field) \
-DEFINE()
-int reg##field##exists() { \
-*/
-
 #define DEFINE_REG(reg, field, cond) \
-int fd_##reg##field = -1; \
+int fd_##reg##_##field = -1; \
 int set##reg##field(char val) { \
 	if (cond && dpath) { \
     		char val_str[6]; \
 		char path[256]; \
-		if (fd_##reg##field == -1) { \
+		if (fd_##reg##_##field == -1) { \
 			sprintf(path, "%s/f54/" #reg  "_" #field, dpath); \
 			LOGE("opening %s\n", path); \
-			fd_##reg##field = open(path, O_RDWR); \
-			if (fd_##reg##field < 0) { \
+			fd_##reg##_##field = open(path, O_RDWR); \
+			if (fd_##reg##_##field < 0) { \
 				LOGE("failed to open fd_%s\n", #reg "_" #field); \
 				return -1; \
 			} \
 		} \
-		if (fd_##reg##field > 0) { \
+		if (fd_##reg##_##field > 0) { \
 			LOGE("setting %s to %d\n", #reg "_" #field, val); \
 			sprintf(val_str, "%d", val); \
-			lseek(fd_##reg##field, 0, SEEK_SET); \
-			write(fd_##reg##field, val_str, strlen(val_str)); \
+			lseek(fd_##reg##_##field, 0, SEEK_SET); \
+			write(fd_##reg##_##field, val_str, strlen(val_str)); \
 		} \
 		else { \
 			LOGE( "error writing %s\n",  #reg "_" #field); \
@@ -130,18 +99,18 @@ char get##reg##field() { \
     		char val_str[6] = {0}; \
 		char path[256]; \
 		char val = 0; \
-		if (fd_##reg##field == -1) { \
+		if (fd_##reg##_##field == -1) { \
 			sprintf(path, "%s/f54/" #reg  "_" #field, dpath); \
 			LOGE("opening %s\n", path); \
-			fd_##reg##field = open(path, O_RDWR); \
-			if (fd_##reg##field < 0) { \
+			fd_##reg##_##field = open(path, O_RDWR); \
+			if (fd_##reg##_##field < 0) { \
 				printf("failed to open fd_%s\n", #reg "_" #field); \
 				return -1; \
 			} \
 		} \
-		if (fd_##reg##field > 0) { \
-			lseek(fd_##reg##field, 0, SEEK_SET); \
-			read(fd_##reg##field, val_str, sizeof(val_str)-1); \
+		if (fd_##reg##_##field > 0) { \
+			lseek(fd_##reg##_##field, 0, SEEK_SET); \
+			read(fd_##reg##_##field, val_str, sizeof(val_str)-1); \
 			val = atoi(val_str); \
 			LOGE( "%s is %s\n",  #reg "_" #field, val_str); \
 			return val; \
@@ -153,6 +122,77 @@ char get##reg##field() { \
 	} \
 	else \
 		return -1; \
+}
+
+#define DEFINE_STR_REG(reg, field, cond) \
+int fd_##reg##_##field = -1; \
+int set##reg##field(char *val_str) { \
+	if (cond && dpath) { \
+		char path[256]; \
+		if (fd_##reg##_##field == -1) { \
+			sprintf(path, "%s/f54/" #reg  "_" #field, dpath); \
+			LOGE("opening %s\n", path); \
+			fd_##reg##_##field = open(path, O_RDWR); \
+			if (fd_##reg##_##field < 0) { \
+				LOGE("failed to open fd_%s\n", #reg "_" #field); \
+				return -1; \
+			} \
+		} \
+		if (fd_##reg##_##field > 0) { \
+			LOGE("setting %s to %s\n", #reg "_" #field, val_str); \
+			lseek(fd_##reg##_##field, 0, SEEK_SET); \
+			write(fd_##reg##_##field, val_str, strlen(val_str)); \
+		} \
+		else { \
+			LOGE( "error writing %s\n",  #reg "_" #field); \
+			return -1; \
+		} \
+		return 0; \
+	} \
+	else \
+		return -1; \
+} \
+char *get##reg##field() { \
+	if (cond && dpath) { \
+    		static char val_str[256]; \
+		char path[256]; \
+		if (fd_##reg##_##field == -1) { \
+			sprintf(path, "%s/f54/" #reg  "_" #field, dpath); \
+			LOGE("opening %s\n", path); \
+			fd_##reg##_##field = open(path, O_RDWR); \
+			if (fd_##reg##_##field < 0) { \
+				printf("failed to open fd_%s\n", #reg "_" #field); \
+				return NULL; \
+			} \
+		} \
+		if (fd_##reg##_##field > 0) { \
+			lseek(fd_##reg##_##field, 0, SEEK_SET); \
+			read(fd_##reg##_##field, val_str, sizeof(val_str)-1); \
+			LOGE( "%s is %s\n",  #reg "_" #field, val_str); \
+			return val_str; \
+		} \
+		else { \
+			LOGE( "error reading %s\n",  #reg "_" #field); \
+			return NULL; \
+		} \
+	} \
+	else \
+		return NULL; \
+}
+
+#define INIT_REG(reg, field, cond) {\
+	cond = 0; \
+	if (fd_##reg##_##field == -1) { \
+		sprintf(path, "%s/f54/" #reg  "_" #field, dpath); \
+		LOGE("opening %s\n", path); \
+		fd_##reg##_##field = open(path, O_RDWR); \
+		if (fd_##reg##_##field < 0) { \
+			printf("failed to open fd_%s\n", #reg "_" #field); \
+			return -1; \
+		} \
+		else \
+			cond = 1; \
+	} \
 }
 
 #define EXPORT_REG(type, reg, field, javaname) \
@@ -181,24 +221,41 @@ int get##reg##field() { \
 	char lsb = get##reg##field##_lsb(); \
 	char msb = get##reg##field##_msb(); \
 	int val; \
-	LOGE( "lsb is %d\n",  lsb); \
-	LOGE( "msb is %d\n",  msb); \
 	val = (msb << 8) | lsb; \
 	LOGE( "%s is %d\n",  #reg "_" #field, val); \
 	return val; \
 }
 
+#define SHOW_REG(reg, field, cond) { \
+	int val = get##reg##field(); \
+	LOGE( "test: " #reg "_" #field " = %d (%x) - %s\n", val, val, \
+		cond ? "present" : "not present"); \
+}
+
+#define SHOW_STR_REG(reg, field, cond) { \
+	char *val = get##reg##field(); \
+	LOGE( "test: " #reg "_" #field " =[%s]- %s\n", val, \
+		cond ? "present" : "not present"); \
+}
+
+int has_c99 = 0;
 DEFINE_WORD_REG(c99, int_dur, has_c99)
 EXPORT_REG(int, c99, int_dur, TranscapIntDur)
 
-DEFINE_WORD_REG(c146, int_dur, has_c146)
-EXPORT_REG(int, c146, int_dur, HybridIntDur)
-
-DEFINE_REG(c113, rx_obj_thresh, hasCtrl113)
+int has_c113 = 0;
+DEFINE_REG(c113, rx_obj_thresh, has_c113)
 EXPORT_REG(int, c113, rx_obj_thresh, RxObjThresh)
 
+int has_c146 = 0;
+DEFINE_WORD_REG(c146, int_dur, has_c146)
+EXPORT_REG(int, c146, int_dur, HybridIntDur)
 DEFINE_REG(c146, stretch_dur, has_c146)
 EXPORT_REG(int, c146, stretch_dur, HybridStretchDur)
+
+int has_c95 = 0;
+DEFINE_STR_REG(c95, filter_bw, has_c95)
+DEFINE_STR_REG(c95, first_burst_length_lsb, has_c95)
+DEFINE_STR_REG(c95, first_burst_length_msb, has_c95)
 
 static void reset_touch()
 {
@@ -207,6 +264,15 @@ static void reset_touch()
 	lseek(fd_reset, 0, SEEK_SET);
     write(fd_reset, val, 1);
     return;
+}
+
+void test_regs() {
+	LOGE("TESTING REGS\n");
+	SHOW_REG(c146, int_dur, has_c146);
+	SHOW_REG(c99, int_dur, has_c99)
+	SHOW_STR_REG(c95, filter_bw, has_c95)
+	SHOW_STR_REG(c95, first_burst_length_lsb, has_c95)
+	SHOW_STR_REG(c95, first_burst_length_msb, has_c95)
 }
 
 // opens all required files internally and inticates success/error
@@ -342,7 +408,7 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 		return -1;
 	}
 
-	hasCtrl113 = 0;
+	has_c113 = 0;
 	sprintf(path, "%s/f54/has_ctrl113", dpath);
 	fd = open(path, O_RDONLY);
 	if (fd < 0) {
@@ -351,11 +417,11 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 	else {
 		read(fd, val, 6);
 		close(fd);
-		hasCtrl113 = atoi(val);
-		printf("control 113 is %s\n", hasCtrl113 ? "present" : "not present");
+		has_c113 = atoi(val);
+		printf("control 113 is %s\n", has_c113 ? "present" : "not present");
     }
 
-	if (hasCtrl113) {
+	if (has_c113) {
 		sprintf(path, "%s/f54/c113_en_hybrid_on_tx", dpath);
 		fd = open(path, O_RDONLY);
 		if (fd < 0) {
@@ -422,10 +488,9 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 
 	sprintf(path, "%s/f54/c95_disable", dpath);
 	fd_gearsEnabled = open(path, O_RDWR);
-	printf("%s: fd_gearsEnabled = %d\n", __FUNCTION__, fd_gearsEnabled);
 	if (fd_gearsEnabled < 0) {
+		
 		printf("failed to open c95_disable (%d: %s)\n", errno, strerror(errno));
-		return -1;
 	}
 
 	sprintf(path, "%s/f54/d17_freq", dpath);
@@ -471,16 +536,25 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 	gearCount = atoi(val);
 	printf("gearCount=%d\n", gearCount);
 	
+	INIT_REG(c146, int_dur_lsb, has_c146)
+	INIT_REG(c99, int_dur_lsb, has_c99)
+	INIT_REG(c95, filter_bw, has_c95)
+	INIT_REG(c95, first_burst_length_lsb, has_c95)
+	INIT_REG(c95, first_burst_length_msb, has_c95)
+
+	test_regs();
+
 	printf("exiting %s\n", __FUNCTION__);
 
 	return 0;
 }
 
+
 // returns flag indication presence of hybrid baseline control
 JNIEXPORT int JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagHasHybridBaselineControl(JNIEnv* env, jobject obj)
 {
-	if (hasCtrl113)
+	if (has_c113)
 		return 1;
 	else
 		return 0;
@@ -491,7 +565,7 @@ Java_com_motorola_ghostbusters_TouchDevice_diagHasHybridBaselineControl(JNIEnv* 
 JNIEXPORT int JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagTxObjThresh(JNIEnv* env, jobject obj)
 {
-	if (hasCtrl113)
+	if (has_c113)
 		return txObjThresh;
 	else
 		return -1;
@@ -501,7 +575,7 @@ Java_com_motorola_ghostbusters_TouchDevice_diagTxObjThresh(JNIEnv* env, jobject 
 JNIEXPORT int JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagRxObjThresh(JNIEnv* env, jobject obj)
 {
-	if (hasCtrl113)
+	if (has_c113)
 		return rxObjThresh;
 	else
 		return -1;
@@ -512,7 +586,7 @@ JNIEXPORT int JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagSetTxObjThresh(JNIEnv* env, jobject obj, int thresh)
 {
 	LOGE("function called %s\n", __FUNCTION__);
-	if (hasCtrl113) {
+	if (has_c113) {
     	char val[12];
 		LOGE("setting TX threshold to %d\n", thresh);
 		sprintf(val, "%d", thresh);
@@ -529,7 +603,7 @@ JNIEXPORT int JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagSetRxObjThresh(JNIEnv* env, jobject obj, int thresh)
 {
 	LOGE("function called %s\n", __FUNCTION__);
-	if (hasCtrl113) {
+	if (has_c113) {
     	char val[12];
 		LOGE("setting RX threshold to %d\n", thresh);
 		sprintf(val, "%d", thresh);
@@ -541,11 +615,67 @@ Java_com_motorola_ghostbusters_TouchDevice_diagSetRxObjThresh(JNIEnv* env, jobje
 		return -1;
 }
 */
+
+int get_burst_len(int filter_bw) {
+	static int burst_len[8] = {20, 28, 33, 38, 53, 63, 75, 104};
+	if (filter_bw >= 0 && filter_bw <= 7)
+		return burst_len[filter_bw];
+	else
+		return -1;
+}
+
+
+// must call force update after this function is called
+int set_c95_FilterBW_BurstLen(int filter_bw)
+{
+	char bw_str[gearCount * 3 + 1];
+	char bl_lsb_str[gearCount * 5 + 1];
+	char bl_msb_str[gearCount * 5 + 1];
+	int bwn = 0, bln1 = 0, bln2 = 0;
+	int i, first_burst_len;
+	LOGE("function called %s\n", __FUNCTION__);
+	
+	if (!has_c95)
+		return -1;
+
+	first_burst_len = get_burst_len(filter_bw);
+
+	if (first_burst_len < 0)
+		return -1;
+
+	if (first_burst_len > 255) {
+		LOGE("%s: unexpected first burst len > 255 (%d)\n", __FUNCTION__, first_burst_len); 
+		return -1;
+	}
+	
+
+	for(i = 0; i < gearCount; ++i) {
+		bwn += snprintf(bw_str + bwn, sizeof(bw_str) - 1 - bwn, "%d ", filter_bw);
+		bln1 += snprintf(bl_lsb_str + bln1, sizeof(bl_lsb_str) - 1 - bln1, "%d ", first_burst_len);
+		bln2 += snprintf(bl_msb_str + bln2, sizeof(bl_msb_str) - 1 - bln2, "%d ", 0);
+	}
+
+	lseek(fd_c95_filter_bw, 0, SEEK_SET);
+	write(fd_c95_filter_bw, bw_str, strlen(bw_str));
+	lseek(fd_c95_first_burst_length_lsb, 0, SEEK_SET);
+	write(fd_c95_first_burst_length_lsb, bl_lsb_str, strlen(bl_lsb_str));
+	lseek(fd_c95_first_burst_length_msb, 0, SEEK_SET);
+	write(fd_c95_first_burst_length_msb, bl_msb_str, strlen(bl_msb_str));
+
+	return 0;
+}
+
+JNIEXPORT int JNICALL
+Java_com_motorola_ghostbusters_TouchDevice_diagSetC95FilterBwBurstLen(JNIEnv* env, jobject obj, int filter_bw)
+{
+	return set_c95_FilterBW_BurstLen(filter_bw);
+}
+
 // returns true if hybrid is using rx
 JNIEXPORT int JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagEnHybridOnRx(JNIEnv* env, jobject obj)
 {
-	if (hasCtrl113)
+	if (has_c113)
 		return enHybridOnRx;
 	else
 		return 0;
@@ -555,7 +685,7 @@ Java_com_motorola_ghostbusters_TouchDevice_diagEnHybridOnRx(JNIEnv* env, jobject
 JNIEXPORT int JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagEnHybridOnTx(JNIEnv* env, jobject obj)
 {
-	if (hasCtrl113)
+	if (has_c113)
 		return enHybridOnTx;
 	else
 		return 0;
@@ -949,7 +1079,7 @@ Java_com_motorola_ghostbusters_TouchDevice_diagRxDeltaPeaks(JNIEnv* env, jobject
 
 	LOGE("function called %s\n", __FUNCTION__);
 
-	if (!hasCtrl113) {
+	if (!has_c113) {
 		LOGE("%s called while F54.c113 is not present\n", __FUNCTION__);
 		return -1;
 	}
@@ -1001,7 +1131,7 @@ Java_com_motorola_ghostbusters_TouchDevice_diagRxTxDeltaPeaks(JNIEnv* env, jobje
 
 	LOGE("function called %s\n", __FUNCTION__);
 
-	if (!hasCtrl113) {
+	if (!has_c113) {
 		LOGE("%s called while F54.c113 is not present\n", __FUNCTION__);
 		return NULL;
 	}

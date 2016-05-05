@@ -170,8 +170,11 @@ public class MainActivity extends Activity {
         prodInfo = (TextView) findViewById(R.id.productInfo);
         touchFWPath = getTouchFWPath();
 
-        mDevice = new TouchDevice();
-        mDevice.diagInit(touchFWPath);
+        if (mDevice == null) {
+            mDevice = new TouchDevice();
+            mDevice.diagInit(touchFWPath);
+            Log.d(TAG, "diagInit called");
+        }
         gearsCount = mDevice.diagGearCount();
 
     }

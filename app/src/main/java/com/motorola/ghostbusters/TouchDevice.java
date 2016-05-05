@@ -50,6 +50,9 @@ public class TouchDevice {
     public native static int diagSetTranscapIntDur(int val);
     public native static int diagTranscapIntDur();
 
+    // must call diagForceUpdate after this function for change to take effect
+    public native static int diagSetC95FilterBwBurstLen(int filter_bw);
+
     public static int gearCount;
     private final String TAG = "Ghostbusters";
 
