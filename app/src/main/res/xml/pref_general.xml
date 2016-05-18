@@ -38,6 +38,16 @@
             android:title="Integration duration range (+/-)" />
 
         <EditTextPreference
+            android:defaultValue="0"
+            android:inputType="number"
+            android:key="bw_range"
+            android:maxLines="1"
+            android:persistent="true"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Filter bandwidth range (+/-)" />
+
+        <EditTextPreference
             android:inputType="number"
             android:key="stretches"
             android:maxLines="1"
@@ -85,6 +95,16 @@
         android:singleLine="true"
         android:title="Report 59 integration duration base" />
 
-</PreferenceCategory>
+        <EditTextPreference
+            android:inputType="number"
+            android:key="bw_base"
+            android:maxLines="1"
+            android:persistent="true"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Filter bandwidth base" />
+
+
+    </PreferenceCategory>
 
 </PreferenceScreen>

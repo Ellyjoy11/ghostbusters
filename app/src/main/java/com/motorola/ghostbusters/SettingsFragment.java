@@ -25,7 +25,7 @@ import java.util.Set;
 public class SettingsFragment extends PreferenceFragment implements
         SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private final String[] keys = { "test_type", "int_base2", "int_base59", "int_time", "samples", "stretches", "custom_path"};
+    private final String[] keys = { "test_type", "int_base2", "int_base59", "int_time", "bw_range", "samples", "stretches", "custom_path", "bw_base"};
     private static String[] entrySet;
     private static String[] valSet;
     private static String[] defSet;
@@ -44,6 +44,8 @@ public class SettingsFragment extends PreferenceFragment implements
         intBase59.setDefaultValue(Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
         Preference stretches = (Preference) findPreference("stretches");
         stretches.setDefaultValue(Integer.toString(MainActivity.mDevice.diagGearCount()+1));
+        Preference bwBase = (Preference) findPreference("bw_base");
+        bwBase.setDefaultValue(Integer.toString(0));
         PreferenceManager.setDefaultValues(getActivity(), R.xml.pref_general, false);
 
         userPref = PreferenceManager
@@ -52,6 +54,7 @@ public class SettingsFragment extends PreferenceFragment implements
         SharedPreferences.Editor editor = userPref.edit();
         editor.putString("int_base2", Integer.toString(MainActivity.mDevice.diagTranscapIntDur()));
         editor.putString("int_base59", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
+        //editor.putString("bw_base", "0"); //TBD Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
         editor.commit();
 
         if (MainActivity.mDevice.diagHasHybridBaselineControl() != 1) {
@@ -94,6 +97,7 @@ public class SettingsFragment extends PreferenceFragment implements
                     //editor.putString("int_base2", Integer.toString(MainActivity.mDevice.diagTranscapIntDur()));
                     //editor.putString("int_base59", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
                     editor.putString("int_time", "0");
+                    editor.putString("bw_range", "0");
                     editor.putString("stretches", Integer.toString(MainActivity.gearsCount + 1));
                     CheckBoxPreference checkCustImg = (CheckBoxPreference) findPreference("custom");
                     checkCustImg.setChecked(false);
@@ -121,6 +125,7 @@ public class SettingsFragment extends PreferenceFragment implements
         SharedPreferences.Editor editor = userPref.edit();
         editor.putString("int_base2", Integer.toString(MainActivity.mDevice.diagTranscapIntDur()));
         editor.putString("int_base59", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
+        //editor.putString("bw_base", "0"); //TBD Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
         editor.commit();
 
         setSummary();
@@ -158,11 +163,13 @@ public class SettingsFragment extends PreferenceFragment implements
         }
         MainActivity.mDevice.diagSetTranscapIntDur(Integer.parseInt(userPref.getString("int_base2",
                 Integer.toString(MainActivity.mDevice.diagTranscapIntDur()))));
+        //MainActivity.mDevice.diagSetC95FilterBwBurstLen(Integer.parseInt(userPref.getString("bw_base", "0")));
         MainActivity.mDevice.diagForceUpdate();
         Log.d(TAG, "set IntDur 59 to: " + Integer.parseInt(userPref.getString("int_base59",
                 Integer.toString(MainActivity.mDevice.diagHybridIntDur()))));
         Log.d(TAG, "set IntDur 2 to: " + Integer.parseInt(userPref.getString("int_base2",
                 Integer.toString(MainActivity.mDevice.diagTranscapIntDur()))));
+        //Log.d(TAG, "set filter BW to: " + Integer.parseInt(userPref.getString("bw_base", "0")));
     }
 
     private void setMultiList(int resolution) {

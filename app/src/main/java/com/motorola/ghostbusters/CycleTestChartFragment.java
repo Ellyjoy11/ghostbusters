@@ -92,7 +92,13 @@ public class CycleTestChartFragment extends Fragment {
         if (testTypeToRun.contains("2")) {
                 chartView.setVisibility(View.VISIBLE);
                 absChartView.setVisibility(View.INVISIBLE);
-                String intDurText = "IntDur: ";
+            String intDurText = "";
+            if (SlideShow.filterBwRange == 0) {
+                intDurText = "IntDur: ";
+            } else if (SlideShow.filterBwRange > 0 && SlideShow.intTimeRange == 0) {
+                intDurText = "FilterBW: ";
+                MainActivity.intTime2 = MainActivity.filterBw;
+            }
                 for (int j=0; j< MainActivity.TEST_CYCLES; j++) {
                     if (MainActivity.TEST_CYCLES < 15) {
                         if (j == currPage && j != MainActivity.TEST_CYCLES - 1) {
@@ -120,7 +126,13 @@ public class CycleTestChartFragment extends Fragment {
                 } else if (testTypeToRun.contains("59")) {
                 chartView.setVisibility(View.INVISIBLE);
                 absChartView.setVisibility(View.VISIBLE);
-                String intDurText = "IntDur: ";
+            String intDurText = "";
+            if (SlideShow.filterBwRange == 0) {
+                intDurText = "IntDur: ";
+            } else if (SlideShow.filterBwRange > 0 && SlideShow.intTimeRange == 0) {
+                intDurText = "FilterBW: ";
+                MainActivity.intTime59 = MainActivity.filterBw;
+            }
                 for (int j=0; j< MainActivity.TEST_CYCLES; j++) {
                     if (MainActivity.TEST_CYCLES < 15) {
                         if (j == currPage && j != MainActivity.TEST_CYCLES - 1) {
@@ -161,7 +173,8 @@ public class CycleTestChartFragment extends Fragment {
             for (int k = 0; k < SlideShow.standardImgMap.length; k++) {
                 if (SlideShow.standardImgMap[k][2] == "1") {
                     for (int l=0; l < SlideShow.mMaxIm[k].length; l++) {
-                        if (MainActivity.mMaxImC[MainActivity.TEST_CYCLES-1][k][l] > 0) {
+                        if (MainActivity.mMaxImC[MainActivity.TEST_CYCLES-1][k][l] > 0)
+                        {
                             dataExists = true;
                             break;
                         }
@@ -192,11 +205,14 @@ public class CycleTestChartFragment extends Fragment {
         Log.d(TAG, "dataExist: " + dataExists + "... absDataExist: " + absDataExists);
 
         if ((!dataExists && CycleTestChart.btnText.contains("2") && (!SlideShow.isDone || userPref.getInt("cycles_done_2", 0) == 0))
-                || (!absDataExists && CycleTestChart.btnText.contains("59") && (!SlideShow.isDone || userPref.getInt("cycles_done_59", 0) == 0))) {
+                || (!absDataExists && CycleTestChart.btnText.contains("59") &&
+                (!SlideShow.isDone || userPref.getInt("cycles_done_59", 0) == 0))) {
             Toast.makeText(getActivity(), "Please run test first",
                     Toast.LENGTH_SHORT).show();
-        } else if ((!dataExists && CycleTestChart.btnText.contains("2") && SlideShow.isDone && userPref.getInt("cycles_done_2", 0) == MainActivity.TEST_CYCLES)
-                || (!absDataExists && CycleTestChart.btnText.contains("59") && SlideShow.isDone && userPref.getInt("cycles_done_59", 0) == MainActivity.TEST_CYCLES)) {
+        } else if ((!dataExists && CycleTestChart.btnText.contains("2") && SlideShow.isDone
+                && userPref.getInt("cycles_done_2", 0) == MainActivity.TEST_CYCLES)
+                || (!absDataExists && CycleTestChart.btnText.contains("59") && SlideShow.isDone
+                && userPref.getInt("cycles_done_59", 0) == MainActivity.TEST_CYCLES)) {
             AlertDialog.Builder builder = new AlertDialog.Builder((new ContextThemeWrapper(getActivity(), R.style.Theme_CustDialog)));
             builder.setMessage(
                     "Something is wrong.\n"

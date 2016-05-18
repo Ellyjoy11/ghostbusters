@@ -111,14 +111,19 @@ public class MainActivity extends Activity {
     public static int intTime2[];
     public static int intTimeBase2;
     public static int intTime59[];
+    public static int filterBw[];
     public static int intTimeBase59;
     public static int intTimeRange;
+    public static int filterBwRange;
     public static int TEST_CYCLES;
     public static int stretches;
 
     public static int intTimeBase2default;
     public static int intTimeBase59default;
-    //public static boolean isHWresetRequired;
+    public static int filterBwBase;
+
+    public static int bwStart;
+    public static int bwEnd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -226,15 +231,17 @@ public class MainActivity extends Activity {
 
         intTimeBase2default = mDevice.diagTranscapIntDur();
         intTimeBase59default = mDevice.diagHybridIntDur();
-
+        //TODO filterBwBase = TBD;
 
         SharedPreferences.Editor editor = userPref.edit();
 
         editor = userPref.edit();
         editor.putString("int_base2", Integer.toString(intTimeBase2default));
         editor.putString("int_base59", Integer.toString(intTimeBase59default));
+        //editor.putString("bw_base", "0"); //TBD Integer.toString(intTimeBase59default));
         if (!userPref.getBoolean("intBasesSet", false)) {
             editor.putString("stretches", Integer.toString(gearsCount + 1));
+            editor.putString("bw_base", "0");
             editor.putBoolean("intBasesSet", true);
         }
         editor.commit();
@@ -266,11 +273,29 @@ public class MainActivity extends Activity {
             AlertDialog dialog = builder.create();
             dialog.show();
         }
-
+/*
         intTimeRange = Integer.parseInt(userPref.getString("int_time", "0"));
-        TEST_CYCLES = 2 * intTimeRange +1;
-        stretches = Integer.parseInt(userPref.getString("stretches", Integer.toString(gearsCount + 1)));
+        filterBwRange = Integer.parseInt(userPref.getString("bw_range", "0"));
+        if (intTimeRange >= 0) {
+            TEST_CYCLES = 2 * intTimeRange + 1;
+        }
+        if (filterBwRange > 0 && intTimeRange == 0) {
+            filterBwBase = Integer.parseInt(userPref.getString("bw_base", "0"));
 
+            if (filterBwBase - filterBwRange < 0 ) {
+                bwStart = 0;
+            } else {
+                bwStart = filterBwBase - filterBwRange;
+            }
+            if (filterBwBase + filterBwRange > 7) {
+                bwEnd = 7;
+            } else {
+                bwEnd = filterBwBase + filterBwRange;
+            }
+            TEST_CYCLES = bwEnd - bwStart +1;
+        }
+        */
+        //Log.d(TAG, "test cycles to run: " + TEST_CYCLES + ".. " + filterBwRange);
 
         if (Integer.parseInt(userPref.getString("int_base2", Integer.toString(intTimeBase2default))) - intTimeRange < 1 ||
                 Integer.parseInt(userPref.getString("int_base59", Integer.toString(intTimeBase59default))) - intTimeRange < 1) {
@@ -294,11 +319,50 @@ public class MainActivity extends Activity {
             dialog.show();
         }
 
+        stretches = Integer.parseInt(userPref.getString("stretches", Integer.toString(gearsCount + 1)));
+        intTimeRange = Integer.parseInt(userPref.getString("int_time", "0"));
+        filterBwRange = Integer.parseInt(userPref.getString("bw_range", "0"));
+
+        if (intTimeRange > 0 && filterBwRange > 0) {
+            AlertDialog.Builder builder = new AlertDialog.Builder((new ContextThemeWrapper(this, R.style.Theme_CustDialog)));
+            builder.setMessage(
+                    "Both sweep test ranges are non-zero.\nSweep test will be run for IntDur.\n" +
+                            "To run filter BW sweep test\nset IntDur range to 0.")
+                    .setTitle("Are you aware?");
+
+            builder.setPositiveButton("Settings",
+                    new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(getApplicationContext(),
+                                    com.motorola.ghostbusters.SetPreferences.class);
+                            startActivity(intent);
+                        }
+                    });
+            builder.setNegativeButton("Sweep IntDur",
+                    new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+
+        /*
+
         if (intTime2 == null) {
             intTime2 = new int[TEST_CYCLES];
         }
         if (intTime59 == null) {
             intTime59 = new int[TEST_CYCLES];
+        }
+        if (filterBw == null) {
+            filterBw = new int[TEST_CYCLES];
         }
 
         if (!userPref.getBoolean("report2_data_exists", false) || TEST_CYCLES != userPref.getInt("cycles_done_2", 0) || mMaxImC == null) {
@@ -314,6 +378,7 @@ public class MainActivity extends Activity {
             mMinTxImC = new int[TEST_CYCLES][standardEntries + 50][stretches];
             eventCountReport59 = new int[TEST_CYCLES][stretches];
         }
+        */
 
         editor = userPref.edit();
         editor.putInt("cycle_counter", 0);
@@ -547,9 +612,32 @@ public class MainActivity extends Activity {
     }
 
     public void onStartClick(View view) {
-        Intent intent = new Intent(getApplicationContext(),
-                com.motorola.ghostbusters.SlideShow.class);
-        startActivity(intent);
+        if (mDevice.diagTranscapIntDur() - intTimeRange < 1 ||
+                mDevice.diagHybridIntDur() - intTimeRange < 1) {
+            AlertDialog.Builder builder = new AlertDialog.Builder((new ContextThemeWrapper(this, R.style.Theme_CustDialog)));
+            builder.setMessage(
+                    "Range is too big, IntDur can't be negative!")
+                    .setTitle("Oops...");
+
+            builder.setPositiveButton("OK",
+                    new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(getApplicationContext(),
+                                    com.motorola.ghostbusters.SetPreferences.class);
+                            startActivity(intent);
+                        }
+                    });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        } else {
+            initArrays();
+            Intent intent = new Intent(getApplicationContext(),
+                    com.motorola.ghostbusters.SlideShow.class);
+            startActivity(intent);
+        }
     }
 
     public void onRptClick(View view) {
@@ -973,6 +1061,68 @@ public class MainActivity extends Activity {
         editor.putInt("stretches_done", 0);
         editor.commit();
         super.onDestroy();
+    }
+
+    public void initArrays () {
+
+        if (intTimeRange >= 0) {
+            TEST_CYCLES = 2 * intTimeRange + 1;
+        }
+        if (filterBwRange > 0 && intTimeRange == 0) {
+            filterBwBase = Integer.parseInt(userPref.getString("bw_base", "0"));
+            //mDevice.diagSetC95FilterBwBurstLen(filterBwBase);
+
+            if (filterBwBase - filterBwRange < 0 ) {
+                bwStart = 0;
+            } else {
+                bwStart = filterBwBase - filterBwRange;
+            }
+            if (filterBwBase + filterBwRange > 7) {
+                bwEnd = 7;
+            } else {
+                bwEnd = filterBwBase + filterBwRange;
+            }
+            TEST_CYCLES = bwEnd - bwStart +1;
+            Log.d(TAG, "filter BW base = " + filterBwBase + "; range = " + filterBwRange);
+            Log.d(TAG, "filter BW range is from " + bwStart + " to " + bwEnd);
+        }
+
+
+        if (intTime2 == null) {
+            intTime2 = new int[TEST_CYCLES];
+        }
+        if (intTime59 == null) {
+            intTime59 = new int[TEST_CYCLES];
+        }
+        if (filterBw == null) {
+            filterBw = new int[TEST_CYCLES];
+        }
+
+        //SharedPreferences.Editor editor = userPref.edit();
+
+        //editor = userPref.edit();
+
+        if (!userPref.getBoolean("report2_data_exists", false) || TEST_CYCLES != userPref.getInt("cycles_done_2", 0) || mMaxImC == null) {
+            mMaxImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
+            mMinImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
+            eventCountReport2 = new int[TEST_CYCLES][mDevice.diagGearCount() + 1];
+           // if (bwEnd > 0) {
+           //     editor.putBoolean("filterBW_2_done", false);
+           // }
+        }
+        if (!userPref.getBoolean("report59_data_exists", false) || TEST_CYCLES != userPref.getInt("cycles_done_59", 0) ||
+                stretches > userPref.getInt("stretches_done", 0) || mMaxRxImC == null) {
+            mMaxRxImC = new int[TEST_CYCLES][standardEntries + 50][stretches];
+            mMinRxImC = new int[TEST_CYCLES][standardEntries + 50][stretches];
+            mMaxTxImC = new int[TEST_CYCLES][standardEntries + 50][stretches];
+            mMinTxImC = new int[TEST_CYCLES][standardEntries + 50][stretches];
+            eventCountReport59 = new int[TEST_CYCLES][stretches];
+            //if (bwEnd > 0) {
+            //    editor.putBoolean("filterBW_59_done", false);
+            //}
+        }
+        //editor.commit();
+
     }
 
 
