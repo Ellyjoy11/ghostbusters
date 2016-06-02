@@ -191,17 +191,20 @@ public class SlideShow extends Activity {
                     if (filterBwRange > 0 && intTimeRange == 0) {
                         if (MainActivity.testType.contains("2")) {
                             //TouchDevice.diagSetC95FilterBwBurstLen(userPref.getInt("startBwBase", filterBwBase));
-                            TouchDevice.diagResetTouch();
+                            MainActivity.restoreFilterBw();
                             TouchDevice.diagForceUpdate();
+                            //Log.d(TAG, "Touch reset is called after filter BW sweep test");
+                            //Log.d(TAG, "Filter BW reset to " + filterBwBase + " after sweep test");
                             editor.putBoolean("filterBW_2_done", true);
-                            Log.d(TAG, "Touch reset is called after filter BW sweep test");
                             Log.d(TAG, "setting filter 2 test done to true");
                         } else if (MainActivity.testType.contains("59")) {
                             //TouchDevice.diagSetC95FilterBwBurstLen(userPref.getInt("startBwBase", filterBwBase));
-                            TouchDevice.diagResetTouch();
+                            MainActivity.restoreFilterBw();
                             TouchDevice.diagForceUpdate();
+                            //Log.d(TAG, "Touch reset is called after filter BW sweep test");
+                            //Log.d(TAG, "Filter BW reset to " + filterBwBase + " after sweep test");
                             editor.putBoolean("filterBW_59_done", true);
-                            Log.d(TAG, "Touch reset is called after filter BW sweep test");
+                            //Log.d(TAG, "Touch reset is called after filter BW sweep test");
                             Log.d(TAG, "setting filter 59 test done to true");
                         }
                     }
@@ -266,7 +269,8 @@ public class SlideShow extends Activity {
         if (cycleTestCounter == 0) {
             intTimeBase2 = TouchDevice.diagTranscapIntDur();
             intTimeBase59 = TouchDevice.diagHybridIntDur();
-            filterBwBase = Integer.parseInt(userPref.getString("bw_base", "0")); //TODO
+            //filterBwBase = Integer.parseInt(userPref.getString("bw_base", "0")); //TODO
+            filterBwBase = MainActivity.getC95FilterBwBurstLen();
             SharedPreferences.Editor editor = userPref.edit();
             editor.putInt("startIntDur2", intTimeBase2);
             editor.putInt("startIntDur59", intTimeBase59);
@@ -713,14 +717,16 @@ public class SlideShow extends Activity {
             if (filterBwRange > 0 && intTimeRange == 0) {
                 if (MainActivity.testType.contains("2")) {
                     //TouchDevice.diagSetC95FilterBwBurstLen(userPref.getInt("startBwBase", filterBwBase));
-                    TouchDevice.diagResetTouch();
+                    MainActivity.restoreFilterBw();
                     TouchDevice.diagForceUpdate();
-                    Log.d(TAG, "Touch reset is called after filter BW sweep test");
+                    //Log.d(TAG, "Touch reset is called after filter BW sweep test");
+                    //Log.d(TAG, "Filter BW reset to " + filterBwBase + " after sweep test");
                 } else if (MainActivity.testType.contains("59")) {
                     //TouchDevice.diagSetC95FilterBwBurstLen(userPref.getInt("startBwBase", filterBwBase));
-                    TouchDevice.diagResetTouch();
+                    MainActivity.restoreFilterBw();
                     TouchDevice.diagForceUpdate();
-                    Log.d(TAG, "Touch reset is called after filter BW sweep test");
+                    //Log.d(TAG, "Touch reset is called after filter BW sweep test");
+                    Log.d(TAG, "Filter BW reset to " + filterBwBase + " after sweep test");
                 }
             }
             finish();

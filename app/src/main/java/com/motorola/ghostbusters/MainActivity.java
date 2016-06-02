@@ -125,6 +125,9 @@ public class MainActivity extends Activity {
     public static int bwStart;
     public static int bwEnd;
 
+    public static String initialC95FilterBwBurstLen = "";
+    public static String initialBurstLen = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -231,7 +234,7 @@ public class MainActivity extends Activity {
 
         intTimeBase2default = mDevice.diagTranscapIntDur();
         intTimeBase59default = mDevice.diagHybridIntDur();
-        //TODO filterBwBase = TBD;
+        filterBwBase = getC95FilterBwBurstLen();
 
         SharedPreferences.Editor editor = userPref.edit();
 
@@ -1063,13 +1066,46 @@ public class MainActivity extends Activity {
         super.onDestroy();
     }
 
+    public static int getC95FilterBwBurstLen () {
+        int filterBwValue = 0;
+
+        String toParse = readFile(touchFWPath + "/f54/c95_filter_bw");
+        String burstLen = readFile(touchFWPath + "/f54/c95_first_burst_length_lsb");
+        if (initialC95FilterBwBurstLen.isEmpty()) {
+            initialC95FilterBwBurstLen = toParse;
+            initialBurstLen = burstLen;
+        }
+        Log.d(TAG, "read from filter BW reg: " + toParse);
+        if (!toParse.isEmpty()) {
+            String[] stringValues = toParse.split(" ");
+            int[] filterBwIntValues = new int[stringValues.length];
+            for (int i = 0; i < filterBwIntValues.length; i++) {
+                filterBwIntValues[i] = Integer.parseInt(stringValues[i]);
+            }
+            int currGear = Integer.parseInt(readFile(touchFWPath + "/f54/d17_freq"));
+            Log.d(TAG, "current gear is " + currGear);
+            filterBwValue = filterBwIntValues[currGear];
+        }
+        Log.d(TAG, "Base filter BW value = " + filterBwValue);
+        return filterBwValue;
+    }
+
+    public static void restoreFilterBw () {
+        updateFile(touchFWPath + "/f54/c95_filter_bw", initialC95FilterBwBurstLen);
+        updateFile(touchFWPath + "/f54/c95_first_burst_length_lsb", initialBurstLen);
+        //mDevice.diagForceUpdate();
+        Log.d(TAG, "/f54/c95_filter_bw written back to " + initialC95FilterBwBurstLen);
+        Log.d(TAG, "/f54/c95_first_burst_length_lsb written back to " + initialBurstLen);
+    }
+
     public void initArrays () {
 
         if (intTimeRange >= 0) {
             TEST_CYCLES = 2 * intTimeRange + 1;
         }
         if (filterBwRange > 0 && intTimeRange == 0) {
-            filterBwBase = Integer.parseInt(userPref.getString("bw_base", "0"));
+            //filterBwBase = Integer.parseInt(userPref.getString("bw_base", "0"));
+            filterBwBase = getC95FilterBwBurstLen();
             //mDevice.diagSetC95FilterBwBurstLen(filterBwBase);
 
             if (filterBwBase - filterBwRange < 0 ) {

@@ -45,7 +45,7 @@ public class SettingsFragment extends PreferenceFragment implements
         Preference stretches = (Preference) findPreference("stretches");
         stretches.setDefaultValue(Integer.toString(MainActivity.mDevice.diagGearCount()+1));
         Preference bwBase = (Preference) findPreference("bw_base");
-        bwBase.setDefaultValue(Integer.toString(0));
+        bwBase.setDefaultValue(Integer.toString(MainActivity.getC95FilterBwBurstLen()));
         PreferenceManager.setDefaultValues(getActivity(), R.xml.pref_general, false);
 
         userPref = PreferenceManager
@@ -54,7 +54,7 @@ public class SettingsFragment extends PreferenceFragment implements
         SharedPreferences.Editor editor = userPref.edit();
         editor.putString("int_base2", Integer.toString(MainActivity.mDevice.diagTranscapIntDur()));
         editor.putString("int_base59", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
-        //editor.putString("bw_base", "0"); //TBD Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
+        editor.putString("bw_base", Integer.toString(MainActivity.getC95FilterBwBurstLen()));
         editor.commit();
 
         if (MainActivity.mDevice.diagHasHybridBaselineControl() != 1) {
@@ -125,7 +125,7 @@ public class SettingsFragment extends PreferenceFragment implements
         SharedPreferences.Editor editor = userPref.edit();
         editor.putString("int_base2", Integer.toString(MainActivity.mDevice.diagTranscapIntDur()));
         editor.putString("int_base59", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
-        //editor.putString("bw_base", "0"); //TBD Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
+        editor.putString("bw_base", Integer.toString(MainActivity.getC95FilterBwBurstLen()));
         editor.commit();
 
         setSummary();
@@ -163,13 +163,19 @@ public class SettingsFragment extends PreferenceFragment implements
         }
         MainActivity.mDevice.diagSetTranscapIntDur(Integer.parseInt(userPref.getString("int_base2",
                 Integer.toString(MainActivity.mDevice.diagTranscapIntDur()))));
-        //MainActivity.mDevice.diagSetC95FilterBwBurstLen(Integer.parseInt(userPref.getString("bw_base", "0")));
+        if (userPref.getString("bw_range", "0").equals("0")) {
+            MainActivity.restoreFilterBw();
+        } else {
+            MainActivity.mDevice.diagSetC95FilterBwBurstLen
+                    (Integer.parseInt(userPref.getString("bw_base", Integer.toString(MainActivity.getC95FilterBwBurstLen()))));
+        }
         MainActivity.mDevice.diagForceUpdate();
         Log.d(TAG, "set IntDur 59 to: " + Integer.parseInt(userPref.getString("int_base59",
                 Integer.toString(MainActivity.mDevice.diagHybridIntDur()))));
         Log.d(TAG, "set IntDur 2 to: " + Integer.parseInt(userPref.getString("int_base2",
                 Integer.toString(MainActivity.mDevice.diagTranscapIntDur()))));
-        //Log.d(TAG, "set filter BW to: " + Integer.parseInt(userPref.getString("bw_base", "0")));
+        Log.d(TAG, "set filter BW to: " +
+                Integer.parseInt(userPref.getString("bw_base", Integer.toString(MainActivity.getC95FilterBwBurstLen()))));
     }
 
     private void setMultiList(int resolution) {
