@@ -234,6 +234,7 @@ public class MainActivity extends Activity {
 
         intTimeBase2default = mDevice.diagTranscapIntDur();
         intTimeBase59default = mDevice.diagHybridIntDur();
+        Log.d(TAG, "defaults are " + intTimeBase2default + " and " + intTimeBase59default);
         filterBwBase = getC95FilterBwBurstLen();
 
         SharedPreferences.Editor editor = userPref.edit();
@@ -241,10 +242,10 @@ public class MainActivity extends Activity {
         editor = userPref.edit();
         editor.putString("int_base2", Integer.toString(intTimeBase2default));
         editor.putString("int_base59", Integer.toString(intTimeBase59default));
-        //editor.putString("bw_base", "0"); //TBD Integer.toString(intTimeBase59default));
+        editor.putString("bw_base", Integer.toString(filterBwBase)); //TBD Integer.toString(intTimeBase59default));
         if (!userPref.getBoolean("intBasesSet", false)) {
             editor.putString("stretches", Integer.toString(gearsCount + 1));
-            editor.putString("bw_base", "0");
+            //editor.putString("bw_base", "0");
             editor.putBoolean("intBasesSet", true);
         }
         editor.commit();
@@ -1057,14 +1058,26 @@ public class MainActivity extends Activity {
 
     @Override
     public void onDestroy() {
+        //Log.d(TAG, "Destroy method is called");
         SharedPreferences.Editor editor = userPref.edit();
         editor.putInt("cycle_counter", 0);
         editor.putInt("cycles_done_2", 0);
         editor.putInt("cycles_done_59", 0);
         editor.putInt("stretches_done", 0);
         editor.commit();
+        //mDevice.diagResetTouch();
         super.onDestroy();
     }
+
+    /*
+    @Override
+    public void onBackPressed() {
+        Intent a = new Intent(Intent.ACTION_MAIN);
+        a.addCategory(Intent.CATEGORY_HOME);
+        a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(a);
+    }
+    */
 
     public static int getC95FilterBwBurstLen () {
         int filterBwValue = 0;

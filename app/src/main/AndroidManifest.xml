@@ -30,6 +30,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_slide_show"
             android:screenOrientation="portrait"
+            android:noHistory="true"
             android:theme="@style/Theme.NoTitleBar"></activity>
         <activity
             android:name=".ChartShow"
@@ -56,6 +57,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_display_test"
             android:screenOrientation="portrait"
+            android:noHistory="true"
             android:theme="@style/Theme.NoTitleBar"></activity>
         <activity
             android:name=".PieChartShow"

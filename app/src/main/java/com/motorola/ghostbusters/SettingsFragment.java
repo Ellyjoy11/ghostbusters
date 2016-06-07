@@ -32,6 +32,7 @@ public class SettingsFragment extends PreferenceFragment implements
     public static SharedPreferences userPref;
     private static MultiSelectListPreference myMultiList;
     private final static String TAG = "Ghostbusters";
+    private boolean needTouchReset = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -126,6 +127,8 @@ public class SettingsFragment extends PreferenceFragment implements
         editor.putString("int_base2", Integer.toString(MainActivity.mDevice.diagTranscapIntDur()));
         editor.putString("int_base59", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
         editor.putString("bw_base", Integer.toString(MainActivity.getC95FilterBwBurstLen()));
+        editor.putString("bw_range", "0");
+        needTouchReset = false;
         editor.commit();
 
         setSummary();
@@ -163,19 +166,34 @@ public class SettingsFragment extends PreferenceFragment implements
         }
         MainActivity.mDevice.diagSetTranscapIntDur(Integer.parseInt(userPref.getString("int_base2",
                 Integer.toString(MainActivity.mDevice.diagTranscapIntDur()))));
-        if (userPref.getString("bw_range", "0").equals("0")) {
+        if (userPref.getString("bw_range", "0").equals("0") && needTouchReset) {
             MainActivity.restoreFilterBw();
-        } else {
+            MainActivity.mDevice.diagResetTouch();
+            Log.d(TAG, "reset touch");
+            needTouchReset = false;
+            SharedPreferences.Editor editor = userPref.edit();
+            editor.putString("int_base2", Integer.toString(MainActivity.mDevice.diagTranscapIntDur()));
+            editor.putString("int_base59", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
+            editor.putString("bw_base", Integer.toString(MainActivity.getC95FilterBwBurstLen()));
+            editor.commit();
+            for (int i = 0; i < keys.length; i++) {
+                String key_string = keys[i];
+                Preference pref = (Preference) findPreference(key_string);
+                String value = userPref.getString(key_string, "5");
+                pref.setSummary(value);
+            }
+        } else if (!userPref.getString("bw_range", "0").equals("0")) {
             MainActivity.mDevice.diagSetC95FilterBwBurstLen
                     (Integer.parseInt(userPref.getString("bw_base", Integer.toString(MainActivity.getC95FilterBwBurstLen()))));
+            Log.d(TAG, "set filter BW to: " +
+                    Integer.parseInt(userPref.getString("bw_base", Integer.toString(MainActivity.getC95FilterBwBurstLen()))));
+            needTouchReset = true;
         }
         MainActivity.mDevice.diagForceUpdate();
         Log.d(TAG, "set IntDur 59 to: " + Integer.parseInt(userPref.getString("int_base59",
                 Integer.toString(MainActivity.mDevice.diagHybridIntDur()))));
         Log.d(TAG, "set IntDur 2 to: " + Integer.parseInt(userPref.getString("int_base2",
                 Integer.toString(MainActivity.mDevice.diagTranscapIntDur()))));
-        Log.d(TAG, "set filter BW to: " +
-                Integer.parseInt(userPref.getString("bw_base", Integer.toString(MainActivity.getC95FilterBwBurstLen()))));
     }
 
     private void setMultiList(int resolution) {

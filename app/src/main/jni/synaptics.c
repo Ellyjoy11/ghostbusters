@@ -535,12 +535,12 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 	read(fd, val, 6);
 	gearCount = atoi(val);
 	printf("gearCount=%d\n", gearCount);
-	
-	INIT_REG(c146, int_dur_lsb, has_c146)
+
 	INIT_REG(c99, int_dur_lsb, has_c99)
 	INIT_REG(c95, filter_bw, has_c95)
 	INIT_REG(c95, first_burst_length_lsb, has_c95)
 	INIT_REG(c95, first_burst_length_msb, has_c95)
+	INIT_REG(c146, int_dur_lsb, has_c146)
 
 	test_regs();
 
