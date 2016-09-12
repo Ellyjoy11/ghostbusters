@@ -233,6 +233,7 @@ public class MainActivity extends Activity {
         //Log.d(TAG, "largeMemoryClass:" + Integer.toString(largeMemoryClass));
 
         intTimeBase2default = mDevice.diagTranscapIntDur();
+        Log.d(TAG, "TranscapIntDur:" + Integer.toString(intTimeBase2default));
         intTimeBase59default = mDevice.diagHybridIntDur();
         Log.d(TAG, "defaults are " + intTimeBase2default + " and " + intTimeBase59default);
         filterBwBase = getC95FilterBwBurstLen();
@@ -300,12 +301,14 @@ public class MainActivity extends Activity {
         }
         */
         //Log.d(TAG, "test cycles to run: " + TEST_CYCLES + ".. " + filterBwRange);
+        int intbase2 = Integer.parseInt(userPref.getString("int_base2", Integer.toString(intTimeBase2default)));
+        int intbase59 = Integer.parseInt(userPref.getString("int_base59", Integer.toString(intTimeBase59default)));
 
-        if (Integer.parseInt(userPref.getString("int_base2", Integer.toString(intTimeBase2default))) - intTimeRange < 1 ||
-                Integer.parseInt(userPref.getString("int_base59", Integer.toString(intTimeBase59default))) - intTimeRange < 1) {
+        if ( intbase2 - intTimeRange < 1 ||
+                intbase59 - intTimeRange < 1) {
             AlertDialog.Builder builder = new AlertDialog.Builder((new ContextThemeWrapper(this, R.style.Theme_CustDialog)));
             builder.setMessage(
-                    "Range is too big, IntDur can't be negative!")
+                    "Range is too big, IntDur can't be negative! " + intbase2 + " " + intbase59)
                     .setTitle("Oops...");
 
             builder.setPositiveButton("OK",

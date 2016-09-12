@@ -80,7 +80,7 @@ int set##reg##field(char val) { \
 			} \
 		} \
 		if (fd_##reg##_##field > 0) { \
-			LOGE("setting %s to %d\n", #reg "_" #field, val); \
+			LOGE("setting MARK %s to %d\n", #reg "_" #field, val); \
 			sprintf(val_str, "%d", val); \
 			lseek(fd_##reg##_##field, 0, SEEK_SET); \
 			write(fd_##reg##_##field, val_str, strlen(val_str)); \
@@ -123,6 +123,9 @@ char get##reg##field() { \
 	else \
 		return -1; \
 }
+
+#define REG_SETTER(reg, field) set##reg##field
+#define REG_GETTER(reg, field) get##reg##field
 
 #define DEFINE_STR_REG(reg, field, cond) \
 int fd_##reg##_##field = -1; \
@@ -188,7 +191,6 @@ char *get##reg##field() { \
 		fd_##reg##_##field = open(path, O_RDWR); \
 		if (fd_##reg##_##field < 0) { \
 			printf("failed to open fd_%s\n", #reg "_" #field); \
-			return -1; \
 		} \
 		else \
 			cond = 1; \
@@ -207,10 +209,32 @@ Java_com_motorola_ghostbusters_TouchDevice_diag##javaname(JNIEnv* env, jobject o
 	return (type)get##reg##field(); \
 }
 
+#define EXPORT_REG_EXT(type, reg, field, javaname) \
+int (*set##reg##field##_var)(type) = &set##reg##field; \
+int (*get##reg##field##_var)() = &get##reg##field; \
+JNIEXPORT int JNICALL \
+Java_com_motorola_ghostbusters_TouchDevice_diagSet##javaname(JNIEnv* env, jobject obj, type val) \
+{ \
+	LOGE("DEBUG: SETTER CALLED %s_%s val = %d (%p)", #reg, #field, val, set##reg##field##_var); \
+	return set##reg##field##_var(val); \
+} \
+JNIEXPORT type JNICALL \
+Java_com_motorola_ghostbusters_TouchDevice_diag##javaname(JNIEnv* env, jobject obj) \
+{ \
+	type val = (type)get##reg##field##_var();\
+	LOGE("DEBUG: GETTER CALLED %s_%s val = %d (%p)", #reg, #field, val, get##reg##field##_var); \
+	return val; \
+}
+
+
+#define REDEFINE_EXPORT_REG_EXT(type, reg, field, javaname, getter, setter) \
+set##reg##field##_var = setter; \
+get##reg##field##_var = getter 
+
 #define DEFINE_WORD_REG(reg, field, cond) \
 DEFINE_REG(reg, field##_lsb, cond) \
 DEFINE_REG(reg, field##_msb, cond) \
-int set##reg##field(unsigned short val) { \
+int set##reg##field(int val) { \
 	if (set##reg##field##_lsb(val & 0xFF) || set##reg##field##_msb(val >> 8)) \
 		return -1; \
 	else { \
@@ -238,9 +262,12 @@ int get##reg##field() { \
 		cond ? "present" : "not present"); \
 }
 
+#define READ_REG(reg, field) \
+	get##reg##field() \
+
 int has_c99 = 0;
 DEFINE_WORD_REG(c99, int_dur, has_c99)
-EXPORT_REG(int, c99, int_dur, TranscapIntDur)
+EXPORT_REG_EXT(int, c99, int_dur, TranscapIntDur)
 
 int has_c113 = 0;
 DEFINE_REG(c113, rx_obj_thresh, has_c113)
@@ -248,7 +275,7 @@ EXPORT_REG(int, c113, rx_obj_thresh, RxObjThresh)
 
 int has_c146 = 0;
 DEFINE_WORD_REG(c146, int_dur, has_c146)
-EXPORT_REG(int, c146, int_dur, HybridIntDur)
+EXPORT_REG_EXT(int, c146, int_dur, HybridIntDur)
 DEFINE_REG(c146, stretch_dur, has_c146)
 EXPORT_REG(int, c146, stretch_dur, HybridStretchDur)
 
@@ -256,6 +283,14 @@ int has_c95 = 0;
 DEFINE_STR_REG(c95, filter_bw, has_c95)
 DEFINE_STR_REG(c95, first_burst_length_lsb, has_c95)
 DEFINE_STR_REG(c95, first_burst_length_msb, has_c95)
+
+int has_pixel_touch_threshold = 0;
+DEFINE_REG(pixel, touch_threshold, has_pixel_touch_threshold)
+int has_number_of_sensing_frequencies = 0;
+DEFINE_REG(number, of_sensing_frequencies, has_number_of_sensing_frequencies)
+
+int has_integration_duration = 0;
+DEFINE_REG(integration, duration, has_integration_duration)
 
 static void reset_touch()
 {
@@ -273,6 +308,25 @@ void test_regs() {
 	SHOW_STR_REG(c95, filter_bw, has_c95)
 	SHOW_STR_REG(c95, first_burst_length_lsb, has_c95)
 	SHOW_STR_REG(c95, first_burst_length_msb, has_c95)
+	SHOW_REG(integration, duration, has_integration_duration)
+}
+int dummy_set(int val) {return 0;}
+int dummy_get() {return 42;};
+int set_int_dur(int val) {
+	if (val < 0) {
+		LOGE("%s: neg value - not setting %d", __FUNCTION__, val);
+		return -1;
+	}
+	else {	
+		LOGE("%s: setting %d", __FUNCTION__, val);
+		return REG_SETTER(integration, duration)(val);
+	}
+}
+
+int get_int_dur() {
+	int val = REG_GETTER(integration, duration)();
+	LOGE("%s: getting %d", __FUNCTION__, val);
+	return val;
 }
 
 // opens all required files internally and inticates success/error
@@ -300,7 +354,7 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
     		return -1;
     	}
 
-//    reset_touch();
+	reset_touch();
 
 	sprintf(path, "%s/f54/num_of_mapped_tx", dpath);
 	fd = open(path, O_RDONLY);
@@ -489,22 +543,34 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 	sprintf(path, "%s/f54/c95_disable", dpath);
 	fd_gearsEnabled = open(path, O_RDWR);
 	if (fd_gearsEnabled < 0) {
-		
 		printf("failed to open c95_disable (%d: %s)\n", errno, strerror(errno));
+		sprintf(path, "%s/f54/disable", dpath);
+		fd_gearsEnabled = open(path, O_RDWR);
+		if (fd_gearsEnabled < 0) {
+			printf("failed to open disable (%d: %s)\n", errno, strerror(errno));
+		}
 	}
 
 	sprintf(path, "%s/f54/d17_freq", dpath);
 	fd_gearCurrent = open(path, O_RDWR);
 	if (fd_gearCurrent < 0) {
 		printf("failed to open d17_freq\n");
-		return -1;
+		sprintf(path, "%s/f54/d4_sense_freq_sel", dpath);
+		fd_gearCurrent = open(path, O_RDWR);
+		if (fd_gearCurrent < 0) {
+			printf("failed to open d4_sense_freq_sel\n");
+		}
 	}
 
 	sprintf(path, "%s/f54/d17_inhibit_freq_shift", dpath);
 	fd_gearAuto = open(path, O_RDWR);
 	if (fd_gearAuto < 0) {
 		printf("failed to open d17_inhibit_freq_shift\n");
-		return -1;
+		sprintf(path, "%s/f54/d4_inhibit_freq_shift", dpath);
+		fd_gearAuto = open(path, O_RDWR);
+		if (fd_gearAuto < 0) {
+			printf("failed to open d4_inhibit_freq_shift\n");
+		}
 	}
 
 	sprintf(path, "%s/f54/d6_interference_metric_lsb", dpath);
@@ -522,25 +588,54 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 	fd_coherentIMm = open(path, O_RDONLY);
 	if (fd_coherentIMl < 0 || fd_coherentIMm < 0) {
 		printf("failed tp open d14_cid_im\n");
-		return -1;
 	}
 
+	gearCount = 0;
 	sprintf(path, "%s/f54/q17_num_of_sense_freqs", dpath);
 	fd = open(path, O_RDONLY);
 	if (fd < 0) {
-		printf("failed to open q17_num_of_sense_freqs\n");
-		return -1;
+		LOGE("failed to open q17_num_of_sense_freqs\n");
 	}
-	printf("%s: fd_gearCount = %d\n", __FUNCTION__, fd);
+	else {
+		LOGE("%s: fd_gearCount = %d\n", __FUNCTION__, fd);
+		read(fd, val, 6);
+		gearCount = atoi(val);
+		printf("gearCount=%d\n", gearCount);
+	}
 	read(fd, val, 6);
 	gearCount = atoi(val);
 	printf("gearCount=%d\n", gearCount);
-
+	
+	INIT_REG(c146, int_dur_lsb, has_c146)
 	INIT_REG(c99, int_dur_lsb, has_c99)
 	INIT_REG(c95, filter_bw, has_c95)
 	INIT_REG(c95, first_burst_length_lsb, has_c95)
 	INIT_REG(c95, first_burst_length_msb, has_c95)
-	INIT_REG(c146, int_dur_lsb, has_c146)
+
+        INIT_REG(pixel, touch_threshold, has_pixel_touch_threshold)
+	INIT_REG(number, of_sensing_frequencies, has_number_of_sensing_frequencies)
+	INIT_REG(integration, duration, has_integration_duration)
+
+	LOGE("testing gearCount and has_number_of_sensing_frequencies");
+	if (!gearCount && has_number_of_sensing_frequencies) {
+		LOGE("gearCount is 0");
+		gearCount = READ_REG(number, of_sensing_frequencies);
+		LOGE("gearCount is %d from number_of_sensing_frequencies", gearCount);
+	}
+
+	LOGE("testing has_c99 and has_integration_duration");
+	if (!has_c99 && has_integration_duration) {
+		LOGE("DEBUG: has_c99 is 0 and has_integration_duration is not, getter= %p", getc99int_dur_var);
+		REDEFINE_EXPORT_REG_EXT(int, c99, int_dur, TranscapIntDur, get_int_dur, set_int_dur);
+		LOGE("DEBUG: now getter is getter= %p, get_int_dur = %p", getc99int_dur_var, &get_int_dur);
+	//	getc99int_dur_var = 
+	}
+	if (!has_c146) {
+		LOGE("has_c146 is 0");
+		REDEFINE_EXPORT_REG_EXT(int, c146, int_dur, HybridIntDur, dummy_get, dummy_set);
+		//setc146int_dur_var = dummy_set;
+		
+	}
 
 	test_regs();
 
@@ -554,6 +649,7 @@ Java_com_motorola_ghostbusters_TouchDevice_diagInit(JNIEnv* env, jobject obj, js
 JNIEXPORT int JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagHasHybridBaselineControl(JNIEnv* env, jobject obj)
 {
+	LOGE("HasHybridBaselineControl is %d\n", has_c113);
 	if (has_c113)
 		return 1;
 	else
@@ -936,6 +1032,8 @@ int synaptics_report2(int16_t* data)
 	if (!(count % 100)) {
 		LOGE("Success counter = %d\n", count);
 	}
+
+	usleep(100000);
 
 	return 0;
 }
@@ -1368,11 +1466,17 @@ Java_com_motorola_ghostbusters_TouchDevice_diagFingerThreshold(JNIEnv* env, jobj
 		Threshold = strtol(val, NULL, 16) * 10 / 25 * SatCap / 100;
 		printf("%s: val=%s, Threshold=%d\n", __FUNCTION__, val, Threshold);
 	}
+	else if (has_pixel_touch_threshold) {
+		int pixel_touch_thresh = READ_REG(pixel, touch_threshold);
+		Threshold = SatCap * pixel_touch_thresh * .25 / 128; // TODO check RMI4 for coeff
+		printf("%s: val=%d, Threshold=%d\n", __FUNCTION__, pixel_touch_thresh, Threshold);
+	}
 
 //	Threshold = SatCap*20/100;
 	return Threshold;
 }
 
+// TODO: read hysteresis from register 
 // returns finger hysteresis value (absolute)
 JNIEXPORT int JNICALL
 Java_com_motorola_ghostbusters_TouchDevice_diagFingerHysteresis(JNIEnv* env, jobject obj)

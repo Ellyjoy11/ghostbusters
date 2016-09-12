@@ -852,6 +852,7 @@ public class SlideShow extends Activity {
                                 //Log.d(TAG, "getting data using diagDeltaPeaks for " + samples + " samples");
                                     Log.d(TAG, "test type is " + MainActivity.testType);
                                     maxmin = MainActivity.mDevice.diagDeltaPeaks(samples);
+                                //Log.d(TAG, "DEBUG: response from  diagDeltaPeaks = " + maxmin);
                                     //Log.d(TAG, "getting max and min from data");
                                     mMaxIm[i][gear] = maxmin / 65536;
                                     mMinIm[i][gear] = maxmin % 65536;
