@@ -61,6 +61,8 @@ public class SlideShow extends Activity {
     public static int mTxMin[][];
     public static int mMaxIm[][];
     public static int mMinIm[][];
+    public static int mMeanIm[][];
+    public static int mStdevIm[][];
 
     public static int cycleTestCounter;
 
@@ -81,8 +83,9 @@ public class SlideShow extends Activity {
     public static int c;
     public static boolean isDefault;
     public static int maxmin;
-    public static int maxminRx;
+    public static int [] maxmin2;
     public static int [] maxminRxTx;
+    public static int [] maxminRxTx2;
     public static boolean needSleep;
     public static boolean isRxEnabled;
     public static boolean isTxEnabled;
@@ -407,6 +410,9 @@ public class SlideShow extends Activity {
 
                  mMaxIm = new int[CYCLES][TouchDevice.diagGearCount() + 1];
                  mMinIm = new int[CYCLES][TouchDevice.diagGearCount() + 1];
+                mMeanIm = new int[CYCLES][TouchDevice.diagGearCount() + 1];
+                mStdevIm = new int[CYCLES][TouchDevice.diagGearCount() + 1];
+                maxmin2 = new int [4];
 
                 editor.commit();
              }
@@ -424,6 +430,7 @@ public class SlideShow extends Activity {
                  mTxMax = new int[CYCLES][MainActivity.stretches];
                  mTxMin = new int[CYCLES][MainActivity.stretches];
                  maxminRxTx = new int [4];
+                 maxminRxTx2 = new int [8];
                  editor.commit();
              }
 
@@ -440,6 +447,9 @@ public class SlideShow extends Activity {
                 MainActivity.mMinTxImC = new int[MainActivity.TEST_CYCLES][MainActivity.standardEntries + 50][MainActivity.stretches];
                 MainActivity.mMaxImC = new int[MainActivity.TEST_CYCLES][MainActivity.standardEntries + 50][TouchDevice.diagGearCount() + 1];
                 MainActivity.mMinImC = new int[MainActivity.TEST_CYCLES][MainActivity.standardEntries + 50][TouchDevice.diagGearCount() + 1];
+                MainActivity.mMeanImC = new int[MainActivity.TEST_CYCLES][MainActivity.standardEntries + 50][TouchDevice.diagGearCount() + 1];
+                MainActivity.mStdevImC = new int[MainActivity.TEST_CYCLES][MainActivity.standardEntries + 50][TouchDevice.diagGearCount() + 1];
+
             }
             Log.d(TAG, "test 2 and test 59 filter BW sweep: " + userPref.getBoolean("filterBW_2_done", false) + ".." +
                     userPref.getBoolean("filterBW_59_done", false));
@@ -669,8 +679,9 @@ public class SlideShow extends Activity {
                 }
 
                 editor.commit();
-                    Intent intent = new Intent(this, CycleTestChart.class);
-                    startActivity(intent);
+
+                Intent intent = new Intent(this, CycleTestChart.class);
+                startActivity(intent);
         } else {
                 finish();
                 Intent intent = new Intent(getApplicationContext(),
@@ -853,18 +864,26 @@ public class SlideShow extends Activity {
                                     Log.d(TAG, "test type is " + MainActivity.testType);
                                     maxmin = MainActivity.mDevice.diagDeltaPeaks(samples);
                                 //Log.d(TAG, "DEBUG: response from  diagDeltaPeaks = " + maxmin);
+                                    //maxmin2 = MainActivity.mDevice.diagDeltaPeaks2(samples);
                                     //Log.d(TAG, "getting max and min from data");
-                                    mMaxIm[i][gear] = maxmin / 65536;
-                                    mMinIm[i][gear] = maxmin % 65536;
+                                mMaxIm[i][gear] = maxmin / 65536;
+                                mMinIm[i][gear] = maxmin % 65536;
+                                //mMaxIm[i][gear] = maxmin2[0];
+                                    //mMinIm[i][gear] = maxmin2[1];
+                                    //mMeanIm[i][gear] = maxmin2[2];
+                                    //mStdevIm[i][gear] = maxmin2[3];
                                 if (mMaxIm != null) {
                                     // if (MainActivity.isCycleTest) {
                                     MainActivity.mMaxImC[cycleTestCounter][i][gear] = mMaxIm[i][gear];
-                                    MainActivity.mMinImC[cycleTestCounter][i][gear] = mMaxIm[i][gear];
+                                    MainActivity.mMinImC[cycleTestCounter][i][gear] = mMinIm[i][gear];
+                                    //MainActivity.mMeanImC[cycleTestCounter][i][gear] = mMeanIm[i][gear];
+                                    //MainActivity.mStdevImC[cycleTestCounter][i][gear] = mStdevIm[i][gear];
                                     int tmpEvCount = TouchDevice.diagTouchEventCount();
                                     MainActivity.eventCountReport2[cycleTestCounter][gear] += tmpEvCount;
                                     // }
 
                                     Log.d(TAG, "max/min for image " + imgNamesToShow[i] + " for gear " + gear + ": " + mMaxIm[i][gear] + "/" + mMinIm[i][gear]);
+                                    //Log.d(TAG, "mean/stdev for image " + imgNamesToShow[i] + " for gear " + gear + ": " + mMeanIm[i][gear] + "/" + mStdevIm[i][gear]);
                                     Log.d(TAG, "adding event counts: " + tmpEvCount + "; total events for test cycle " + cycleTestCounter + " for gear " + gear + " = " + MainActivity.eventCountReport2[cycleTestCounter][gear]);
                                     TouchDevice.diagDisableTouch();
                                 }
@@ -897,6 +916,7 @@ public class SlideShow extends Activity {
                                     Log.d(TAG, "test type is " + MainActivity.testType);
                                     //maxminRx = MainActivity.mDevice.diagRxDeltaPeaks(samples);
                                     maxminRxTx = MainActivity.mDevice.diagRxTxDeltaPeaks(samples, 59);
+                                    //maxminRxTx2 = MainActivity.mDevice.diagRxTxDeltaPeaks(samples, 59);
                                     //Log.d(TAG, "getting max and min from data");
                                 if (maxminRxTx != null) {
                                     mRxMax[i][stretch] = maxminRxTx[3];

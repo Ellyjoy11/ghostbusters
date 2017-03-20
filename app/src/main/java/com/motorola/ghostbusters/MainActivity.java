@@ -98,6 +98,8 @@ public class MainActivity extends Activity {
 
     public static int mMaxImC[][][];
     public static int mMinImC[][][];
+    public static int mMeanImC[][][];
+    public static int mStdevImC[][][];
 
     public static int mMaxRxImC[][][];
     public static int mMinRxImC[][][];
@@ -245,7 +247,7 @@ public class MainActivity extends Activity {
         editor.putString("int_base59", Integer.toString(intTimeBase59default));
         editor.putString("bw_base", Integer.toString(filterBwBase)); //TBD Integer.toString(intTimeBase59default));
         if (!userPref.getBoolean("intBasesSet", false)) {
-            editor.putString("stretches", Integer.toString(gearsCount + 1));
+            editor.putString("stretches", "1");
             //editor.putString("bw_base", "0");
             editor.putBoolean("intBasesSet", true);
         }
@@ -304,11 +306,11 @@ public class MainActivity extends Activity {
         int intbase2 = Integer.parseInt(userPref.getString("int_base2", Integer.toString(intTimeBase2default)));
         int intbase59 = Integer.parseInt(userPref.getString("int_base59", Integer.toString(intTimeBase59default)));
 
-        if ( intbase2 - intTimeRange < 1 ||
+        if (intbase2 - intTimeRange < 1 ||
                 intbase59 - intTimeRange < 1) {
             AlertDialog.Builder builder = new AlertDialog.Builder((new ContextThemeWrapper(this, R.style.Theme_CustDialog)));
             builder.setMessage(
-                    "Range is too big, IntDur can't be negative! " + intbase2 + " " + intbase59)
+                    "Range is too big, IntDur can't be negative!" + intbase2 + " " + intbase59)
                     .setTitle("Oops...");
 
             builder.setPositiveButton("OK",
@@ -326,7 +328,7 @@ public class MainActivity extends Activity {
             dialog.show();
         }
 
-        stretches = Integer.parseInt(userPref.getString("stretches", Integer.toString(gearsCount + 1)));
+        stretches = Integer.parseInt(userPref.getString("stretches", "1"));
         intTimeRange = Integer.parseInt(userPref.getString("int_time", "0"));
         filterBwRange = Integer.parseInt(userPref.getString("bw_range", "0"));
 
@@ -1157,6 +1159,8 @@ public class MainActivity extends Activity {
         if (!userPref.getBoolean("report2_data_exists", false) || TEST_CYCLES != userPref.getInt("cycles_done_2", 0) || mMaxImC == null) {
             mMaxImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
             mMinImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
+            mMeanImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
+            mStdevImC = new int[TEST_CYCLES][standardEntries + 50][mDevice.diagGearCount() + 1];
             eventCountReport2 = new int[TEST_CYCLES][mDevice.diagGearCount() + 1];
            // if (bwEnd > 0) {
            //     editor.putBoolean("filterBW_2_done", false);

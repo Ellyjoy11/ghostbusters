@@ -44,7 +44,7 @@ public class SettingsFragment extends PreferenceFragment implements
         Preference intBase59 = (Preference) findPreference("int_base59");
         intBase59.setDefaultValue(Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
         Preference stretches = (Preference) findPreference("stretches");
-        stretches.setDefaultValue(Integer.toString(MainActivity.mDevice.diagGearCount()+1));
+        stretches.setDefaultValue("1");
         Preference bwBase = (Preference) findPreference("bw_base");
         bwBase.setDefaultValue(Integer.toString(MainActivity.getC95FilterBwBurstLen()));
         PreferenceManager.setDefaultValues(getActivity(), R.xml.pref_general, false);
@@ -99,7 +99,7 @@ public class SettingsFragment extends PreferenceFragment implements
                     //editor.putString("int_base59", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
                     editor.putString("int_time", "0");
                     editor.putString("bw_range", "0");
-                    editor.putString("stretches", Integer.toString(MainActivity.gearsCount + 1));
+                    editor.putString("stretches", "1");
                     CheckBoxPreference checkCustImg = (CheckBoxPreference) findPreference("custom");
                     checkCustImg.setChecked(false);
                     editor.putString("custom_path", "Enter path to images");
@@ -127,8 +127,11 @@ public class SettingsFragment extends PreferenceFragment implements
         editor.putString("int_base2", Integer.toString(MainActivity.mDevice.diagTranscapIntDur()));
         editor.putString("int_base59", Integer.toString(MainActivity.mDevice.diagHybridIntDur()));
         editor.putString("bw_base", Integer.toString(MainActivity.getC95FilterBwBurstLen()));
-        editor.putString("bw_range", "0");
-        needTouchReset = false;
+        /*if (needTouchReset) {
+            editor.putString("bw_range", "0");
+            needTouchReset = false;
+        }
+        */
         editor.commit();
 
         setSummary();

@@ -9,7 +9,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 21
         versionCode 1
-        versionName "1.2.2"
+        versionName "1.2.3"
 
         ndk {
             moduleName "synaptics"
@@ -29,6 +29,6 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     //compile "com.android.support:appcompat-v7:22.1.0"
-
+    compile files ('libs/javacsv.jar')
     compile 'com.android.support:support-v4:22.2.1'
 }
