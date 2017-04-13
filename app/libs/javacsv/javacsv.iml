@@ -15,7 +15,10 @@
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$/../../../javacsv">
+      <excludeFolder url="file://$MODULE_DIR$/../../../javacsv/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../javacsv/build" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>

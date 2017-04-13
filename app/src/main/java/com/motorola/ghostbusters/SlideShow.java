@@ -680,6 +680,12 @@ public class SlideShow extends Activity {
 
                 editor.commit();
 
+                int exp = ExportResults.exportResToCsv();
+                if (exp == 1) {
+                    Toast.makeText(getApplicationContext(), "results are saved in " + ExportResults.resultsFile.getAbsolutePath(),
+                            Toast.LENGTH_SHORT).show();
+                }
+
                 Intent intent = new Intent(this, CycleTestChart.class);
                 startActivity(intent);
         } else {
