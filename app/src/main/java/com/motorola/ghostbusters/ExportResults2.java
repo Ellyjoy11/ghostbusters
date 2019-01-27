@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Created by elenalast on 3/19/17.
  */
-public class ExportResults {
+public class ExportResults2 {
     private final static String TAG = "Ghostbusters";
 
     public static File resultsFile;
@@ -60,19 +60,16 @@ public class ExportResults {
         new File("sdcard" + File.separator + "Ghostbusters_results").mkdirs();
         exportDir = new File("sdcard" + File.separator + "Ghostbusters_results");
 
-        if (MainActivity.testType.contains("2")) {
             if (report2ToFile()==1) {
                 return 1;
             } else {
                 return 0;
             }
-        }
-
-        return 0;
     }
 
     public static int report2ToFile() {
-        resultsFile = new File(exportDir.getAbsolutePath(), MainActivity.product + "-" + Build.SERIAL + "-Ghostbusters-Report2.csv");
+        resultsFile = new File(exportDir.getAbsolutePath(), MainActivity.product + "-" + MainActivity.HWrev + "-" + Build.SERIAL +
+                "-" + MainActivity.touchCfg + "-Report2.csv");
 
 
         try {
@@ -92,63 +89,41 @@ public class ExportResults {
             CsvWriter csvWrite = new CsvWriter(new FileWriter(resultsFile, true), ',');
             List<String> columnNames = new ArrayList<>();
             columnNames.add("product");
+            columnNames.add("HW rev");
             columnNames.add("serial");
             columnNames.add("imgMask");
-            columnNames.add("min/max");
             columnNames.add("intDur");
+            columnNames.add("threshold.min");
+            columnNames.add("threshold.max");
             for (int i=0;i<MainActivity.gearsCount;i++) {
-                columnNames.add("gear" + i);
+                columnNames.add("gear" + i +".min");
+                columnNames.add("gear" + i +".max");
             }
-            columnNames.add("auto");
+            columnNames.add("auto.min");
+            columnNames.add("auto.max");
 
             csvWrite.writeRecord(columnNames.toArray(new String[0]));
             //Records/////////////
             sortValuesRep2();
             List<String> valuesToWrite1 = new ArrayList<>();
-            List<String> valuesToWrite2 = new ArrayList<>();
             for (int j=0; j < MainActivity.TEST_CYCLES; j++) {
                 valuesToWrite1.add(MainActivity.product);
+                valuesToWrite1.add(MainActivity.HWrev);
                 valuesToWrite1.add(MainActivity.barcode);
                 valuesToWrite1.add(MainActivity.imgMaskAsString);
-                valuesToWrite1.add("min");
                 valuesToWrite1.add(Integer.toString(MainActivity.intTime2[j]));
-                valuesToWrite2.add(" ");
-                valuesToWrite2.add(" ");
-                valuesToWrite2.add(" ");
-                valuesToWrite2.add("max");
-                valuesToWrite2.add(" ");
+                valuesToWrite1.add(Integer.toString(-1*MainActivity.threshold));
+                valuesToWrite1.add(Integer.toString(MainActivity.threshold));
+
                 for (int k=0; k < MainActivity.gearsCount+1; k++) {
                     valuesToWrite1.add(Integer.toString(-1*allMinV[j][k]));
-                    valuesToWrite2.add(Integer.toString(allMaxV[j][k]));
+                    valuesToWrite1.add(Integer.toString(allMaxV[j][k]));
                 }
                 csvWrite.writeRecord(valuesToWrite1.toArray(new String[0]));
-                csvWrite.writeRecord(valuesToWrite2.toArray(new String[0]));
                 valuesToWrite1.clear();
-                valuesToWrite2.clear();
             }
-            valuesToWrite1.add(" ");
-            valuesToWrite1.add(" ");
-            valuesToWrite1.add("");
-            valuesToWrite1.add("");
-            valuesToWrite1.add("minThreshold");
-            valuesToWrite2.add(" ");
-            valuesToWrite2.add(" ");
-            valuesToWrite2.add(" ");
-            valuesToWrite2.add(" ");
-            valuesToWrite2.add("maxThreshold");
-            for (int k=0; k < MainActivity.gearsCount+1; k++) {
-                if (k==0 || k==MainActivity.gearsCount) {
-                    valuesToWrite1.add(Integer.toString(-1*MainActivity.threshold));
-                    valuesToWrite2.add(Integer.toString(MainActivity.threshold));
-                } else {
-                    valuesToWrite1.add(" ");
-                    valuesToWrite2.add(" ");
-                }
-            }
-            csvWrite.writeRecord(valuesToWrite1.toArray(new String[0]));
-            csvWrite.writeRecord(valuesToWrite2.toArray(new String[0]));
-            valuesToWrite1.clear();
-            valuesToWrite2.clear();
+            //csvWrite.writeRecord(valuesToWrite1.toArray(new String[0]));
+            //valuesToWrite1.clear();
 
             csvWrite.close();
         }

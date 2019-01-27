@@ -4,6 +4,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="action_show_chart">Report data chart</string>
+    <string name="action_upload_to_gcs">Upload data to Cloud Storage</string>
     <string name="action_show_stats">Touch statistics</string>
     <string name="about">About</string>
     <string name="check_im">Select images for test</string>

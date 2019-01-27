@@ -33,13 +33,14 @@ import java.util.Arrays;
 
 
 public class MainActivity extends Activity {
-    public static final String ABOUT_TITLE = "\u00a9 2015-2016\n" +
+    public static final String ABOUT_TITLE = "\u00a9 2015-2017\n" +
             "Igor Kovalenko\nElena Last\nAlex Filonenko\nKonstantin Makariev";
     public static String ABOUT_VERSION;
     private final static String TAG = "Ghostbusters";
 
     public static String touchFWPath;
     public static String product;
+    public static String HWrev = "";
     public static String barcode;
     public static String touchCfg;
     public static String productInfo;
@@ -398,6 +399,20 @@ public class MainActivity extends Activity {
         touchCfg = getTouchCfg();
         panel = getPanelType();
 
+        String line;
+        try {
+            Process pr = Runtime.getRuntime().exec("getprop ro.hw.revision");
+            BufferedReader in = new BufferedReader(new InputStreamReader(
+                    pr.getInputStream()));
+            while ((line = in.readLine()) != null) {
+                HWrev = line;
+                //Log.d(TAG, "adding: " + line);
+            }
+            in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         String textForProductInfo = "Product: " + productInfo + "  Config: " + touchCfg;
         if (!panel.isEmpty()) {
             textForProductInfo += " Panel: " + panel;
@@ -577,6 +592,11 @@ public class MainActivity extends Activity {
         if (item.getItemId() == R.id.action_show_stats) {
             Intent intent = new Intent(this, PieChartShow.class);
             startActivity(intent);
+            return true;
+        }
+
+        if (item.getItemId() == R.id.action_upload_to_gcs) {
+            UploadResults.uploadFunction(this);
             return true;
         }
 

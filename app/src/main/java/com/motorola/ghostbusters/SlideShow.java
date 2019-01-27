@@ -52,8 +52,8 @@ public class SlideShow extends Activity {
     public static int gearsSetDoneRx=0;
     public static String testTypeDone="";
 
-    public static String imgUri;
-    public static String imgUriDone;
+    public static String imgUri = "";
+    public static String imgUriDone = "";
 
     public static int mRxMax[][];
     public static int mRxMin[][];
@@ -356,7 +356,7 @@ public class SlideShow extends Activity {
         gearsSet = userPref.getInt("gearsMask", 0);
         Log.d(TAG, "read gears set from pref: " + gearsSet);
         //isModeAuto = userPref.getBoolean("isAuto", true);
-        imgUri = userPref.getString("uri", null);
+        imgUri = userPref.getString("uri", "");
         imgNames = getImgNames();
 
 
@@ -672,19 +672,23 @@ public class SlideShow extends Activity {
                 editor.putInt("cycle_counter", 0);
                 if (testTypeDone.contains("2")) {
                     editor.putInt("cycles_done_2", cycleTestCounter+1);
+                    int exp = ExportResults2.exportResToCsv();
+                    if (exp == 1) {
+                        Toast.makeText(getApplicationContext(), "results are saved in " + ExportResults2.resultsFile.getAbsolutePath(),
+                                Toast.LENGTH_SHORT).show();
+                    }
                 }
                 if (testTypeDone.contains("59")) {
                     editor.putInt("cycles_done_59", cycleTestCounter+1);
                     editor.putInt("stretches_done", MainActivity.stretches);
+                    int exp = ExportResults59.exportResToCsv();
+                    if (exp == 1) {
+                        Toast.makeText(getApplicationContext(), "results are saved in " + ExportResults59.resultsFile.getAbsolutePath(),
+                                Toast.LENGTH_SHORT).show();
+                    }
                 }
 
                 editor.commit();
-
-                int exp = ExportResults.exportResToCsv();
-                if (exp == 1) {
-                    Toast.makeText(getApplicationContext(), "results are saved in " + ExportResults.resultsFile.getAbsolutePath(),
-                            Toast.LENGTH_SHORT).show();
-                }
 
                 Intent intent = new Intent(this, CycleTestChart.class);
                 startActivity(intent);

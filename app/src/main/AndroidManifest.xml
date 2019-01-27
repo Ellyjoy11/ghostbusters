@@ -2,18 +2,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.motorola.ghostbusters"
     android:versionCode="1"
-    android:versionName="1.2.3"> <!-- The version MUST be updated in gradle.build!!! -->
+    android:versionName="1.2.4"> <!-- The version MUST be updated in gradle.build!!! -->
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"></uses-permission>
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:theme="@style/AppTheme"
-        >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -29,41 +32,41 @@
             android:name=".SlideShow"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_slide_show"
-            android:screenOrientation="portrait"
             android:noHistory="true"
-            android:theme="@style/Theme.NoTitleBar"></activity>
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.NoTitleBar" />
         <activity
             android:name=".ChartShow"
             android:configChanges="orientation"
             android:label="@string/title_activity_chart_show"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".CycleTestChart"
             android:configChanges="orientation"
             android:label="@string/title_activity_cycle_test_chart"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PieChartShow"
+            android:configChanges="orientation"
+            android:label="@string/title_activity_pie_chart_show"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".SetPreferences"
             android:label="@string/title_activity_set_preferences"
-            android:theme="@style/PreferencesTheme"></activity>
+            android:theme="@style/PreferencesTheme" />
         <activity
             android:name=".TouchRpt"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_touch_rpt"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.NoTitleBar"></activity>
+            android:theme="@style/Theme.NoTitleBar" />
         <activity
             android:name=".DisplayTest"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_display_test"
-            android:screenOrientation="portrait"
             android:noHistory="true"
-            android:theme="@style/Theme.NoTitleBar"></activity>
-        <activity
-            android:name=".PieChartShow"
-            android:configChanges="orientation"
-            android:label="@string/title_activity_pie_chart_show"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.NoTitleBar" />
     </application>
 
 </manifest>
